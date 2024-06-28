@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import { docco,github,monokai } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import {
+  docco,
+  github,
+  monokai,
+} from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 const Output = () => {
   const [option, setOption] = useState("Output");
@@ -9,32 +13,22 @@ const Output = () => {
   const [error, setError] = useState(false);
   const [errorCount, setErrorCount] = useState(0);
   const [warning, setWarning] = useState(0);
-    const [errors, setErrors] = useState("");
+  const [errors, setErrors] = useState("");
 
-    const [output, setOutput] = useState('Not Compiled');
-    const [files, setFiles] = useState('Still Not Compiled');
-    
-    let errorText = `Warning: Each child in a list should have a unique "key" prop.
+  const [output, setOutput] = useState("Not Compiled");
+  const [files, setFiles] = useState("Still Not Compiled");
+
+  //Sample Error Text
+  let errorText = `Warning: Each child in a list should have a unique "key" prop.
 
 Check the render method of App. See https://reactjs.org/link/warning-keys for more information.
 `;
-    
-    let outputText = `Ramcharan`
+  //Sample output Text
+  let outputText = `Ramcharan`;
 
   const handleChange = (event) => {
-      setOption(event.target.value);
-    //   if (event.target.value == 'Graphs') {
-    //       setError(true);
-    //       setErrors(errorText);
-    //   }
-    //   else if(event.target.value == 'Terminal'){
-    //       setError(false);
-    //       setOutput(outputText);
-    //   }
-    };
-    
-
-    
+    setOption(event.target.value);
+  };
 
   return (
     <div className="flex justify-center text-wrap m-2">
