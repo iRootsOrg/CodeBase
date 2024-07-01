@@ -5,10 +5,10 @@ import { CODE_SNIPPETS } from "../Utils/languages";
   
   const DropDown = ({ language, onSelect }) => {
     return (
-      <div className="ml-2 mb-4">
-  <label className="block mb-2 text-lg">Language:</label>
+      <div className="ml-2 mb-4 flex gap-2 mt-4 items-center">
+  <label className="block mb-2 text-lg font-semibold">Language:</label>
   <select
-    className="block w-20% px-4 py-2 rounded border border-gray-700 bg-gray-900 text-white focus:outline-none"
+    className="block w-20% px-4 py-1 rounded border border-gray-700 bg-gray-900 text-white focus:outline-none"
     value={language}
     onChange={(e) => onSelect(e.target.value)}
   >

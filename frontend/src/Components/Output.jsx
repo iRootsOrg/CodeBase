@@ -32,8 +32,8 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
       <div className="border-2 border-black flex flex-col h-auto w-[70vw]">
         <div className="flex justify-between p-3 border-b border-gray-600 text-lg">
           <div className="font-semibold">{option} : </div>
-          <div className="border border-black ">
-            <select
+          <div className=" ">
+            <select className="bg-black text-white rounded p-1"
               onChange={(event) => {
                 handleChange(event);
               }}
