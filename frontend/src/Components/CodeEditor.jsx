@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { Box} from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import DropDown from "./DropDown";
 import { CODE_SNIPPETS} from "../Utils/languages"
@@ -21,8 +20,8 @@ const CodeEditor = () => {
   };
 
   return (
-   
-        <Box w="100%">
+   <div> 
+        
           <DropDown language={language} onSelect={onSelect} />
           <Editor
             options={{
@@ -38,7 +37,7 @@ const CodeEditor = () => {
             value={value}
             onChange={(value) => setValue(value)}
           />
-        </Box>
+       </div>
    
   );
 };
