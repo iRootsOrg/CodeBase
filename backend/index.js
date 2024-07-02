@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path")
 const fileRoutes=require("./routes/fileRoutes")
+const userRoutes = require("./routes/userRoutes")
 const connectDB=require("./config/db")
 const fileUpload = require("express-fileupload");
 
@@ -21,6 +22,7 @@ app.use(fileUpload());
 const PORT = process.env.PORT;
 
 app.use("/api/v1/file",fileRoutes);
+app.use("/api/v1/user", userRoutes);
 
 app.get("/", (req, res) => {
     res.send({
