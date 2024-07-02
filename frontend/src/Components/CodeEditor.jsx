@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
 import DropDown from "./DropDown";
 import { CODE_SNIPPETS} from "../Utils/languages"
-
+import Run from "./Run";
 
 const CodeEditor = () => {
   const editorRef = useRef();
@@ -20,25 +20,26 @@ const CodeEditor = () => {
   };
 
   return (
-   <div> 
-        
-          <DropDown language={language} onSelect={onSelect} />
-          <Editor
-            options={{
-              minimap: {
-                enabled: false,
-              },
-            }}
-            height="75vh"
-            theme="vs-dark"
-            language={language}
-            defaultValue={CODE_SNIPPETS[language]}
-            onMount={onMount}
-            value={value}
-            onChange={(value) => setValue(value)}
-          />
-       </div>
-   
+    <div>
+      <div className="flex justify-between mr-4 items-center">
+        <DropDown language={language} onSelect={onSelect} />
+        <Run />
+      </div>
+      <Editor
+        options={{
+          minimap: {
+            enabled: false,
+          },
+        }}
+        height="75vh"
+        theme="vs-dark"
+        language={language}
+        defaultValue={CODE_SNIPPETS[language]}
+        onMount={onMount}
+        value={value}
+        onChange={(value) => setValue(value)}
+      />
+    </div>
   );
 };
 export default CodeEditor;
