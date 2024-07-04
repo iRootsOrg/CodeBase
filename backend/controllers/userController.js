@@ -4,7 +4,7 @@ const User = require('../models/userModel');
 
 async function registerUser(req, res) {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, role } = req.body;
 
         if (!username || !email || !password) {
             return res.status(400).json({ message: 'Please provide all required fields.' });
@@ -16,6 +16,7 @@ async function registerUser(req, res) {
             username,
             email,
             password: hashedPassword,
+            role
         });
 
         await newUser.save();
