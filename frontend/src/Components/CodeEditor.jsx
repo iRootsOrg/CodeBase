@@ -1,15 +1,18 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Editor } from "@monaco-editor/react";
 import DropDown from "./DropDown";
 import { CODE_SNIPPETS} from "../Utils/languages";
 import { BiCodeAlt } from "react-icons/bi";
 import Run from "./Run";
 
-
-const CodeEditor = () => {
+const CodeEditor = (props) => {
   const editorRef = useRef();
-  const [value, setValue] = useState("");
-  const [language, setLanguage] = useState("javascript");
+ 
+  const [language, setLanguage] = useState("Javascript");
+
+  useEffect(() => {
+    props.setValue(CODE_SNIPPETS[language]);
+  },[])
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -17,11 +20,13 @@ const CodeEditor = () => {
   };
   const onSelect = (language) => {
     setLanguage(language);
-    setValue(CODE_SNIPPETS[language]);
+    props.setValue(CODE_SNIPPETS[language]);
   };
+  
   const formatCode = () => {
     editorRef.current.getAction('editor.action.formatDocument').run();
   };
+  
 
   return (
     <div>
@@ -48,8 +53,8 @@ const CodeEditor = () => {
         language={language}
         defaultValue={CODE_SNIPPETS[language]}
         onMount={onMount}
-        value={value}
-        onChange={(value) => setValue(value)}
+        value={props.value}
+        onChange={(value) => props.setValue(value)}
       />
     </div>
   );
