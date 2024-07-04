@@ -15,7 +15,6 @@ const CodeEditor = () => {
     editorRef.current = editor;
     editor.focus();
   };
-  
   const onSelect = (language) => {
     setLanguage(language);
     setValue(CODE_SNIPPETS[language]);
@@ -28,6 +27,7 @@ const CodeEditor = () => {
     <div>
       <div className="flex justify-between mr-4 items-center">
         <DropDown language={language} onSelect={onSelect} />
+
         <div className="flex">
         <button className="h-10 w-10 mx-3 flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hover:bg-blue-600" onClick={formatCode}>
   <BiCodeAlt className="text-xl" />

@@ -161,6 +161,24 @@ const decodeController = async (req, res) => {
     }
 };
 
+const decodeController = async (req, res) => {
+    if (!req.body.fileId) {
+        return res.status(400).send("No filename provided.");
+    }
+
+    try {
+        const fileId = req.body.fileId;
+        const file = await File.findById(fileId);
+        if (!file) {
+            return res.status(404).send("File not found.");
+        }
+
+        const decodedFile = Buffer.from(file.file, 'binary').toString('utf-8');
+        res.status(200).send(decodedFile);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+}
 
 module.exports = {
     uploadController,
