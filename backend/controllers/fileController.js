@@ -10,7 +10,7 @@ const handleFileUpload = async (file, authorId) => {
         filename: file.name,
         language: file.language,
         file: file.data,
-        authorId: authorId,  // Use the passed authorId
+        authorId: authorId,  
         createdAt: new Date(),
         updatedAt: new Date(),
         tags: file.tags || [],
@@ -65,7 +65,7 @@ const uploadController = async (req, res) => {
             return res.status(400).send("No main file named 'file' found in the request.");
         }
 
-        // Ensure authorId is available
+        
         if (!req.userId) {
             return res.status(401).send("User not authenticated.");
         }
@@ -74,7 +74,7 @@ const uploadController = async (req, res) => {
         try {
             testCases = JSON.parse(req.body.testCases);
             if (!Array.isArray(testCases)) {
-                testCases = [testCases]; // If it's a single object, wrap it in an array
+                testCases = [testCases]; 
             }
         } catch (error) {
             return res.status(400).send("Invalid testCases format. Must be a valid JSON array.");
@@ -86,7 +86,7 @@ const uploadController = async (req, res) => {
             return res.status(400).send("Invalid testCase structure. Each testCase must have 'inputs' and 'outputs' arrays.");
         }
 
-        // Process test case files
+        
         const processedTestCases = await Promise.all(testCases.map(async testCase => ({
             inputs: await Promise.all(testCase.inputs.map(async input => {
                 if (input.type === 'file' && input.file) {
