@@ -1,7 +1,40 @@
 import subprocess
 import os
+import hashlib
+import pickle
 
-def execute_code(file_path):
+# Define the cache file location
+cache_file = 'cache.pkl'
+
+def load_cache():
+    """Load the cache from the file if it exists."""
+    if os.path.exists(cache_file):
+        with open(cache_file, 'rb') as f:
+            return pickle.load(f)
+    return {}
+
+def save_cache(cache):
+    """Save the cache to the file."""
+    with open(cache_file, 'wb') as f:
+        pickle.dump(cache, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+def get_file_hash(file_path, block_size=65536):
+    """Calculate SHA-256 hash of the file content in chunks for efficiency."""
+    hasher = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        buf = f.read(block_size)
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = f.read(block_size)
+    return hasher.hexdigest()
+
+def read_input_from_file(input_file):
+    """Read input data from a specified file."""
+    with open(input_file, 'r') as f:
+        return f.read().strip()
+
+def execute_code(file_path, cache):
+    """Compile and run the code if not cached; otherwise, return the cached result."""
     # Define compile and run commands based on file extension
     language_settings = {
         '.py': {
@@ -10,7 +43,7 @@ def execute_code(file_path):
         },
         '.cpp': {
             'compile_cmd': ['g++', '{file_path}', '-o', '{file_base}.out'],
-            'run_cmd': ['{file_base}.out']
+            'run_cmd': ['./{file_base}.out']
         },
         '.java': {
             'compile_cmd': ['javac', '{file_path}'],
@@ -36,21 +69,41 @@ def execute_code(file_path):
 
     file_base, _ = os.path.splitext(file_path)
 
+    # Calculate file hash
+    file_hash = get_file_hash(file_path)
+
+    # Read inputs from input.txt file
+    input_data = read_input_from_file('input.txt')
+
+    # Check if result is already in cache, considering input
+    if file_hash in cache and 'input' in cache[file_hash]:
+        cached_input = cache[file_hash]['input']
+        if cached_input == input_data:
+            return cache[file_hash]['output']
+
     try:
         # Compile the code if necessary
         if compile_cmd:
             compile_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in compile_cmd]
             compile_process = subprocess.run(compile_cmd, capture_output=True, text=True)
             if compile_process.returncode != 0:
-                return f"Compilation Error:\n{compile_process.stderr}"
+                return f"Compilation Error:\n{compile_process.stderr.strip()}"
 
         # Run the code
-        run_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in run_cmd]
-        run_process = subprocess.run(run_cmd, capture_output=True, text=True)
-        if run_process.returncode != 0:
-            return f"Runtime Error:\n{run_process.stderr}"
+        if input_data:
+            run_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in run_cmd]
+            run_process = subprocess.run(run_cmd, input=input_data, capture_output=True, text=True)
+        else:
+            run_process = subprocess.run(run_cmd, capture_output=True, text=True)
 
-        return run_process.stdout
+        if run_process.returncode != 0:
+            return f"Runtime Error:\n{run_process.stderr.strip()}"
+
+        # Cache the result along with the input
+        output = run_process.stdout
+        cache[file_hash] = {'output': output, 'input': input_data}
+        save_cache(cache)
+        return output
 
     finally:
         # Check if the files are present before removing them
@@ -62,14 +115,15 @@ def execute_code(file_path):
 
 # Main script
 if __name__ == '__main__':
+    cache = load_cache()
     print("Files available in the current directory:")
-    for file_name in os.listdir('.'):
-        if os.path.isfile(file_name):
-            print(file_name)
+    current_files = [file_name for file_name in os.listdir('.') if os.path.isfile(file_name) and file_name != 'main.py']
+    for file_name in current_files:
+        print(file_name)
 
     file_to_execute = input("\nEnter the filename you want to execute: ")
     if not os.path.isfile(file_to_execute):
         print("File not found in the current directory.")
     else:
-        output = execute_code(file_to_execute)
+        output = execute_code(file_to_execute, cache)
         print(f"Output:\n{output}")
