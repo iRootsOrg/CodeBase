@@ -40,7 +40,6 @@ const fileSchema = new mongoose.Schema({
     authorId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'User',
-        unique:true,
         required: true,
     },
     createdAt: {
@@ -53,7 +52,6 @@ const fileSchema = new mongoose.Schema({
     },
     tags: {
         type:[String],
-        unique: true
     }, 
     description: {
         type:String
@@ -62,6 +60,7 @@ const fileSchema = new mongoose.Schema({
 });
 
 const File = mongoose.model("File", fileSchema);
+
 module.exports = File;
 
 
