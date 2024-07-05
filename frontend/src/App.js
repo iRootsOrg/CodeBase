@@ -8,7 +8,8 @@ import { useState, useEffect } from "react";
 import Folder from "./Components/Folder.jsx";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import light from "react-syntax-highlighter/dist/cjs/light.js";
+import Run from "./Components/Run.jsx";
+import RunAll from "./Components/RunAll.jsx"
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
 function App() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
@@ -80,11 +81,11 @@ function App() {
   });
 
   //Sample Folders
-const [lightmode, setLightMode] = useState(true);
+  const [lightmode, setLightMode] = useState(true);
 
-const handleLight = () => {
-  setLightMode(!lightmode);
-};
+  const handleLight = () => {
+    setLightMode(!lightmode);
+  };
   const [folderIndex, setFolderIndex] = useState(-1);
   const [fileIndex, setFileIndex] = useState(-1);
   const [selectedFiles, setSelectedFiles] = useState(null);
@@ -93,10 +94,10 @@ const handleLight = () => {
     setMsg("");
   };
 
-    const copyToClipboard = () => {
-      navigator.clipboard.writeText("https://example.com");
-      alert("URL copied to clipboard!");
-    };
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText("https://example.com");
+    alert("URL copied to clipboard!");
+  };
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -109,8 +110,6 @@ const handleLight = () => {
       closeMsg();
     }, 4000);
   };
-
-  
 
   // useEffect(() => {
   //   setTimeout(() => {
@@ -127,62 +126,82 @@ const handleLight = () => {
     setNewFolderName(e.target.value);
   };
 
- const addNewFolder = () => {
-   setFolderFiles((prevState) => ({
-     ...prevState,
-     folders: [
-       ...prevState.folders,
-       {
-         name: newFolderName,
-         files: [],
-       },
-     ],
-   }));
+  const addNewFolder = () => {
+    setFolderFiles((prevState) => ({
+      ...prevState,
+      folders: [
+        ...prevState.folders,
+        {
+          name: newFolderName,
+          files: [],
+        },
+      ],
+    }));
 
-   setOpenNewFolder(false);
-   setNewFolderName("");
- };
+    setOpenNewFolder(false);
+    setNewFolderName("");
+  };
 
   const updateChangeCode = () => {
     const updateFileCode = (folderIndex, fileIndex, newCode, newLanguage) => {
       setFolderFiles((prevFolderFiles) => {
-        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
-          if (fIndex === folderIndex) {
-            return {
-              ...folder,
-              files: folder.files.map((file, fiIndex) => {
-                if (fiIndex === fileIndex) {
-                  return {
-                    ...file,
-                    code: newCode,
-                    language: newLanguage,
-                  };
-                }
-                return file;
-              }),
-            };
-          }
-          return folder;
-        });
+        if (folderIndex === -1) {
+          // Update extraFiles
+          const newExtraFiles = prevFolderFiles.extraFiles.map(
+            (file, fiIndex) => {
+              if (fiIndex === fileIndex) {
+                return {
+                  ...file,
+                  code: newCode,
+                  language: newLanguage,
+                };
+              }
+              return file;
+            }
+          );
+          return {
+            ...prevFolderFiles,
+            extraFiles: newExtraFiles,
+          };
+        } else {
+          // Update files within a folder
+          const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
+            if (fIndex === folderIndex) {
+              return {
+                ...folder,
+                files: folder.files.map((file, fiIndex) => {
+                  if (fiIndex === fileIndex) {
+                    return {
+                      ...file,
+                      code: newCode,
+                      language: newLanguage,
+                    };
+                  }
+                  return file;
+                }),
+              };
+            }
+            return folder;
+          });
 
-        return {
-          ...prevFolderFiles,
-          folders: newFolders,
-        };
+          return {
+            ...prevFolderFiles,
+            folders: newFolders,
+          };
+        }
       });
     };
 
     // Usage example:
-    updateFileCode(folderIndex, fileIndex, value,language);
+    updateFileCode(folderIndex, fileIndex, value, language);
 
     // Post request sending can be implemented here
   };
 
-
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1) {
-      folderfiles.forEach((folder) => {
+      folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
           folderZip.file(`${file.name}.${file.language}`, file.code);
@@ -225,77 +244,9 @@ const handleLight = () => {
 
   return (
     <div className="flex h-screen">
-      <ToolBar
-        folderopen={folderopen}
-        setFolderOpen={setFolderOpen}
-        value={value}
-        setValue={setValue}
-        updateChangeCode={updateChangeCode}
-        zipAndDownload={zipAndDownload}
-        handleFileUpload={handleFileUpload}
-        lightmode={lightmode}
-        setLightMode={setLightMode}
-        handleLight={handleLight}
-        shareOpen={shareOpen}
-        setShareOpen={setShareOpen}
-        infoOpen={infoOpen}
-        setInfoOpen={setInfoOpen}
-      />
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex overflow-hidden">
-          {folderopen === true ? (
-            <div className="w-48 bg-gray-100 ">
-              <Folder
-                folderfiles={folderfiles}
-                setFolderFiles={setFolderFiles}
-                opennewfolder={opennewfolder}
-                setOpenNewFolder={setOpenNewFolder}
-                value={value}
-                setValue={setValue}
-                folderIndex={folderIndex}
-                setFolderIndex={setFolderIndex}
-                fileIndex={fileIndex}
-                setFileIndex={setFileIndex}
-                language={language}
-                setLanguage={setLanguage}
-              />
-
-              {opennewfolder === true ? (
-                <div className="flex gap-2 hover:text-blue-600 font-semibold text-lg p-2 w-full items-center">
-                  <div>📁</div>
-                  <input
-                    value={newFolderName}
-                    onChange={(e) => {
-                      handleFolderName(e);
-                    }}
-                    className="w-20 focus:outline-none"
-                  ></input>
-
-                  <button
-                    onClick={() => {
-                      addNewFolder();
-                    }}
-                  >
-                    ✔️
-                  </button>
-                  <button
-                    onClick={() => {
-                      setOpenNewFolder(false);
-                      setNewFolderName("");
-                    }}
-                  >
-                    🗑️
-                  </button>
-                </div>
-              ) : (
-                ""
-              )}
-            </div>
-          ) : (
-            ""
-          )}
-
-          <div className="flex-1 h-full ">
+          <div className="flex-1 h-[96%] ">
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -306,6 +257,27 @@ const handleLight = () => {
               lightmode={lightmode}
               setLightMode={setLightMode}
               handleLight={handleLight}
+              folderopen={folderopen}
+              setFolderOpen={setFolderOpen}
+              updateChangeCode={updateChangeCode}
+              zipAndDownload={zipAndDownload}
+              handleFileUpload={handleFileUpload}
+              shareOpen={shareOpen}
+              setShareOpen={setShareOpen}
+              infoOpen={infoOpen}
+              setInfoOpen={setInfoOpen}
+              folderfiles={folderfiles}
+              setFolderFiles={setFolderFiles}
+              opennewfolder={opennewfolder}
+              setOpenNewFolder={setOpenNewFolder}
+              folderIndex={folderIndex}
+              setFolderIndex={setFolderIndex}
+              fileIndex={fileIndex}
+              setFileIndex={setFileIndex}
+              newFolderName={newFolderName}
+              setNewFolderName={setNewFolderName}
+              addNewFolder={addNewFolder}
+              handleFolderName={handleFolderName}
             />
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
@@ -313,24 +285,30 @@ const handleLight = () => {
             <Output />
           </div>
         </div>
-        <div className="bg-gray-100">
-          <div className="flex p-4 justify-between mb-0">
+        <div className="bg-gray-100 pl-4">
+          <div className={`flex p-4 justify-between `}>
             <label for="testcases" className="font-bold text-xl">
               Test Cases :
             </label>
-            <button
-              onClick={() => {
-                handleClick();
-              }}
-            >
-              <img
-                src={
-                  testcaseOpen === true ? "./Icons/Down.png" : "./Icons/Up.png"
-                }
-                alt="Arrow"
-                className="h-[32px] w-[32px]"
-              ></img>
-            </button>
+            <div className="flex items-center gap-4">
+              <Run />
+              <RunAll />
+              <button
+                onClick={() => {
+                  handleClick();
+                }}
+              >
+                <img
+                  src={
+                    testcaseOpen === true
+                      ? "./Icons/Down.png"
+                      : "./Icons/Up.png"
+                  }
+                  alt="Arrow"
+                  className="h-[32px] w-[32px]"
+                ></img>
+              </button>
+            </div>
           </div>
           {testcaseOpen === true ? (
             <TestCase testCases={testCases} setTestCases={setTestCases} />

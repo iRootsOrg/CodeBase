@@ -1,6 +1,7 @@
 import { useState } from "react";
 import File from "./File";
 import { CODE_SNIPPETS } from "../Utils/languages";
+import { FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
 const Folder = (props) => {
   const [fileopen, setFileOpen] = useState(-1);
   const [newFileName, setNewFileName] = useState("");
@@ -95,22 +96,23 @@ const Folder = (props) => {
 
   return (
     <div className="flex flex-col w-full  gap-1  border-r-4 border-[#d1d5db]">
-      <div className="font-bold text-xl p-2 flex justify-between">
-        <p>Files</p>
-        <div>
+      <div className="font-bold text-lg p-2 flex justify-between items-center h-10">
+        <div className="h-full">Files</div>
+        <div className="flex gap-1 items-center h-full">
           <button
             onClick={() => {
               addNewFolder();
             }}
+            className=""
           >
-            ➕
+            <FaPlus />
           </button>
           <button
             onClick={() => {
               setAllNull();
             }}
           >
-            🆑
+            <FaTimes />
           </button>
         </div>
       </div>
@@ -119,26 +121,32 @@ const Folder = (props) => {
           return (
             <div
               key={index}
-              className={`w-full text-lg gap-2 p-2 font-semibold cursor-pointer hover:bg-white ${
+              className={`w-full text-base gap-2 p-2 font-semibold cursor-pointer hover:bg-white ${
                 fileopen === index ? "shadow-2xl bg-white" : ""
               }`}
             >
               <div
+                key={index}
                 className={`flex gap-1 hover:text-blue-600 items-center ${
                   fileopen === index ? "text-blue-600  " : ""
                 }`}
               >
                 {fileopen === index ? "📂 " : "📁 "}
 
-                <div className="flex justify-between  w-full select-none">
-                  <div onClick={() => openFolder(index)}>{folder.name}</div>
-                  <div className="flex">
+                <div
+                  key={index}
+                  className="flex justify-between  w-full select-none"
+                >
+                  <div key={index} onClick={() => openFolder(index)}>
+                    {folder.name}
+                  </div>
+                  <div key={index} className="flex gap-2">
                     <button
                       onClick={() => {
                         handleNewFolder(index);
                       }}
                     >
-                      ➕
+                      <FaPlus />
                     </button>
 
                     <button
@@ -146,14 +154,14 @@ const Folder = (props) => {
                         deleteFolder(index);
                       }}
                     >
-                      🗑️
+                      <FaTrash />
                     </button>
                   </div>
                 </div>
               </div>
 
               {fileopen === index ? (
-                <div className="pl-6 w-full">
+                <div key={index} className="pl-6 w-full">
                   <File
                     key={fileopen}
                     files={props.folderfiles.folders[fileopen].files}
@@ -166,10 +174,15 @@ const Folder = (props) => {
                     setLanguage={props.setLanguage}
                     selectFile={selectFile}
                     setSelectFile={setSelectFile}
+                    folderIndex={props.folderIndex}
+                    setFolderIndex={props.setFolderIndex}
                   />
 
                   {opennewfile === true ? (
-                    <div className="flex gap-2 hover:text-blue-600 font-medium text-base p-1 items-center">
+                    <div
+                      key={index}
+                      className="flex gap-2 hover:text-blue-600 font-medium text-sm p-1 items-center"
+                    >
                       <div>🗃️</div>
                       <input
                         value={newFileName}
@@ -178,14 +191,14 @@ const Folder = (props) => {
                         }}
                         className="w-[50px] focus:outline-none"
                       ></input>
-
+                    <div className="flex gap-2 justify-end  items-center w-full">
                       <button
                         onClick={() => {
                           addNewFile(index);
                         }}
                         className=""
                       >
-                        ✔️
+                        <FaCheck />
                       </button>
 
                       <button
@@ -195,8 +208,9 @@ const Folder = (props) => {
                         }}
                         className=""
                       >
-                        🗑️
-                      </button>
+                        <FaTrash />
+                        </button>
+                        </div>
                     </div>
                   ) : (
                     ""
@@ -209,26 +223,31 @@ const Folder = (props) => {
           );
         })}
       </div>
-      <div className="w-full flex flex-col p-2">
-        
-          
-           <div className="w-full">
-                  <File
-                    key={fileopen}
-                    files={props.folderfiles.extraFiles}
-                    value={props.value}
-                    setValue={props.setValue}
-                    fileIndex={props.fileIndex}
-                    setFileIndex={props.setFileIndex}
-                    language={props.language}
-                    setLanguage={props.setLanguage}
-                    selectFile={selectFile}
-                    setSelectFile={setSelectFile}
-              />
-              </div>
-          
-        
-      </div>
+      {/* <div className="w-full flex flex-col p-2">
+        <div className="w-full">
+          <File
+            key="extraFiles"
+            files={props.folderfiles.extraFiles}
+            updateFiles={(newFiles) => {
+              const updatedFolderFiles = {
+                ...props.folderfiles,
+                extraFiles: newFiles,
+              };
+              props.setFolderFiles(updatedFolderFiles);
+            }}
+            value={props.value}
+            setValue={props.setValue}
+            fileIndex={props.fileIndex}
+            setFileIndex={props.setFileIndex}
+            language={props.language}
+            setLanguage={props.setLanguage}
+            selectFile={selectFile}
+            setSelectFile={setSelectFile}
+            folderIndex={-1}
+            setFolderIndex={props.setFolderIndex}
+          />
+        </div>
+      </div> */}
     </div>
   );
 };

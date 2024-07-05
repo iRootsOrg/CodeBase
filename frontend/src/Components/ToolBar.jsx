@@ -26,7 +26,7 @@ const ToolBar = (props) => {
     }
 
     if (e === 7) {
-      setSettingsOpen(true);
+      setSettingsOpen(!settingsopen);
       
     }
     
@@ -65,22 +65,26 @@ const ToolBar = (props) => {
   };
 
   return (
-    <div className="flex">
-      <div className="border-r-2 border-[#d1d5db] flex flex-col h-full w-14 items-center pr-2 gap-4 pt-2 pb-2 bg-gray-100">
+    
+    <div className="flex p-0">
+      {props.toolBar === true ? 
+      (<div className="border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 bg-gray-100">
+        
+
         <div
-          className={`${
+          className={`ml-1 h-8 flex justify-center items-center  w-full pt-2 ${
             selected === 1 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900 `}
+          } cursor-pointer hover:border-l-4 hover:border-blue-900  `}
           onClick={() => handleSelected(1)}
         >
           <img
             src={"./Icons/SelectFile.png"}
             alt="Select File"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`     ml-1 h-8 flex justify-center items-center w-full ${
             selected === 2 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900 `}
           onClick={() => handleSelected(2)}
@@ -88,11 +92,11 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/Save.png"}
             alt="Save"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`      ml-1 h-8 flex justify-center items-center w-full ${
             selected === 3 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(3)}
@@ -100,11 +104,11 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/Folder.png"}
             alt="Folder"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`      ml-1 h-8 flex justify-center items-center w-full ${
             selected === 4 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(4)}
@@ -112,11 +116,11 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/Download.png"}
             alt="Download"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`     ml-1 h-8 flex justify-center items-center w-full ${
             selected === 5 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(5)}
@@ -124,11 +128,11 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/History.png"}
             alt="History"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`      ml-1 h-8 flex justify-center items-center w-full ${
             selected === 6 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(6)}
@@ -136,23 +140,43 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/Clipboard.png"}
             alt="Clipboard"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
+
         <div
-          className={`flex ${
+          className={`     ml-1 h-8 flex justify-center items-center w-full  ${
             selected === 7 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(7)}
         >
           <img
+            onClick={() => handleSelected(7)}
             src={"./Icons/Settings.png"}
             alt="Settings"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
+
+          {settingsopen === true ? (
+            <div
+              className={`absolute left-14  py-2 z-10 rounded ${
+                props.lightmode === true
+                  ? "bg-gray-100 text-black"
+                  : "bg-black text-gray-100"
+              }`}
+            >
+              <Settings
+                lightmode={props.lightmode}
+                setLightMode={props.setLightMode}
+                handleLight={props.handleLight}
+                formatCode={props.formatCode}
+              />
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         <div
-          className={`${
+          className={`     ml-1 h-8 flex justify-center items-center w-full ${
             selected === 8 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(8)}
@@ -160,11 +184,11 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/Share.png"}
             alt="Share"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`     ml-1 h-8 flex justify-center items-center w-full ${
             selected === 9 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(9)}
@@ -172,11 +196,11 @@ const ToolBar = (props) => {
           <img
             src={"./Icons/Info.png"}
             alt="Info"
-            className="!h-[32px] !w-[32px]"
+            className="!h-[24px] !w-[24px]"
           />
         </div>
         <div
-          className={`${
+          className={`     ml-1 h-8 flex justify-center items-center w-full ${
             selected === 10 ? "border-l-4 border-blue-900" : ""
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(10)}
@@ -185,7 +209,7 @@ const ToolBar = (props) => {
             <img
               src={"./Icons/Upload.png"}
               alt="Upload"
-              className="!h-[32px] !w-[32px] cursor-pointer"
+              className="!h-[24px] !w-[24px] cursor-pointer"
             />
             <input
               type="file"
@@ -197,21 +221,19 @@ const ToolBar = (props) => {
             />
           </label>
         </div>
-      </div>
-
-      <div className="bg-gray-100">
-        {settingsopen === true ? (
-          <div className="w-44 p-2 ">
-            <Settings
-              lightmode={props.lightmode}
-              setLightMode={props.setLightMode}
-              handleLight={props.handleLight}
-            />
-          </div>
-        ) : (
-          ""
-        )}
-      </div>
+        <div
+          className={`     ml-1 h-8 flex justify-center items-center w-full ${
+            selected === 11 ? "border-l-4 border-blue-900" : ""
+          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+          onClick={() => handleSelected(11)}
+        >
+          <img
+            src={"./Icons/More.png"}
+            alt="Info"
+            className="!h-[24px] !w-[24px]"
+          />
+        </div>
+      </div>):""}
     </div>
   );
 };

@@ -1,9 +1,8 @@
-
 import { useState } from "react";
-import { FaPlus, FaTrash, FaTimes } from "react-icons/fa";
-const File = (props) => {
+const ExtraFiles = (props) => {
   const openFile = ({ file, index }) => {
-    console.log(index);
+      console.log(index);
+      
     if (props.selectFile === index) {
       props.setSelectFile(-1);
       props.setFileIndex(-1);
@@ -15,7 +14,8 @@ const File = (props) => {
       props.setFileIndex(index);
       //Can be merged with selectfile
       props.setValue(file.code);
-      props.setLanguage(file.language);
+        props.setLanguage(file.language);
+        props.setFolderIndex(props.folderIndex);
     }
   };
 
@@ -29,8 +29,10 @@ const File = (props) => {
       {props.files.map((file, index) => {
         return (
           <div
-            className={`w-full text-sm  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
-              (props.selectFile === index && props.folderIndex !== -1) === true ? "text-blue-700 shadow-md" : ""
+            className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
+              (props.selectFile === index && props.folderIndex === -1) === true
+                ? "text-blue-700 shadow-md"
+                : ""
             }`}
             onClick={() => {
               openFile({ file, index });
@@ -45,7 +47,7 @@ const File = (props) => {
                 deleteFile(index);
               }}
             >
-              <FaTrash />
+              🗑️
             </button>
           </div>
         );
@@ -54,4 +56,4 @@ const File = (props) => {
   );
 };
 
-export default File;
+export default ExtraFiles;
