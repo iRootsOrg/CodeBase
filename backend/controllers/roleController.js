@@ -24,7 +24,7 @@ class RoleController {
 
         const adminRole = new Role({
             name: 'author',
-            permissions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'RUN_TESTCASES', 'CONTRIBUTE']
+            permissions: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'RUN_TESTCASES', 'CONTRIBUTE', 'MANAGE_PERMISSIONS']
         });
 
         await authorRole.save();

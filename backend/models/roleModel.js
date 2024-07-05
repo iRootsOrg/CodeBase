@@ -8,7 +8,7 @@ const roleSchema = new mongoose.Schema({
     },
     permissions: [{
         type: String,
-        enum: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'RUN_TESTCASES', 'CONTRIBUTE']
+        enum: ['CREATE', 'READ', 'UPDATE', 'DELETE', 'RUN_TESTCASES', 'CONTRIBUTE', 'MANAGE_PERMISSIONS']
     }]
 });
 
