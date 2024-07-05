@@ -2,9 +2,11 @@ import subprocess
 import os
 import hashlib
 import pickle
+import threading  # Use threading for timeout handling
 
 # Define the cache file location
 cache_file = 'cache.pkl'
+timeout_seconds = 5  # Set the timeout limit in seconds
 
 def load_cache():
     """Load the cache from the file if it exists."""
@@ -61,7 +63,7 @@ def execute_code(file_path, cache):
 
     _, file_extension = os.path.splitext(file_path)
     if file_extension not in language_settings:
-        raise ValueError(f"Unsupported file extension: {file_extension}")
+        return f"Error: Unsupported file extension: {file_extension}"
 
     settings = language_settings[file_extension]
     compile_cmd = settings['compile_cmd']
@@ -74,6 +76,7 @@ def execute_code(file_path, cache):
 
     # Read inputs from input.txt file
     input_data = read_input_from_file('input.txt')
+    input_data_lines = input_data.splitlines()
 
     # Check if result is already in cache, considering input
     if file_hash in cache and 'input' in cache[file_hash]:
@@ -89,18 +92,28 @@ def execute_code(file_path, cache):
             if compile_process.returncode != 0:
                 return f"Compilation Error:\n{compile_process.stderr.strip()}"
 
-        # Run the code
-        if input_data:
-            run_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in run_cmd]
-            run_process = subprocess.run(run_cmd, input=input_data, capture_output=True, text=True)
-        else:
-            run_process = subprocess.run(run_cmd, capture_output=True, text=True)
+        # Run the code with timeout handling using threading
+        def run_with_timeout(cmd, input_data, timeout):
+            proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            timer = threading.Timer(timeout, proc.kill)
+            try:
+                timer.start()
+                stdout, stderr = proc.communicate(input=input_data, timeout=timeout)
+                return proc.returncode, stdout, stderr
+            finally:
+                timer.cancel()
 
-        if run_process.returncode != 0:
-            return f"Runtime Error:\n{run_process.stderr.strip()}"
+        run_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in run_cmd]
+        returncode, stdout, stderr = run_with_timeout(run_cmd, input_data, timeout_seconds)
+
+        if returncode == -9:
+            return f"Error: Code execution exceeded the time limit of {timeout_seconds} seconds."
+
+        if returncode != 0:
+            return f"Runtime Error:\n{stderr.strip()}"
 
         # Cache the result along with the input
-        output = run_process.stdout
+        output = stdout
         cache[file_hash] = {'output': output, 'input': input_data}
         save_cache(cache)
         return output
@@ -123,7 +136,10 @@ if __name__ == '__main__':
 
     file_to_execute = input("\nEnter the filename you want to execute: ")
     if not os.path.isfile(file_to_execute):
-        print("File not found in the current directory.")
+        with open('output.txt', 'w') as output_file:
+            output_file.write("Error: File not found in the current directory.")
     else:
         output = execute_code(file_to_execute, cache)
-        print(f"Output:\n{output}")
+        print(output)
+        with open('output.txt', 'w') as output_file:
+            output_file.write(output)
