@@ -1,17 +1,20 @@
 import { useState } from "react";
 import File from "./File";
-
+import { CODE_SNIPPETS} from "../Utils/languages";
 const Folder = (props) => {
   const [fileopen, setFileOpen] = useState(-1);
   const [newFileName, setNewFileName] = useState("");
   const [opennewfile, setOpenNewFile] = useState(false);
+   const [selectFile, setSelectFile] = useState(-1);
   
   const openFolder = (index) => {
     console.log(index);
     if (fileopen === index) {
+      props.setFolderIndex(-1);
       setFileOpen(-1);
     } else {
       setFileOpen(index);
+      props.setFolderIndex(index);//This can be merged with setFileOpen
     }
   };
 
@@ -39,7 +42,8 @@ const Folder = (props) => {
             ...folder.files,
             {
               name: `${newFileName}`,
-              code: '',
+              code: `${CODE_SNIPPETS[props.language]}`,
+              language:`${props.language}`
             },
           ],
         };
@@ -48,6 +52,7 @@ const Folder = (props) => {
     });
 
     props.setFolderFiles(newFolders);
+    setSelectFile(props.folderfiles[folderIndex].files.length)
     setOpenNewFile(false);
     setNewFileName('');
   }
@@ -67,13 +72,38 @@ const Folder = (props) => {
     props.setFolderFiles(newFolders);
   }
 
+  const setAllNull = () => {
+    setFileOpen(-1);
+    setSelectFile(-1);
+    setOpenNewFile(false);
+    props.setOpenNewFolder(false);
+    setNewFileName("");
+    props.setFolderIndex(-1);
+    props.setFileIndex(-1);
+  }
+
   
 
   return (
     <div className="flex flex-col w-full  gap-1  border-r-4 border-[#d1d5db]">
       <div className="font-bold text-xl p-2 flex justify-between">
         <p>Files</p>
-        <button onClick={() => { addNewFolder() }}>➕</button>
+        <div>
+          <button
+            onClick={() => {
+              addNewFolder();
+            }}
+          >
+            ➕
+          </button>
+          <button
+            onClick={() => {
+              setAllNull();
+            }}
+          >
+            🆑
+          </button>
+        </div>
       </div>
       <div className="w-full flex flex-col">
         {props.folderfiles.map((folder, index) => {
@@ -91,24 +121,24 @@ const Folder = (props) => {
               >
                 {fileopen === index ? "📂 " : "📁 "}
 
-                <div className="flex justify-between  w-full">
+                <div className="flex justify-between  w-full select-none">
                   <div onClick={() => openFolder(index)}>{folder.name}</div>
                   <div className="flex">
-                  <button
-                    onClick={() => {
-                      handleNewFolder(index);
-                    }}
-                  >
-                    ➕
-                  </button>
+                    <button
+                      onClick={() => {
+                        handleNewFolder(index);
+                      }}
+                    >
+                      ➕
+                    </button>
 
-                  <button
-                    onClick={() => {
-                      deleteFolder(index);
-                    }}
-                  >
-                    🗑️
-                  </button>
+                    <button
+                      onClick={() => {
+                        deleteFolder(index);
+                      }}
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
               </div>
@@ -119,6 +149,14 @@ const Folder = (props) => {
                     key={fileopen}
                     files={props.folderfiles[fileopen].files}
                     updateFiles={(newFiles) => updateFiles(index, newFiles)}
+                    value={props.value}
+                    setValue={props.setValue}
+                    fileIndex={props.fileIndex}
+                    setFileIndex={props.setFileIndex}
+                    language={props.language}
+                    setLanguage={props.setLanguage}
+                    selectFile={selectFile}
+                    setSelectFile={setSelectFile}
                   />
 
                   {opennewfile === true ? (

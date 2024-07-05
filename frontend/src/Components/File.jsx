@@ -2,14 +2,23 @@
 import { useState } from "react";
 const File = (props) => {
     
-    const [selectFile, setSelectFile] = useState(-1);
-    const openFile = (index) => {
+   
+  const openFile = ({ file, index }) => {
       console.log(index);
-      if (selectFile === index) {
-        setSelectFile(-1);
-      } else {
-         setSelectFile(index);
-      }
+    if (props.selectFile === index) {
+      props.setSelectFile(-1);
+      props.setFileIndex(-1);
+      props.setValue("No File Selected");
+      props.setLanguage("");
+      
+    } else {
+     props.setSelectFile(index);
+      // console.log(file);
+      props.setFileIndex(index);
+      //Can be merged with selectfile
+      props.setValue(file.code);
+      props.setLanguage(file.language);
+    }
     };
 
     const deleteFile = (index) => {
@@ -23,10 +32,10 @@ const File = (props) => {
         {props.files.map((file, index) => {
             return (
                 <div
-                    className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${selectFile === index ? "text-blue-700 shadow-md"
+                    className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${props.selectFile === index ? "text-blue-700 shadow-md"
                         :""
                     }`}
-                    onClick={()=>{openFile(index)}}
+                onClick={() => { openFile({ file, index })}}
               >
                     <div>🗃️ {file.name}</div>
                     

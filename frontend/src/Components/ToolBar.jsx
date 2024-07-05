@@ -34,6 +34,22 @@ const ToolBar = (props) => {
       props.setFolderOpen(!props.folderopen);
     }
 
+    if (e === 2) {
+      //Save functionality
+      props.updateChangeCode();
+      setSelected(0);
+    }
+
+    if (e === 4) {
+      props.zipAndDownload();
+      setSelected(0);
+    }
+
+    if (e === 8) {
+      props.setShareOpen(!props.shareopen);
+      console.log("share opened");
+    }
+
     
   };
 
@@ -154,19 +170,35 @@ const ToolBar = (props) => {
           } cursor-pointer hover:border-l-4 hover:border-blue-900`}
           onClick={() => handleSelected(10)}
         >
-          <img
-            src={"./Icons/Upload.png"}
-            alt="Upload"
-            className="!h-[32px] !w-[32px]"
-          />
+          <label>
+            <img
+              src={"./Icons/Upload.png"}
+              alt="Upload"
+              className="!h-[32px] !w-[32px] cursor-pointer"
+            />
+            <input
+              type="file"
+              multiple
+              webkitdirectory="true"
+              onChange={props.handleFileUpload}
+              className="hidden"
+              name="upload"
+            />
+          </label>
         </div>
       </div>
 
       <div className="bg-gray-100">
-        {settingsopen && (
+        {settingsopen === true ? (
           <div className="w-44 p-2 ">
-            <Settings />
+            <Settings
+              lightmode={props.lightmode}
+              setLightMode={props.setLightMode}
+              handleLight={props.handleLight}
+            />
           </div>
+        ) : (
+          ""
         )}
       </div>
     </div>
