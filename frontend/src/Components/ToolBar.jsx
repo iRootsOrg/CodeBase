@@ -26,12 +26,16 @@ const ToolBar = (props) => {
     }
 
     if (e === 7) {
-      setSettingsOpen(!settingsopen)
+      setSettingsOpen(true);
+      
     }
     
-    if (e === 3) {
+    if (e === 3 || e === 1) {
       //Folder
       props.setFolderOpen(!props.folderopen);
+      // if (e === 1) {
+      //   InvokeFile
+      // }
     }
 
     if (e === 2) {
@@ -46,8 +50,15 @@ const ToolBar = (props) => {
     }
 
     if (e === 8) {
-      props.setShareOpen(!props.shareopen);
+      props.setShareOpen(!props.shareOpen);
       console.log("share opened");
+      setSelected(0);
+    }
+
+    if (e === 9) {
+      props.setInfoOpen(!props.infoOpen);
+      console.log("info opened");
+      setSelected(0);
     }
 
     

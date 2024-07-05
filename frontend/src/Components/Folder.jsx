@@ -1,12 +1,12 @@
 import { useState } from "react";
 import File from "./File";
-import { CODE_SNIPPETS} from "../Utils/languages";
+import { CODE_SNIPPETS } from "../Utils/languages";
 const Folder = (props) => {
   const [fileopen, setFileOpen] = useState(-1);
   const [newFileName, setNewFileName] = useState("");
   const [opennewfile, setOpenNewFile] = useState(false);
-   const [selectFile, setSelectFile] = useState(-1);
-  
+  const [selectFile, setSelectFile] = useState(-1);
+
   const openFolder = (index) => {
     console.log(index);
     if (fileopen === index) {
@@ -14,27 +14,26 @@ const Folder = (props) => {
       setFileOpen(-1);
     } else {
       setFileOpen(index);
-      props.setFolderIndex(index);//This can be merged with setFileOpen
+      props.setFolderIndex(index); //This can be merged with setFileOpen
     }
   };
 
-  const handleNewFolder = (index)=>{
+  const handleNewFolder = (index) => {
     setFileOpen(index);
     setOpenNewFile(true);
-    
-  }
+  };
 
   const addNewFolder = () => {
     props.setOpenNewFolder(true);
     console.log("Add new folder");
-  }
+  };
 
   const handleFileName = (e) => {
     setNewFileName(e.target.value);
-  }
+  };
 
   const addNewFile = (folderIndex) => {
-    const newFolders = props.folderfiles.map((folder, index) => {
+    const newFolders = props.folderfiles.folders.map((folder, index) => {
       if (index === folderIndex) {
         return {
           ...folder,
@@ -43,7 +42,7 @@ const Folder = (props) => {
             {
               name: `${newFileName}`,
               code: `${CODE_SNIPPETS[props.language]}`,
-              language:`${props.language}`
+              language: `${props.language}`,
             },
           ],
         };
@@ -51,26 +50,38 @@ const Folder = (props) => {
       return folder;
     });
 
-    props.setFolderFiles(newFolders);
-    setSelectFile(props.folderfiles[folderIndex].files.length)
+    props.setFolderFiles({ ...props.folderFiles, folders: newFolders });
+    setSelectFile(props.folderfiles.folders[folderIndex].files.length);
     setOpenNewFile(false);
-    setNewFileName('');
-  }
+    setNewFileName("");
+  };
 
   const updateFiles = (folderIndex, newFiles) => {
-    const newFolders = props.folderfiles.map((folder, index) => {
+    const newFolders = props.folderfiles.folders.map((folder, index) => {
       if (index === folderIndex) {
         return { ...folder, files: newFiles };
       }
       return folder;
     });
-    props.setFolderFiles(newFolders);
+
+    props.setFolderFiles((prevState) => ({
+      ...prevState,
+      folders: newFolders,
+    }));
   };
 
-  const deleteFolder = (folderIndex) => {
-    const newFolders = props.folderfiles.filter((_, index) => index !== folderIndex);
-    props.setFolderFiles(newFolders);
-  }
+
+ const deleteFolder = (folderIndex) => {
+   const newFolders = props.folderfiles.folders.filter(
+     (_, index) => index !== folderIndex
+   );
+
+   props.setFolderFiles((prevState) => ({
+     ...prevState,
+     folders: newFolders,
+   }));
+ };
+
 
   const setAllNull = () => {
     setFileOpen(-1);
@@ -80,9 +91,7 @@ const Folder = (props) => {
     setNewFileName("");
     props.setFolderIndex(-1);
     props.setFileIndex(-1);
-  }
-
-  
+  };
 
   return (
     <div className="flex flex-col w-full  gap-1  border-r-4 border-[#d1d5db]">
@@ -106,7 +115,7 @@ const Folder = (props) => {
         </div>
       </div>
       <div className="w-full flex flex-col">
-        {props.folderfiles.map((folder, index) => {
+        {props.folderfiles.folders.map((folder, index) => {
           return (
             <div
               key={index}
@@ -147,7 +156,7 @@ const Folder = (props) => {
                 <div className="pl-6 w-full">
                   <File
                     key={fileopen}
-                    files={props.folderfiles[fileopen].files}
+                    files={props.folderfiles.folders[fileopen].files}
                     updateFiles={(newFiles) => updateFiles(index, newFiles)}
                     value={props.value}
                     setValue={props.setValue}
@@ -199,6 +208,26 @@ const Folder = (props) => {
             </div>
           );
         })}
+      </div>
+      <div className="w-full flex flex-col p-2">
+        
+          
+           <div className="w-full">
+                  <File
+                    key={fileopen}
+                    files={props.folderfiles.extraFiles}
+                    value={props.value}
+                    setValue={props.setValue}
+                    fileIndex={props.fileIndex}
+                    setFileIndex={props.setFileIndex}
+                    language={props.language}
+                    setLanguage={props.setLanguage}
+                    selectFile={selectFile}
+                    setSelectFile={setSelectFile}
+              />
+              </div>
+          
+        
       </div>
     </div>
   );

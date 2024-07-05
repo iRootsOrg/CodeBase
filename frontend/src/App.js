@@ -9,7 +9,7 @@ import Folder from "./Components/Folder.jsx";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import light from "react-syntax-highlighter/dist/cjs/light.js";
-
+import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
 function App() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
@@ -29,26 +29,56 @@ function App() {
   const [msg, setMsg] = useState("");
   const [msgpositive, setMsgPositive] = useState(true);
 
-  const [shareopen, setShareOpen] = useState(true);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const [folderopen, setFolderOpen] = useState(false);
-  const [folderfiles, setFolderFiles] = useState([
-    {
-      name: "Folder1",
-      files: [
-        {
-          name: "File1",
-          code: "Hello fdg",
-          language: "js",
-        },
-        {
-          name: "File2",
-          code: "He",
-          language: "ts",
-        },
-      ],
-    },
-  ]);
+  const [folderfiles, setFolderFiles] = useState({
+    folders: [
+      {
+        name: "Folder1",
+        files: [
+          {
+            name: "File1",
+            code: "Hello fdg",
+            language: "js",
+          },
+          {
+            name: "File2",
+            code: "He",
+            language: "ts",
+          },
+        ],
+      },
+      {
+        name: "Folder2",
+        files: [
+          {
+            name: "File21",
+            code: "lorem  ipsum fdfdsf",
+            language: "js",
+          },
+          {
+            name: "File22",
+            code: "He jkbdv dvdvdfdf",
+            language: "ts",
+          },
+        ],
+      },
+    ],
+    extraFiles: [
+      {
+        name: "ExtraFile1",
+        code: "Extra file code",
+        language: "js",
+      },
+      {
+        name: "ExtraFile2",
+        code: "More extra file code",
+        language: "ts",
+      },
+    ],
+  });
+
   //Sample Folders
 const [lightmode, setLightMode] = useState(true);
 
@@ -62,6 +92,11 @@ const handleLight = () => {
     setNotify(false);
     setMsg("");
   };
+
+    const copyToClipboard = () => {
+      navigator.clipboard.writeText("https://example.com");
+      alert("URL copied to clipboard!");
+    };
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -92,23 +127,26 @@ const handleLight = () => {
     setNewFolderName(e.target.value);
   };
 
-  const addNewFolder = () => {
-    setFolderFiles([
-      ...folderfiles,
-      {
-        name: `${newFolderName}`,
-        files: [],
-      },
-    ]);
+ const addNewFolder = () => {
+   setFolderFiles((prevState) => ({
+     ...prevState,
+     folders: [
+       ...prevState.folders,
+       {
+         name: newFolderName,
+         files: [],
+       },
+     ],
+   }));
 
-    setOpenNewFolder(false);
-    setNewFolderName("");
-  };
+   setOpenNewFolder(false);
+   setNewFolderName("");
+ };
 
   const updateChangeCode = () => {
-    const updateFileCode = (folderIndex, fileIndex, newCode, newlanguage) => {
+    const updateFileCode = (folderIndex, fileIndex, newCode, newLanguage) => {
       setFolderFiles((prevFolderFiles) => {
-        return prevFolderFiles.map((folder, fIndex) => {
+        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
           if (fIndex === folderIndex) {
             return {
               ...folder,
@@ -117,7 +155,7 @@ const handleLight = () => {
                   return {
                     ...file,
                     code: newCode,
-                    language: newlanguage,
+                    language: newLanguage,
                   };
                 }
                 return file;
@@ -126,14 +164,20 @@ const handleLight = () => {
           }
           return folder;
         });
+
+        return {
+          ...prevFolderFiles,
+          folders: newFolders,
+        };
       });
     };
 
     // Usage example:
-    updateFileCode(folderIndex, fileIndex, value, language);
+    updateFileCode(folderIndex, fileIndex, value,language);
 
-    //Post request bhejna
+    // Post request sending can be implemented here
   };
+
 
   const zipAndDownload = () => {
     const zip = new JSZip();
@@ -153,7 +197,7 @@ const handleLight = () => {
       folderIndex < folderfiles.length &&
       fileIndex === -1
     ) {
-      const folder = folderfiles[folderIndex];
+      const folder = folderfiles.folders[folderIndex];
       const folderZip = zip.folder(folder.name);
 
       folder.files.forEach((file) => {
@@ -164,7 +208,7 @@ const handleLight = () => {
         saveAs(content, `${folder.name}.zip`);
       });
     } else {
-      const folder = folderfiles[folderIndex];
+      const folder = folderfiles.folders[folderIndex];
       if (fileIndex >= 0 && fileIndex < folder.files.length) {
         const file = folder.files[fileIndex];
         const blob = new Blob([file.code], {
@@ -176,6 +220,8 @@ const handleLight = () => {
       }
     }
   };
+
+  const [infoOpen, setInfoOpen] = useState(false);
 
   return (
     <div className="flex h-screen">
@@ -190,8 +236,10 @@ const handleLight = () => {
         lightmode={lightmode}
         setLightMode={setLightMode}
         handleLight={handleLight}
-        shareopen={shareopen}
+        shareOpen={shareOpen}
         setShareOpen={setShareOpen}
+        infoOpen={infoOpen}
+        setInfoOpen={setInfoOpen}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex overflow-hidden">
@@ -305,7 +353,7 @@ const handleLight = () => {
                     closeMsg();
                   }}
                 >
-                  ⚫
+                  <FaTimes size={24} />
                 </button>
               </div>
               <div className="flex justify-center h-16 items-center shadow-3xl  animate-pulse ">
@@ -318,33 +366,89 @@ const handleLight = () => {
         </div>
       </div>
 
-      {shareopen === true ? (
-        <div className="relative">
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative">
+      {shareOpen === true ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
             <button
-              className="absolute top-0 right-0 m-2 text-gray-600 hover:text-gray-800"
-              onClick={setShareOpen(false)}
+              onClick={() => {
+                setShareOpen(false);
+              }}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
-              &times;
+              <FaTimes size={24} />
             </button>
-            <p className="mb-4">Share this content!</p>
-            <div className="flex space-x-4">
-              <button className="bg-blue-700 text-white px-4 py-2 rounded">
-                Facebook
-              </button>
-              <button className="bg-blue-400 text-white px-4 py-2 rounded">
-                Twitter
-              </button>
-              <button className="bg-gray-500 text-white px-4 py-2 rounded">
-                Email
-              </button>
+            <h2 className="text-xl font-bold mb-4">Share this page</h2>
+            <input
+              type="text"
+              value={window.location.href}
+              readOnly
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+            />
+            <button
+              onClick={copyToClipboard}
+              className="bg-blue-500 text-white p-2 rounded w-full mb-4"
+            >
+              Copy URL
+            </button>
+            <div className="flex justify-around">
+              <a
+                href="https://www.facebook.com/sharer/sharer.php?u=https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaFacebook size={32} className="text-blue-700" />
+              </a>
+              <a
+                href="https://twitter.com/intent/tweet?url=https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaTwitter size={32} className="text-blue-500" />
+              </a>
+              <a
+                href="https://wa.me/?text=https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaWhatsapp size={32} className="text-green-500" />
+              </a>
             </div>
           </div>
-          </div>
-          </div>
+        </div>
       ) : (
-        <div>Hello</div>
+        ""
+      )}
+
+      {infoOpen === true ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+            <div>
+              <button
+                onClick={() => {
+                  setInfoOpen(false);
+                }}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes size={24} />
+              </button>
+              <h2 className="text-xl font-bold mb-4">Info</h2>
+            </div>
+
+            <div className="flex flex-col p-2 font-semibold">
+              <a href="/about">About</a>
+              <a href="/about">FAQ</a>
+              <a href="/about">Terms and Conditions</a>
+              <a href="/about">How to use</a>
+              <a href="/about">Contact us</a>
+            </div>
+
+            <div className="mb-0 font-bold">
+              &copy; iRoots Data and Publishing Company Private Limited
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
       )}
     </div>
   );
