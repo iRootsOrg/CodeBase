@@ -200,6 +200,38 @@ const Folder = (props) => {
             )}
           </div>
         ))}
+
+        {props.opennewfolder === true ? (
+          <div className="flex gap-2 hover:text-blue-600 font-semibold text-lg p-2 w-full items-center">
+            <div>📁</div>
+            <input
+              value={props.newFolderName}
+              onChange={(e) => {
+                props.handleFolderName(e);
+              }}
+              className="w-20 focus:outline-none"
+            ></input>
+            <div className="flex justify-around items-center w-full">
+              <button
+                onClick={() => {
+                  props.addNewFolder();
+                }}
+              >
+                <FaCheck />
+              </button>
+              <button
+                onClick={() => {
+                  props.setOpenNewFolder(false);
+                  props.setNewFolderName("");
+                }}
+              >
+                <FaTrash />
+              </button>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div className="w-full flex flex-col p-2">
         <div className="w-full">

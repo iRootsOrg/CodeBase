@@ -39,47 +39,59 @@ const CodeEditor = (props) => {
 
   return (
     <div className="h-[90%]">
-      <div className="flex justify-between mr-4 items-center">
-        <div
-          className="cursor-pointer"
-          onClick={() => {
-            handleToolBar();
-          }}
-        >
-          <img
-            src="./Icons/Close.png"
-            alt="Close"
-            className="h-[32px] w-[32px] ml-2"
-          />
+      <div className="flex justify-between m-4 items-center">
+        <div className="cursor-pointer flex gap-2">
+          {toolBar === true ? (
+            <img
+              src="./Icons/Close.png"
+              alt="Close"
+              className="h-[32px] w-[32px]"
+              onClick={() => {
+                handleToolBar();
+              }}
+            />
+          ) : (
+            <img
+              src="./Icons/More.png"
+              alt="More"
+              className="h-[32px] w-[32px]"
+              onClick={() => {
+                handleToolBar();
+              }}
+            />
+          )}
+
+          <DropDown language={props.language} onSelect={onSelect} />
         </div>
-        <DropDown language={props.language} onSelect={onSelect} />
 
-        <div className="flex gap-2 h-10">
-          <button
-            className="h-10 w-10  flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hover:bg-blue-600"
-            onClick={formatCode}
-          >
-            <BiCodeAlt className="text-xl" />
-          </button>
-          <div className=" cursor-pointer h-10 w-10 text-black bg-white  p-2 flex justify-center items-center rounded border border-black">
-            <Fullscreen />
-          </div>
-          <div
-            className=" cursor-pointer font-semibold"
-            onClick={() => props.handleLight()}
-          >
-            {props.lightmode === true ? (
-              <button className="text-white h-10 w-10 bg-black  p-2 flex justify-between rounded border border-white">
-                <div>🌙</div>
-              </button>
-            ) : (
-              <button className="text-black  h-10 w-10 bg-white  p-2 flex justify-between rounded border border-black">
-                <div>☀️</div>
-              </button>
-            )}
-          </div>
+        <div className="flex justify-between items-center gap-4">
+          <div className=" flex gap-5 h-10">
+            <button
+              className="h-10 w-10  flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hover:bg-blue-600"
+              onClick={formatCode}
+            >
+              <BiCodeAlt className="text-xl" />
+            </button>
+            <div className=" cursor-pointer h-10 w-10 text-black bg-white  p-2 flex justify-center items-center rounded border border-black">
+              <Fullscreen />
+            </div>
+            <div
+              className=" cursor-pointer font-semibold"
+              onClick={() => props.handleLight()}
+            >
+              {props.lightmode === true ? (
+                <button className="text-white h-10 w-10 bg-black  p-2 flex justify-between rounded border border-white">
+                  <div>🌙</div>
+                </button>
+              ) : (
+                <button className="text-black  h-10 w-10 bg-white  p-2 flex justify-between rounded border border-black">
+                  <div>☀️</div>
+                </button>
+              )}
+            </div>
 
-          <Submit />
+            <Submit />
+          </div>
         </div>
       </div>
 
@@ -139,39 +151,11 @@ const CodeEditor = (props) => {
                 setOpenExtraNewFile={props.setOpenExtraNewFile}
                 extraNewFileName={props.extraNewFileName}
                 setExtraNewFileName={props.setExtraNewFileName}
+                newFolderName={props.newFolderName}
+                handleFolderName={props.handleFolderName}
+                addNewFolder={props.addNewFolder}
+                
               />
-
-              {props.opennewfolder === true ? (
-                <div className="flex gap-2 hover:text-blue-600 font-semibold text-lg p-2 w-full items-center">
-                  <div>📁</div>
-                  <input
-                    value={props.newFolderName}
-                    onChange={(e) => {
-                      props.handleFolderName(e);
-                    }}
-                    className="w-20 focus:outline-none"
-                  ></input>
-                  <div className="flex justify-around items-center w-full">
-                    <button
-                      onClick={() => {
-                        props.addNewFolder();
-                      }}
-                    >
-                      <FaCheck />
-                    </button>
-                    <button
-                      onClick={() => {
-                        props.setOpenNewFolder(false);
-                        props.setNewFolderName("");
-                      }}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                ""
-              )}
             </div>
           ) : (
             ""
