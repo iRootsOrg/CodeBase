@@ -11,6 +11,8 @@ import { FaCheck, FaTrash } from "react-icons/fa";
 const CodeEditor = (props) => {
   const editorRef = useRef();
   const [toolBar, setToolBar] = useState(false);
+   const [selected, setSelected] = useState(0);
+   const [settingsopen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     props.setLanguage("Choose_Language");
@@ -29,12 +31,24 @@ const CodeEditor = (props) => {
     }
   };
 
+  const setToolbarNull = () => {
+    setSelected(0);
+    props.setFolderOpen(false);
+    props.setOpenNewFile(false);
+    props.setOpenExtraNewFile(false);
+    setSettingsOpen(false);
+    props.setShareOpen(false);
+    props.setInfoOpen(false);
+  };
+
+
   const formatCode = () => {
     editorRef.current.getAction("editor.action.formatDocument").run();
   };
 
   const handleToolBar = () => {
     setToolBar(!toolBar);
+    setToolbarNull();
   };
 
   return (
@@ -124,6 +138,10 @@ const CodeEditor = (props) => {
           setOpenNewFile={props.setOpenNewFile}
           openExtraNewFile={props.openExtraNewFile}
           setOpenExtraNewFile={props.setOpenExtraNewFile}
+          selected={selected}
+          setSelected={setSelected}
+          settingsopen={settingsopen}
+          setSettingsOpen={setSettingsOpen}
         />
         <div className="">
           {props.folderopen === true ? (

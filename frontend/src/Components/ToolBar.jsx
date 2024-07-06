@@ -1,256 +1,253 @@
 import { useState } from "react";
 import Settings from "./Settings.jsx";
 const ToolBar = (props) => {
-  const [selected, setSelected] = useState(0);
-   const [settingsopen, setSettingsOpen] = useState(false);
+ 
+
+
+ 
 
   const handleSelected = (e) => {
-
-    // console.log(props.value);
-    
-    if (selected === e) {
-      setSelected(0);
+    if (props.selected === e) {
+      props.setSelected(0);
     } else {
-      setSelected(e);
+      props.setSelected(e);
     }
 
-    if (e === 6) {
-      // console.log(props.value);
-      navigator.clipboard.writeText(props.value).then(() => {
-        // console.log(props.value);
-        setSelected(0);
-        alert("Code successfully copied to Clipboard!");
-      }).catch((err) => {
-        console.error("Error in copying ", err);
-      });
-      
-    }
-
-    if (e === 7) {
-      setSettingsOpen(!settingsopen);
-      
-    }
-
-    if (e === 1) {
-      props.setFolderOpen(true);
-
-      if (props.folderIndex !== -1) {
-        console.log("For folderindex ", props.folderIndex);
-        props.setOpenNewFile(true);
+    switch (e) {
+      case 1:
+        props.setFolderOpen(true);
+        props.setSelected(3);
+        if (props.folderIndex !== -1) {
+          // console.log("For folderindex ", props.folderIndex);
+          props.setOpenNewFile(true);
+        } else {
+          // console.log("extra file");
+          props.setOpenExtraNewFile(true);
+        }
         
-      }
-      else {
-        console.log("extra file");
-        props.setOpenExtraNewFile(true);
-      }
+        break;
 
-      setSelected(3);
-    }
-    
-    if (e === 3) {
-      //Folder
-      props.setFolderOpen(!props.folderopen);
-      props.setFolderIndex(-1);
-      props.setFileIndex(-1);
-      
-    }
+      case 2:
+        props.updateChangeCode();
+        props.setSelected(0);
+        break;
 
-    if (e === 2) {
-      //Save functionality
-      props.updateChangeCode();
-      setSelected(0);
-    }
+      case 3:
+        props.setFolderOpen(!props.folderopen);
+        // props.setFolderIndex(-1);
+        // props.setFileIndex(-1);
+        break;
 
-    if (e === 4) {
-      props.zipAndDownload();
-      setSelected(0);
-    }
+      case 4:
+        props.zipAndDownload();
+        props.setSelected(0);
+        break;
 
-    if (e === 8) {
-      props.setShareOpen(!props.shareOpen);
-      console.log("share opened");
-      setSelected(0);
-    }
+      case 6:
+        navigator.clipboard
+          .writeText(props.value)
+          .then(() => {
+            props.setSelected(0);
+            alert("Code successfully copied to Clipboard!");
+          })
+          .catch((err) => {
+            console.error("Error in copying ", err);
+          });
+        break;
 
-    if (e === 9) {
-      props.setInfoOpen(!props.infoOpen);
-      console.log("info opened");
-      setSelected(0);
-    }
+      case 7:
+        props.setSettingsOpen(!props.settingsopen);
+        break;
 
-    
+      case 8:
+        props.setShareOpen(!props.shareOpen);
+        console.log("share opened");
+        props.setSelected(0);
+        break;
+
+      case 9:
+        props.setInfoOpen(!props.infoOpen);
+        console.log("info opened");
+        props.setSelected(0);
+        break;
+
+      default:
+        props.setSelected(0);
+        break;
+    }
   };
 
+
   return (
-    
     <div className="flex p-0">
-      {props.toolBar === true ? 
-      (<div className="border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 bg-gray-100">
-        
-
-        <div
-          className={`ml-1 h-8 flex justify-center items-center  w-full pt-2 ${
-            selected === 1 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900  `}
-          onClick={() => handleSelected(1)}
-        >
-          <img
-            src={"./Icons/SelectFile.png"}
-            alt="Select File"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 2 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900 `}
-          onClick={() => handleSelected(2)}
-        >
-          <img
-            src={"./Icons/Save.png"}
-            alt="Save"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`      ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 3 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(3)}
-        >
-          <img
-            src={"./Icons/Folder.png"}
-            alt="Folder"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`      ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 4 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(4)}
-        >
-          <img
-            src={"./Icons/Download.png"}
-            alt="Download"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 5 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(5)}
-        >
-          <img
-            src={"./Icons/History.png"}
-            alt="History"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`      ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 6 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(6)}
-        >
-          <img
-            src={"./Icons/Clipboard.png"}
-            alt="Clipboard"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full  ${
-            selected === 7 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-        >
-          <img
-            onClick={() => handleSelected(7)}
-            src={"./Icons/Settings.png"}
-            alt="Settings"
-            className="!h-[24px] !w-[24px]"
-          />
-
-          {settingsopen === true ? (
-            <div
-              className={`absolute left-14  py-2 z-10 rounded ${
-                props.lightmode === true
-                  ? "bg-gray-100 text-black"
-                  : "bg-black text-gray-100"
-              }`}
-            >
-              <Settings
-                lightmode={props.lightmode}
-                setLightMode={props.setLightMode}
-                handleLight={props.handleLight}
-                formatCode={props.formatCode}
-              />
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 8 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(8)}
-        >
-          <img
-            src={"./Icons/Share.png"}
-            alt="Share"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 9 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(9)}
-        >
-          <img
-            src={"./Icons/Info.png"}
-            alt="Info"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 10 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(10)}
-        >
-          <label>
+      {props.toolBar === true ? (
+        <div className="border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 bg-gray-100">
+          <div
+            className={`ml-1 h-8 flex justify-center items-center  w-full pt-2 ${
+              props.selected === 1 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900  `}
+            onClick={() => handleSelected(1)}
+          >
             <img
-              src={"./Icons/Upload.png"}
-              alt="Upload"
-              className="!h-[24px] !w-[24px] cursor-pointer"
+              src={"./Icons/SelectFile.png"}
+              alt="Select File"
+              className="!h-[24px] !w-[24px]"
             />
-            <input
-              type="file"
-              multiple
-              webkitdirectory="true"
-              onChange={props.handleFileUpload}
-              className="hidden"
-              name="upload"
+          </div>
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 2 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900 `}
+            onClick={() => handleSelected(2)}
+          >
+            <img
+              src={"./Icons/Save.png"}
+              alt="Save"
+              className="!h-[24px] !w-[24px]"
             />
-          </label>
+          </div>
+          <div
+            className={`      ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 3 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(3)}
+          >
+            <img
+              src={"./Icons/Folder.png"}
+              alt="Folder"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
+          <div
+            className={`      ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 4 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(4)}
+          >
+            <img
+              src={"./Icons/Download.png"}
+              alt="Download"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 5 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(5)}
+          >
+            <img
+              src={"./Icons/History.png"}
+              alt="History"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
+          <div
+            className={`      ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 6 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(6)}
+          >
+            <img
+              src={"./Icons/Clipboard.png"}
+              alt="Clipboard"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
+
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full  ${
+              props.selected === 7 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+          >
+            <img
+              onClick={() => handleSelected(7)}
+              src={"./Icons/Settings.png"}
+              alt="Settings"
+              className="!h-[24px] !w-[24px]"
+            />
+
+            {props.settingsopen === true ? (
+              <div
+                className={`absolute left-14  py-2 z-10 rounded ${
+                  props.lightmode === true
+                    ? "bg-gray-100 text-black"
+                    : "bg-black text-gray-100"
+                }`}
+              >
+                <Settings
+                  lightmode={props.lightmode}
+                  setLightMode={props.setLightMode}
+                  handleLight={props.handleLight}
+                  formatCode={props.formatCode}
+                />
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 8 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(8)}
+          >
+            <img
+              src={"./Icons/Share.png"}
+              alt="Share"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 9 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(9)}
+          >
+            <img
+              src={"./Icons/Info.png"}
+              alt="Info"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 10 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(10)}
+          >
+            <label>
+              <img
+                src={"./Icons/Upload.png"}
+                alt="Upload"
+                className="!h-[24px] !w-[24px] cursor-pointer"
+              />
+              <input
+                type="file"
+                multiple
+                webkitdirectory="true"
+                onChange={props.handleFileUpload}
+                className="hidden"
+                name="upload"
+              />
+            </label>
+          </div>
+          <div
+            className={`     ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 11 ? "border-l-4 border-blue-900" : ""
+            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            onClick={() => handleSelected(11)}
+          >
+            <img
+              src={"./Icons/More.png"}
+              alt="Info"
+              className="!h-[24px] !w-[24px]"
+            />
+          </div>
         </div>
-        <div
-          className={`     ml-1 h-8 flex justify-center items-center w-full ${
-            selected === 11 ? "border-l-4 border-blue-900" : ""
-          } cursor-pointer hover:border-l-4 hover:border-blue-900`}
-          onClick={() => handleSelected(11)}
-        >
-          <img
-            src={"./Icons/More.png"}
-            alt="Info"
-            className="!h-[24px] !w-[24px]"
-          />
-        </div>
-      </div>):""}
+      ) : (
+        ""
+      )}
     </div>
   );
 };
