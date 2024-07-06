@@ -13,7 +13,8 @@ const CodeEditor = (props) => {
   const [toolBar, setToolBar] = useState(false);
 
   useEffect(() => {
-    props.setValue(CODE_SNIPPETS[props.language]);
+    props.setLanguage("Choose_Language");
+    props.setValue(CODE_SNIPPETS["Choose_Language"]);
   }, []);
 
   const onMount = (editor) => {
@@ -101,6 +102,16 @@ const CodeEditor = (props) => {
           formatCode={formatCode}
           toolBar={toolBar}
           setToolBar={setToolBar}
+          folderIndex={props.folderIndex}
+          setFolderIndex={props.setFolderIndex}
+          fileIndex={props.fileIndex}
+          setFileIndex={props.setFileIndex}
+          newFileName={props.newFileName}
+          setNewFileName={props.setNewFileName}
+          opennewfile={props.opennewfile}
+          setOpenNewFile={props.setOpenNewFile}
+          openExtraNewFile={props.openExtraNewFile}
+          setOpenExtraNewFile={props.setOpenExtraNewFile}
         />
         <div className="">
           {props.folderopen === true ? (
@@ -118,6 +129,16 @@ const CodeEditor = (props) => {
                 setFileIndex={props.setFileIndex}
                 language={props.language}
                 setLanguage={props.setLanguage}
+                extraFileIndex={props.extraFileIndex}
+                setExtraFileIndex={props.setExtraFileIndex}
+                newFileName={props.newFileName}
+                setNewFileName={props.setNewFileName}
+                opennewfile={props.opennewfile}
+                setOpenNewFile={props.setOpenNewFile}
+                openExtraNewFile={props.openExtraNewFile}
+                setOpenExtraNewFile={props.setOpenExtraNewFile}
+                extraNewFileName={props.extraNewFileName}
+                setExtraNewFileName={props.setExtraNewFileName}
               />
 
               {props.opennewfolder === true ? (
@@ -130,23 +151,23 @@ const CodeEditor = (props) => {
                     }}
                     className="w-20 focus:outline-none"
                   ></input>
-                 <div className="flex justify-around items-center w-full">
-                  <button
-                    onClick={() => {
-                      props.addNewFolder();
-                    }}
-                  >
-                    <FaCheck />
-                  </button>
-                  <button
-                    onClick={() => {
-                      props.setOpenNewFolder(false);
-                      props.setNewFolderName("");
-                    }}
-                  >
-                    <FaTrash />
-                  </button>
-                    </div>
+                  <div className="flex justify-around items-center w-full">
+                    <button
+                      onClick={() => {
+                        props.addNewFolder();
+                      }}
+                    >
+                      <FaCheck />
+                    </button>
+                    <button
+                      onClick={() => {
+                        props.setOpenNewFolder(false);
+                        props.setNewFolderName("");
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
               ) : (
                 ""

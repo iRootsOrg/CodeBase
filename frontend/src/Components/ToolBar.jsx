@@ -7,6 +7,7 @@ const ToolBar = (props) => {
   const handleSelected = (e) => {
 
     // console.log(props.value);
+    
     if (selected === e) {
       setSelected(0);
     } else {
@@ -29,13 +30,29 @@ const ToolBar = (props) => {
       setSettingsOpen(!settingsopen);
       
     }
+
+    if (e === 1) {
+      props.setFolderOpen(true);
+
+      if (props.folderIndex !== -1) {
+        console.log("For folderindex ", props.folderIndex);
+        props.setOpenNewFile(true);
+        
+      }
+      else {
+        console.log("extra file");
+        props.setOpenExtraNewFile(true);
+      }
+
+      setSelected(3);
+    }
     
-    if (e === 3 || e === 1) {
+    if (e === 3) {
       //Folder
       props.setFolderOpen(!props.folderopen);
-      // if (e === 1) {
-      //   InvokeFile
-      // }
+      props.setFolderIndex(-1);
+      props.setFileIndex(-1);
+      
     }
 
     if (e === 2) {

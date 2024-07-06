@@ -11,6 +11,8 @@ import { saveAs } from "file-saver";
 import Run from "./Components/Run.jsx";
 import RunAll from "./Components/RunAll.jsx"
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
+
+
 function App() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
@@ -31,6 +33,14 @@ function App() {
   const [msgpositive, setMsgPositive] = useState(true);
 
   const [shareOpen, setShareOpen] = useState(false);
+
+  const [newFileName, setNewFileName] = useState("");
+  const [opennewfile, setOpenNewFile] = useState(false);
+
+  const [openExtraNewFile, setOpenExtraNewFile] = useState(false);
+  const [extraNewFileName, setExtraNewFileName] = useState("");
+
+  
 
   const [folderopen, setFolderOpen] = useState(false);
   const [folderfiles, setFolderFiles] = useState({
@@ -88,6 +98,7 @@ function App() {
   };
   const [folderIndex, setFolderIndex] = useState(-1);
   const [fileIndex, setFileIndex] = useState(-1);
+  const [extraFileIndex, setExtraFileIndex] = useState(-1);
   const [selectedFiles, setSelectedFiles] = useState(null);
   const closeMsg = () => {
     setNotify(false);
@@ -142,65 +153,87 @@ function App() {
     setNewFolderName("");
   };
 
-  const updateChangeCode = () => {
-    const updateFileCode = (folderIndex, fileIndex, newCode, newLanguage) => {
-      setFolderFiles((prevFolderFiles) => {
-        if (folderIndex === -1) {
-          // Update extraFiles
-          const newExtraFiles = prevFolderFiles.extraFiles.map(
-            (file, fiIndex) => {
-              if (fiIndex === fileIndex) {
-                return {
-                  ...file,
-                  code: newCode,
-                  language: newLanguage,
-                };
-              }
-              return file;
-            }
-          );
-          return {
-            ...prevFolderFiles,
-            extraFiles: newExtraFiles,
-          };
-        } else {
-          // Update files within a folder
-          const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
-            if (fIndex === folderIndex) {
+const updateChangeCode = () => {
+  const updateFileCode = (folderIndex, fileIndex,extraFileIndex, newCode, newLanguage) => {
+    setFolderFiles((prevFolderFiles) => {
+  
+      if (folderIndex === -1) {
+        // Update extraFiles
+        const newExtraFiles = prevFolderFiles.extraFiles.map(
+          (file, fiIndex) => {
+            if (fiIndex === extraFileIndex) {
+              console.log("Updating extra file:", file.name);
               return {
-                ...folder,
-                files: folder.files.map((file, fiIndex) => {
-                  if (fiIndex === fileIndex) {
-                    return {
-                      ...file,
-                      code: newCode,
-                      language: newLanguage,
-                    };
-                  }
-                  return file;
-                }),
+                ...file,
+                code: newCode,
+                language: newLanguage,
               };
             }
-            return folder;
-          });
+            return file;
+          }
+        );
+        console.log("Updated extraFiles:", newExtraFiles);
+        return {
+          ...prevFolderFiles,
+          extraFiles: newExtraFiles,
+        };
+      } else {
+        // Update files within a folder
+        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
+          if (fIndex === folderIndex) {
+            return {
+              ...folder,
+              files: folder.files.map((file, fiIndex) => {
+                if (fiIndex === fileIndex) {
+                  console.log(
+                    "Updating file in folder:",
+                    folder.name,
+                    file.name
+                  );
+                  return {
+                    ...file,
+                    code: newCode,
+                    language: newLanguage,
+                  };
+                }
+                return file;
+              }),
+            };
+          }
+          return folder;
+        });
 
-          return {
-            ...prevFolderFiles,
-            folders: newFolders,
-          };
-        }
-      });
-    };
+        console.log("Updated folders:", newFolders);
+        return {
+          ...prevFolderFiles,
+          folders: newFolders,
+        };
+      }
+    });
+  };
 
+  // Ensure folderIndex, fileIndex, value, and language are defined
+  if (
+    typeof folderIndex === "number" &&
+    typeof fileIndex === "number" &&
+    value &&
+    language
+  ) {
     // Usage example:
-    updateFileCode(folderIndex, fileIndex, value, language);
+    updateFileCode(folderIndex, fileIndex,extraFileIndex, value, language);
 
     // Post request sending can be implemented here
-  };
+  } else {
+    console.error("Invalid folderIndex, fileIndex, value, or language");
+  }
+};
+
+
 
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1) {
+      alert("All folders and files are being downloaded!")
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
@@ -278,6 +311,16 @@ function App() {
               setNewFolderName={setNewFolderName}
               addNewFolder={addNewFolder}
               handleFolderName={handleFolderName}
+              extraFileIndex={extraFileIndex}
+              setExtraFileIndex={setExtraFileIndex}
+              newFileName={newFileName}
+              setNewFileName={setNewFileName}
+              opennewfile={opennewfile}
+              setOpenNewFile={setOpenNewFile}
+              openExtraNewFile={openExtraNewFile}
+              setOpenExtraNewFile={setOpenExtraNewFile}
+              extraNewFileName={extraNewFileName}
+              setExtraNewFileName={setExtraNewFileName}
             />
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>

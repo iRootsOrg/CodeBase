@@ -1,21 +1,25 @@
 import { useState } from "react";
+import { CODE_SNIPPETS } from "../Utils/languages";
+import { FaPlus, FaTrash, FaTimes } from "react-icons/fa";
 const ExtraFiles = (props) => {
   const openFile = ({ file, index }) => {
-      console.log(index);
+    console.log(index);
+    
       
-    if (props.selectFile === index) {
-      props.setSelectFile(-1);
-      props.setFileIndex(-1);
-      props.setValue("No File Selected");
-      props.setLanguage("");
+    if (props.extraFileIndex === index) {
+      
+      props.setExtraFileIndex(-1);
+      props.setLanguage("Choose_Language");
+      props.setValue(CODE_SNIPPETS["Choose_Language"]);
     } else {
-      props.setSelectFile(index);
+      
       // console.log(file);
-      props.setFileIndex(index);
+      props.setExtraFileIndex(index);
       //Can be merged with selectfile
       props.setValue(file.code);
         props.setLanguage(file.language);
-        props.setFolderIndex(props.folderIndex);
+      props.setFolderIndex(-1);
+      props.setFileIndex(-1);
     }
   };
 
@@ -29,10 +33,9 @@ const ExtraFiles = (props) => {
       {props.files.map((file, index) => {
         return (
           <div
+            key={index}
             className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
-              (props.selectFile === index && props.folderIndex === -1) === true
-                ? "text-blue-700 shadow-md"
-                : ""
+              props.extraFileIndex === index ? "text-blue-700 shadow-md" : ""
             }`}
             onClick={() => {
               openFile({ file, index });
@@ -47,7 +50,7 @@ const ExtraFiles = (props) => {
                 deleteFile(index);
               }}
             >
-              🗑️
+              <FaTrash />
             </button>
           </div>
         );
