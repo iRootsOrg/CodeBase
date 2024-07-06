@@ -1,6 +1,6 @@
-import { useState } from "react";
+
 import { CODE_SNIPPETS } from "../Utils/languages";
-import { FaPlus, FaTrash, FaTimes } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 const ExtraFiles = (props) => {
   const openFile = ({ file, index }) => {
     console.log(index);

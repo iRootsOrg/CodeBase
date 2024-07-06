@@ -1,11 +1,5 @@
-import { useState } from "react";
 import Settings from "./Settings.jsx";
 const ToolBar = (props) => {
- 
-
-
- 
-
   const handleSelected = (e) => {
     if (props.selected === e) {
       props.setSelected(0);
@@ -24,7 +18,7 @@ const ToolBar = (props) => {
           // console.log("extra file");
           props.setOpenExtraNewFile(true);
         }
-        
+
         break;
 
       case 2:
@@ -42,7 +36,9 @@ const ToolBar = (props) => {
         props.zipAndDownload();
         props.setSelected(0);
         break;
-
+      case 5:
+        props.setHistoryOpen(!props.historyOpen);
+        break;
       case 6:
         navigator.clipboard
           .writeText(props.value)
@@ -76,7 +72,6 @@ const ToolBar = (props) => {
         break;
     }
   };
-
 
   return (
     <div className="flex p-0">

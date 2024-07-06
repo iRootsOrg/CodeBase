@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BiCodeAlt } from "react-icons/bi";
+
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 const Settings = (props) => {

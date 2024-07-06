@@ -1,6 +1,6 @@
 
-import { useEffect, useState } from "react";
-import { FaPlus, FaTrash, FaTimes } from "react-icons/fa";
+
+import {  FaTrash } from "react-icons/fa";
 import { CODE_SNIPPETS } from "../Utils/languages";
 const File = (props) => {
   const openFile = ({ file, index }) => {
@@ -26,14 +26,6 @@ const File = (props) => {
     props.updateFiles(newFiles); // Use the callback to update the parent state
   };
 
-  // const initialFile = props.files[0];
-  // console.log(initialFile);
-  // const initialIndex = 0;
-  
-  // useEffect(() => {
-    
-  //   openFile({ initialFile, initialIndex });
-  // },[])
 
   return (
     <div className="w-full">

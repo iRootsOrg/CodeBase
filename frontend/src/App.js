@@ -1,11 +1,9 @@
-import logo from "./logo.svg";
+
 import "./App.css";
 import Output from "./Components/Output.jsx";
 import CodeEditor from "./Components/CodeEditor";
-import ToolBar from "./Components/ToolBar.jsx";
 import TestCase from "./Components/TestCase.jsx";
-import { useState, useEffect } from "react";
-import Folder from "./Components/Folder.jsx";
+import { useState } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Run from "./Components/Run.jsx";
@@ -40,8 +38,7 @@ function App() {
   const [openExtraNewFile, setOpenExtraNewFile] = useState(false);
   const [extraNewFileName, setExtraNewFileName] = useState("");
 
-  
-
+  //Sample Folders
   const [folderopen, setFolderOpen] = useState(false);
   const [folderfiles, setFolderFiles] = useState({
     folders: [
@@ -90,23 +87,23 @@ function App() {
     ],
   });
 
-  //Sample Folders
   const [lightmode, setLightMode] = useState(true);
 
   const handleLight = () => {
     setLightMode(!lightmode);
   };
+
   const [folderIndex, setFolderIndex] = useState(-1);
   const [fileIndex, setFileIndex] = useState(-1);
   const [extraFileIndex, setExtraFileIndex] = useState(-1);
-  const [selectedFiles, setSelectedFiles] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState(null); //The uploaded files
   const closeMsg = () => {
     setNotify(false);
     setMsg("");
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText("https://example.com");
+    navigator.clipboard.writeText(window.location.href);
     alert("URL copied to clipboard!");
   };
 
@@ -121,12 +118,6 @@ function App() {
       closeMsg();
     }, 4000);
   };
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     closeMsg();
-  //   }, 3000);
-  // },[notify])
 
   const handleClick = () => {
     setTestCaseOpen(!testcaseOpen);
@@ -153,92 +144,89 @@ function App() {
     setNewFolderName("");
   };
 
-const updateChangeCode = () => {
-  const updateFileCode = (folderIndex, fileIndex,extraFileIndex, newCode, newLanguage) => {
-    setFolderFiles((prevFolderFiles) => {
-  
-      if (folderIndex === -1) {
-        // Update extraFiles
-        const newExtraFiles = prevFolderFiles.extraFiles.map(
-          (file, fiIndex) => {
-            if (fiIndex === extraFileIndex) {
-              console.log("Updating extra file:", file.name);
+  const updateChangeCode = () => {
+    const updateFileCode = (
+      folderIndex,
+      fileIndex,
+      extraFileIndex,
+      newCode,
+      newLanguage
+    ) => {
+      setFolderFiles((prevFolderFiles) => {
+        if (folderIndex === -1) {
+          // Update extraFiles
+          const newExtraFiles = prevFolderFiles.extraFiles.map(
+            (file, fiIndex) => {
+              if (fiIndex === extraFileIndex) {
+                console.log("Updating extra file:", file.name);
+                return {
+                  ...file,
+                  code: newCode,
+                  language: newLanguage,
+                };
+              }
+              return file;
+            }
+          );
+          console.log("Updated extraFiles:", newExtraFiles);
+          return {
+            ...prevFolderFiles,
+            extraFiles: newExtraFiles,
+          };
+        } else {
+          // Update files within a folder
+          const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
+            if (fIndex === folderIndex) {
               return {
-                ...file,
-                code: newCode,
-                language: newLanguage,
+                ...folder,
+                files: folder.files.map((file, fiIndex) => {
+                  if (fiIndex === fileIndex) {
+                    console.log(
+                      "Updating file in folder:",
+                      folder.name,
+                      file.name
+                    );
+                    return {
+                      ...file,
+                      code: newCode,
+                      language: newLanguage,
+                    };
+                  }
+                  return file;
+                }),
               };
             }
-            return file;
-          }
-        );
-        console.log("Updated extraFiles:", newExtraFiles);
-        return {
-          ...prevFolderFiles,
-          extraFiles: newExtraFiles,
-        };
-      } else {
-        // Update files within a folder
-        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
-          if (fIndex === folderIndex) {
-            return {
-              ...folder,
-              files: folder.files.map((file, fiIndex) => {
-                if (fiIndex === fileIndex) {
-                  console.log(
-                    "Updating file in folder:",
-                    folder.name,
-                    file.name
-                  );
-                  return {
-                    ...file,
-                    code: newCode,
-                    language: newLanguage,
-                  };
-                }
-                return file;
-              }),
-            };
-          }
-          return folder;
-        });
+            return folder;
+          });
 
-        console.log("Updated folders:", newFolders);
-        return {
-          ...prevFolderFiles,
-          folders: newFolders,
-        };
-      }
-    });
+          console.log("Updated folders:", newFolders);
+          return {
+            ...prevFolderFiles,
+            folders: newFolders,
+          };
+        }
+      });
+    };
+
+    
+      // Usage example:
+      updateFileCode(folderIndex, fileIndex, extraFileIndex, value, language);
+
+      // Post request sending can be implemented here
   };
-
-  // Ensure folderIndex, fileIndex, value, and language are defined
-  if (
-    typeof folderIndex === "number" &&
-    typeof fileIndex === "number" &&
-    value &&
-    language
-  ) {
-    // Usage example:
-    updateFileCode(folderIndex, fileIndex,extraFileIndex, value, language);
-
-    // Post request sending can be implemented here
-  } else {
-    console.error("Invalid folderIndex, fileIndex, value, or language");
-  }
-};
-
-
 
   const zipAndDownload = () => {
     const zip = new JSZip();
-    if (folderIndex === -1 && fileIndex === -1) {
-      alert("All folders and files are being downloaded!")
+    if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
+      alert("All folders and files are being downloaded!");
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
           folderZip.file(`${file.name}.${file.language}`, file.code);
         });
+      });
+      folderfiles.extraFiles.forEach((file) => {
+        zip.file(`${file.name}.${file.language}`, file.code);
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
@@ -246,7 +234,7 @@ const updateChangeCode = () => {
       });
     } else if (
       folderIndex >= 0 &&
-      folderIndex < folderfiles.length &&
+      folderIndex < folderfiles.folders.length &&
       fileIndex === -1
     ) {
       const folder = folderfiles.folders[folderIndex];
@@ -259,23 +247,35 @@ const updateChangeCode = () => {
       zip.generateAsync({ type: "blob" }).then((content) => {
         saveAs(content, `${folder.name}.zip`);
       });
-    } else {
+    } else if (
+      extraFileIndex >= 0 &&
+      extraFileIndex < folderfiles.extraFiles.length
+    ) {
+      const file = folderfiles.extraFiles[extraFileIndex];
+      const blob = new Blob([file.code], {
+        type: "text/plain;charset=utf-8",
+      });
+      saveAs(blob, `${file.name}.${file.language}`);
+    } else if (
+      folderIndex >= 0 &&
+      folderIndex < folderfiles.folders.length &&
+      fileIndex >= 0 &&
+      fileIndex < folderfiles.folders[folderIndex].files.length
+    ) {
       const folder = folderfiles.folders[folderIndex];
-      if (fileIndex >= 0 && fileIndex < folder.files.length) {
-        const file = folder.files[fileIndex];
-        const blob = new Blob([file.code], {
-          type: "text/plain;charset=utf-8",
-        });
-        saveAs(blob, `${file.name}.${file.language}`);
-      } else {
-        console.error("Invalid file index");
-      }
+      const file = folder.files[fileIndex];
+      const blob = new Blob([file.code], {
+        type: "text/plain;charset=utf-8",
+      });
+      saveAs(blob, `${file.name}.${file.language}`);
+    } else {
+      alert("No File Selected");
+      console.error("Invalid file index");
     }
   };
 
-  const [infoOpen, setInfoOpen] = useState(false);
 
-  
+  const [infoOpen, setInfoOpen] = useState(false);
 
   return (
     <div className="flex h-screen">
@@ -332,7 +332,7 @@ const updateChangeCode = () => {
         </div>
         <div className="bg-gray-100 pl-4">
           <div className={`flex p-4 justify-between `}>
-            <label for="testcases" className="font-bold text-xl">
+            <label  className="font-bold text-xl">
               Test Cases :
             </label>
             <div className="flex items-center gap-4">

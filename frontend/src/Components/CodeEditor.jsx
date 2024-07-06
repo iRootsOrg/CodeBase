@@ -7,12 +7,15 @@ import Submit from "./Submit";
 import Fullscreen from "./FullScreen";
 import ToolBar from "./ToolBar";
 import Folder from "./Folder";
-import { FaCheck, FaTrash } from "react-icons/fa";
+import History from "./History";
+
 const CodeEditor = (props) => {
   const editorRef = useRef();
   const [toolBar, setToolBar] = useState(false);
    const [selected, setSelected] = useState(0);
-   const [settingsopen, setSettingsOpen] = useState(false);
+  const [settingsopen, setSettingsOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  
 
   useEffect(() => {
     props.setLanguage("Choose_Language");
@@ -142,6 +145,8 @@ const CodeEditor = (props) => {
           setSelected={setSelected}
           settingsopen={settingsopen}
           setSettingsOpen={setSettingsOpen}
+          historyOpen={historyOpen}
+          setHistoryOpen={setHistoryOpen}
         />
         <div className="">
           {props.folderopen === true ? (
@@ -172,8 +177,17 @@ const CodeEditor = (props) => {
                 newFolderName={props.newFolderName}
                 handleFolderName={props.handleFolderName}
                 addNewFolder={props.addNewFolder}
-                
               />
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
+
+        <div className="">
+          {historyOpen === true ? (
+            <div className="w-48 ">
+              <History />
             </div>
           ) : (
             ""

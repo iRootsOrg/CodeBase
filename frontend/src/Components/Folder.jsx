@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import File from "./File";
 import { CODE_SNIPPETS } from "../Utils/languages";
 import { FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
@@ -155,7 +155,7 @@ const Folder = (props) => {
               </div>
             </div>
 
-            {props.folderIndex === index && (
+            {props.folderIndex === index ? (
               <div className="pl-6 w-full">
                 <File
                   folderKey={index}
@@ -173,7 +173,7 @@ const Folder = (props) => {
                   setExtraFileIndex={props.setExtraFileIndex}
                 />
 
-                {props.opennewfile && (
+                {props.opennewfile ? (
                   <div className="flex gap-2 hover:text-blue-600 font-medium text-sm p-1 items-center">
                     <div>🗃️</div>
                     <input
@@ -195,9 +195,9 @@ const Folder = (props) => {
                       </button>
                     </div>
                   </div>
-                )}
+                ):""}
               </div>
-            )}
+            ):""}
           </div>
         ))}
 
