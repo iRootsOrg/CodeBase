@@ -1,5 +1,5 @@
 export const CODE_SNIPPETS = {
-  Choose_Language: `No File Selected`,
+  Choose_Language: `No File/Language Selected`,
   js: `function greet(name) {\n\tconsole.log("Hello, " + name + "!");\n}\n\ngreet("Alex");\n`,
   ts: `type Params = {\n\tname: string;\n}\n\nfunction greet(data: Params) {\n\tconsole.log("Hello, " + data.name + "!");\n}\n\ngreet({ name: "Alex" });\n`,
   py: `def greet(name):\n\tprint("Hello, " + name + "!")\n\ngreet("Alex")\n`,

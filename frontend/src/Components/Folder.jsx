@@ -19,8 +19,15 @@ const Folder = (props) => {
   };
 
   const handleNewFolder = (index) => {
+    props.setLanguage("Choose_Language");
+    props.setValue(CODE_SNIPPETS["Choose_Language"]);
+    let lastFileIndex = props.folderfiles.folders[index].files.length - 1;
+    lastFileIndex = lastFileIndex >= 0 ? lastFileIndex : 0;
+      props.setFileIndex(lastFileIndex);
     props.setFolderIndex(index);
     props.setOpenNewFile(true);
+   
+    
   };
 
   const addNewFolder = () => {
@@ -102,6 +109,11 @@ const Folder = (props) => {
       ...prevState,
       folders: newFolders,
     }));
+
+    props.setFolderIndex(-1);
+    props.setFileIndex(-1);
+    props.setExtraFileIndex(-1);
+     props.setValue("No File Selected");
   };
 
   const setAllNull = () => {

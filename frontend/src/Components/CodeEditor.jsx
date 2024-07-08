@@ -27,11 +27,13 @@ const CodeEditor = (props) => {
     editor.focus();
   };
   const onSelect = (language) => {
-    props.setLanguage(language);
-    console.log(language);
-    if (props.boilerplatecode === true) {
+   
+    if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
     }
+
+     props.setLanguage(language);
+     console.log(language);
   };
 
   const setToolbarNull = () => {
@@ -78,7 +80,11 @@ const CodeEditor = (props) => {
             />
           )}
 
-          <DropDown language={props.language} onSelect={onSelect} />
+          {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
+            <DropDown language={props.language} onSelect={onSelect} />
+          ) : (
+            ""
+          )}
         </div>
 
         <div className="flex justify-between items-center gap-4">
@@ -114,6 +120,8 @@ const CodeEditor = (props) => {
 
       <div className="flex h-full bg-gray-100">
         <ToolBar
+          folderfiles={props.folderfiles}
+          setFolderFiles={props.setFolderFiles}
           folderopen={props.folderopen}
           setFolderOpen={props.setFolderOpen}
           value={props.value}
@@ -135,6 +143,8 @@ const CodeEditor = (props) => {
           setFolderIndex={props.setFolderIndex}
           fileIndex={props.fileIndex}
           setFileIndex={props.setFileIndex}
+          extraFileIndex={props.extraFileIndex}
+          setExtraFileIndex={props.setExtraFileIndex}
           newFileName={props.newFileName}
           setNewFileName={props.setNewFileName}
           opennewfile={props.opennewfile}
@@ -147,6 +157,8 @@ const CodeEditor = (props) => {
           setSettingsOpen={setSettingsOpen}
           historyOpen={historyOpen}
           setHistoryOpen={setHistoryOpen}
+          language={props.language}
+          setLanguage={props.setLanguage}
         />
         <div className="">
           {props.folderopen === true ? (

@@ -25,7 +25,11 @@ const ExtraFiles = (props) => {
 
   const deleteFile = (index) => {
     const newFiles = props.files.filter((_, fileIndex) => fileIndex !== index);
-    props.updateFiles(newFiles); // Use the callback to update the parent state
+    props.updateFiles(newFiles); 
+    props.setExtraFileIndex(-1);
+    props.setFolderIndex(-1);
+    props.setFileIndex(-1);
+     props.setValue("No File Selected");
   };
 
   return (

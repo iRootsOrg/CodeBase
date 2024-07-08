@@ -1,4 +1,5 @@
 import Settings from "./Settings.jsx";
+import { CODE_SNIPPETS } from "../Utils/languages.jsx";
 const ToolBar = (props) => {
   const handleSelected = (e) => {
     if (props.selected === e) {
@@ -13,11 +14,24 @@ const ToolBar = (props) => {
         props.setSelected(3);
         if (props.folderIndex !== -1) {
           // console.log("For folderindex ", props.folderIndex);
+           let lastFileIndex =
+            props.folderfiles.folders[props.folderIndex].files.length - 1;
+          lastFileIndex = lastFileIndex >= 0 ? lastFileIndex : 0;
+           props.setFileIndex(lastFileIndex);
           props.setOpenNewFile(true);
         } else {
           // console.log("extra file");
           props.setOpenExtraNewFile(true);
+          
+            
+           let lastExtraFileIndex =
+            props.folderfiles.extraFiles.length - 1;
+          lastExtraFileIndex = lastExtraFileIndex >= 0 ? lastExtraFileIndex : 0;
+           props.setExtraFileIndex(lastExtraFileIndex);
         }
+
+         props.setLanguage("Choose_Language");
+         props.setValue(CODE_SNIPPETS["Choose_Language"]);
 
         break;
 

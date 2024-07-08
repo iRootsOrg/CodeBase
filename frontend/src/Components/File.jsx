@@ -19,11 +19,16 @@ const File = (props) => {
       props.setLanguage(file.language);
       props.setExtraFileIndex(-1);
     }
+
+
   };
 
   const deleteFile = (index) => {
     const newFiles = props.files.filter((_, fileIndex) => fileIndex !== index);
     props.updateFiles(newFiles); // Use the callback to update the parent state
+    props.setFileIndex(-1);
+    props.setExtraFileIndex(-1);
+    props.setValue("No File Selected");
   };
 
 

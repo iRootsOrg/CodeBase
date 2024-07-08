@@ -1,15 +1,13 @@
-
 import "./App.css";
 import Output from "./Components/Output.jsx";
 import CodeEditor from "./Components/CodeEditor";
 import TestCase from "./Components/TestCase.jsx";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Run from "./Components/Run.jsx";
-import RunAll from "./Components/RunAll.jsx"
+import RunAll from "./Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
-
 
 function App() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
@@ -39,53 +37,33 @@ function App() {
   const [extraNewFileName, setExtraNewFileName] = useState("");
 
   //Sample Folders
+  const [saveLocally, setSaveLocally] = useState(false);
   const [folderopen, setFolderOpen] = useState(false);
-  const [folderfiles, setFolderFiles] = useState({
-    folders: [
-      {
-        name: "Folder1",
-        files: [
-          {
-            name: "File1",
-            code: "Hello fdg",
-            language: "js",
-          },
-          {
-            name: "File2",
-            code: "He",
-            language: "ts",
-          },
-        ],
-      },
-      {
-        name: "Folder2",
-        files: [
-          {
-            name: "File21",
-            code: "lorem  ipsum fdfdsf",
-            language: "js",
-          },
-          {
-            name: "File22",
-            code: "He jkbdv dvdvdfdf",
-            language: "ts",
-          },
-        ],
-      },
-    ],
-    extraFiles: [
-      {
-        name: "ExtraFile1",
-        code: "Extra file code",
-        language: "js",
-      },
-      {
-        name: "ExtraFile2",
-        code: "More extra file code",
-        language: "ts",
-      },
-    ],
-  });
+  const initialFolderFiles = {
+    folders: [],
+    extraFiles: [],
+  };
+  const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
+
+
+
+  useEffect(() => {
+    const initialCode = localStorage.getItem("folderfiles");
+    // console.log(initialCode);
+
+    if (initialCode === null) {
+      localStorage.setItem("folderfiles", JSON.stringify(initialFolderFiles));
+    } else {
+      setFolderFiles(JSON.parse(initialCode));
+      setSaveLocally(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (saveLocally === true) {
+      localStorage.setItem("folderfiles", JSON.stringify(folderfiles));
+    }
+  }, [folderfiles]);
 
   const [lightmode, setLightMode] = useState(true);
 
@@ -208,11 +186,9 @@ function App() {
       });
     };
 
-    
-      // Usage example:
-      updateFileCode(folderIndex, fileIndex, extraFileIndex, value, language);
+    updateFileCode(folderIndex, fileIndex, extraFileIndex, value, language);
 
-      // Post request sending can be implemented here
+    // Post request sending can be implemented here
   };
 
   const zipAndDownload = () => {
@@ -274,7 +250,6 @@ function App() {
     }
   };
 
-
   const [infoOpen, setInfoOpen] = useState(false);
 
   return (
@@ -332,9 +307,7 @@ function App() {
         </div>
         <div className="bg-gray-100 pl-4">
           <div className={`flex p-4 justify-between `}>
-            <label  className="font-bold text-xl">
-              Test Cases :
-            </label>
+            <label className="font-bold text-xl">Test Cases :</label>
             <div className="flex items-center gap-4">
               <Run />
               <RunAll />
