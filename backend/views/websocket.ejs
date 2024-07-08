@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket</title>
+</head>
+<body>
+  <h1>WebSocket</h1>
+  <textarea id="code" cols="30" rows="10"></textarea>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script>// Get the wssPort variable from the server
+    const socketUrl = `https://localhost:${process.env.WSS_PORT}/ws`;
+    const socket = new SockJS(socketUrl);
+    socket.onmessage = (event) => {
+      console.log(`Received message => ${event.data}`);
+      const code = JSON.parse(event.data).code;
+      document.getElementById('code').value = code;
+    };
+    socket.onopen = () => {
+      console.log('Connected to WebSocket');
+    };
+    socket.onclose = () => {
+      console.log('Disconnected from WebSocket');
+    };
+    document.getElementById('code').addEventListener('input', (event) => {
+      const code = event.target.value;
+      socket.send(JSON.stringify({ code }));
+    });
+  </script>
+</body>
+</html>
