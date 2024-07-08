@@ -8,6 +8,7 @@ const userRoutes = require("./routes/userRoutes")
 const connectDB = require("./config/db")
 const fileUpload = require("express-fileupload");
 const WebSocket = require("ws");
+const errorMiddleware = require("./middlewares/errorMiddleware");
 
 const app = express();
 dotenv.config();
@@ -18,6 +19,7 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
+
 
 const PORT = process.env.PORT;
 const wssPort = process.env.WSS_PORT;
@@ -58,6 +60,9 @@ app.get("/", (req, res) => {
         message: "Welcome to compiler backend",
     });
 });
+
+
+app.use(errorMiddleware); 
 
 // listen server
 app.listen(PORT, () => {
