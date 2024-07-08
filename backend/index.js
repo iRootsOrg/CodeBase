@@ -7,7 +7,7 @@ const fileRoutes=require("./routes/fileRoutes")
 const userRoutes = require("./routes/userRoutes")
 const connectDB=require("./config/db")
 const fileUpload = require("express-fileupload");
-const WebSocket = require("ws");
+
 
 const app = express();
 dotenv.config();
@@ -20,27 +20,6 @@ app.use(express.json());
 app.use(fileUpload());
 
 const PORT = process.env.PORT;
-const wssPort = process.env.WSS_PORT;
-
-const wss = new WebSocket.Server({ port: wssPort });
-
-wss.on("connection", (ws) => {
-    console.log("Client connected to WebSocket server");
-
-    ws.on("message", (message) => {
-        console.log(`Received message => ${message}`);
-    });
-
-    ws.on("error", (error) => {
-        console.log("Error occurred in WebSocket connection");
-        console.error(error);
-    });
-
-    ws.on("close", () => {
-        console.log("Client disconnected from WebSocket server");
-    });
-});
-
 
 app.use("/api/v1/file",fileRoutes);
 app.use("/api/v1/user", userRoutes);

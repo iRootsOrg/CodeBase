@@ -20,16 +20,4 @@ function authenticateToken(req, res, next) {
     }
 }
 
-function hasPermission(permission) {
-    return function (req, res, next) {
-        const user = req.user;
-        const role = user.role;
-        if (role.permissions.includes(permission)) {
-            next();
-        } else {
-            res.status(403).send({ error: 'Forbidden' });
-        }
-    };
-}
-
-module.exports = {authenticateToken, hasPermission};
+module.exports = authenticateToken;
