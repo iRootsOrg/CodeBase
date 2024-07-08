@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Role'
+    },
+    editingSessionId: {
+        type: String
     }
 }, {timestamps: true});
 

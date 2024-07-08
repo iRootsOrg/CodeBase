@@ -57,4 +57,28 @@ async function loginUser(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser };
+async function startEditingSession(req, res) {
+    const { code } = req.body;
+    const user = req.user;
+    const editingSession = new mongoose.model('EditingSession')({ code, users: [user._id] });
+    await editingSession.save();
+    user.editingSessionId = editingSession.sessionId;
+    await user.save();
+    res.json({ sessionId: editingSession.sessionId });
+}
+
+async function joinEditingSession(req, res) {
+    const { sessionId } = req.body;
+    const user = req.user;
+    const editingSession = await mongoose.model('EditingSession').findOne({ sessionId });
+    if (!editingSession) {
+        return res.status(404).json({ message: 'Editing session not found.' });
+    }
+    editingSession.users.push(user._id);
+    await editingSession.save();
+    user.editingSessionId = editingSession.sessionId;
+    await user.save();
+    res.json({ message: 'Joined editing session successfully.' });
+}
+
+module.exports = { registerUser, loginUser, startEditingSession, joinEditingSession };
