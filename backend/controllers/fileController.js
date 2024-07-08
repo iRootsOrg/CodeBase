@@ -2,6 +2,7 @@ const fs = require("fs");
 const File = require("../models/fileModel.js");
 const dotenv = require("dotenv");
 const path = require("path");
+const CustomError = require("../utils/CustomError.js");
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
@@ -54,20 +55,20 @@ const parseTestCases = async (testCases) => {
     })));
 };
 
-const uploadController = async (req, res) => {
+const uploadController = async (req, res, next) => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send("No files uploaded.");
+            throw new CustomError("No files uploaded.", 400);
         }
 
         const mainFile = req.files.file;
         if (!mainFile) {
-            return res.status(400).send("No main file named 'file' found in the request.");
+            throw new CustomError("No main file named 'file' found in the request.", 400);
         }
 
         
         if (!req.userId) {
-            return res.status(401).send("User not authenticated.");
+            throw new CustomError("User not authenticated.", 401);
         }
 
         let testCases;
@@ -77,13 +78,13 @@ const uploadController = async (req, res) => {
                 testCases = [testCases]; 
             }
         } catch (error) {
-            return res.status(400).send("Invalid testCases format. Must be a valid JSON array.");
+            throw new CustomError("Invalid testCases format. Must be a valid JSON array.", 400);
         }
 
         if (!testCases.every(testCase => 
             Array.isArray(testCase.inputs) && Array.isArray(testCase.outputs)
         )) {
-            return res.status(400).send("Invalid testCase structure. Each testCase must have 'inputs' and 'outputs' arrays.");
+            throw new CustomError("Invalid testCase structure. Each testCase must have 'inputs' and 'outputs' arrays.", 400);
         }
 
         
@@ -92,7 +93,7 @@ const uploadController = async (req, res) => {
                 if (input.type === 'file' && input.file) {
                     const uploadedFile = req.files[input.file];
                     if (!uploadedFile) {
-                        throw new Error(`File ${input.file} not found in the request.`);
+                        throw new CustomError(`File ${input.file} not found in the request.`);
                     }
                     const fileId = await handleFileUpload({
                         name: uploadedFile.name,
@@ -137,48 +138,28 @@ const uploadController = async (req, res) => {
         const savedFile = await File.create(fileData);
         res.status(201).send({ fileId: savedFile._id });
     } catch (error) {
-        console.error('Error in uploadController:', error);
-        res.status(500).send({ error: error.message || "An error occurred while processing your request." });
+        next(error);
     }
 };
 
-const decodeController = async (req, res) => {
+const decodeController = async (req, res, next ) => {
     const fileId = req.params.id;
     if (!fileId) {
-        return res.status(400).send("No fileId provided.");
+        throw new CustomError("No fileId provided.", 400);
     }
 
     try {
         const file = await File.findById(fileId);
         if (!file) {
-            return res.status(404).send("File not found.");
+            throw new CustomError("File not found.", 404)
         }
 
         const decodedFile = Buffer.from(file.file, 'binary').toString('utf-8');
         res.status(200).send(decodedFile);
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        next(error);
     }
 };
-
-const decodeController = async (req, res) => {
-    if (!req.body.fileId) {
-        return res.status(400).send("No filename provided.");
-    }
-
-    try {
-        const fileId = req.body.fileId;
-        const file = await File.findById(fileId);
-        if (!file) {
-            return res.status(404).send("File not found.");
-        }
-
-        const decodedFile = Buffer.from(file.file, 'binary').toString('utf-8');
-        res.status(200).send(decodedFile);
-    } catch (error) {
-        res.status(500).send({ error: error.message });
-    }
-}
 
 module.exports = {
     uploadController,
