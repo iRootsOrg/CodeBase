@@ -18,9 +18,9 @@ const TestCase = (props) => {
   }, [props.testCases, selected]);
 
   return (
-    <div className="flex">
-      <div className="w-56 font-bold">
-        {[1, 2, 3, 4].map((num) => (
+    <div className="flex h-52">
+      <div className="w-56 font-bold h-full overflow-y-scroll">
+        {[1, 2, 3, 4,5,6,7,8].map((num) => (
           <div
             key={num}
             className={`border-r-2 border-[#d1d5db] h-14 w-full content-center p-2.5 cursor-pointer ${
