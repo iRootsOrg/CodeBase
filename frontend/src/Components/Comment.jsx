@@ -49,15 +49,17 @@ export default function Comment(props) {
           {warning && (
             <p className="text-sm text-red-500 mt-1">Feedback cannot be empty.</p>
           )}
-          {!submitted && (
+          
+      
             <button
               onClick={handleSubmit}
               className={`mt-2 ml-auto px-6 py-2 md text-white font-bold bg-gradient-to-r from-cyan-500 via-cyan-600 to-cyan-700 focus:outline-none ${feedback.trim().length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={feedback.trim().length === 0}
             >
-              Submit Review
+             {!submitted?'Submit Review': 'Approve'} 
             </button>
-          )}
+          
+
         </div>
       </div>
       
