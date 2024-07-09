@@ -1,6 +1,10 @@
 #include <iostream>
+using namespace std;
+
 int main()
 {
-    std::cout << "Hello, World from C++!" << std::endl;
+    int a, b, c, d;
+    cin >> a >> b >> c >> d;
+    cout << a + b + c + d << "\n";
     return 0;
 }

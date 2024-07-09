@@ -6,7 +6,7 @@ const Run = () => {
     }
     return (
       <button
-        className="border border-black block w-20% px-4 py-1 text-center rounded bg-black text-white"
+        className="border border-custom-gradient block w-20% px-4 py-1 text-center rounded bg-custom-gradient text-white"
         onClick={() => {
           onRun();
         }}
