@@ -31,10 +31,7 @@ const addCommentToReview = async (req, res, next) => {
         if (!author) {
             throw new CustomError('Author is required', 400);
         }
-        if(!isReviewer) {
-            throw new CustomError('isReviewer is required', 400);
-        }
-
+        
         comment.replies.push({ content, author, isReviewer });
 
         await review.save();
