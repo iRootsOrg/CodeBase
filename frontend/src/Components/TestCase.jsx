@@ -45,17 +45,20 @@ const TestCase = (props) => {
           </div>
         ))}
       </div>
-      <textarea
-        className={`border-l-4 w-full p-2 ${
-          props.lightmode
-            ? "bg-gray-100 text-black border-[#d1d5db] scrollbar-light"
-            : "bg-[#1e1e1e] text-white border-[#2e2a24] scrollbar-dark"
-        } focus:outline-none focus:border-t`}
-        placeholder="Please input your test cases..."
-        name={`textArea${selected}`}
-        value={props.testCases[`textArea${selected}`]}
-        onChange={(e) => handleTestCase(e)}
-      />
+      <div className="flex flex-col h-full w-full overflow-y-auto items-end ">
+        <textarea
+          className={`border-l-4 w-full h-full p-2 ${
+            props.lightmode
+              ? "bg-gray-100 text-black border-[#d1d5db] scrollbar-light"
+              : "bg-[#1e1e1e] text-white border-[#2e2a24] scrollbar-dark"
+          } focus:outline-none focus:border-t`}
+          placeholder="Please input your test cases..."
+          name={`textArea${selected}`}
+          value={props.testCases[`textArea${selected}`]}
+          onChange={(e) => handleTestCase(e)}
+        />
+        <button className={`p-2.5 ${props.lightmode ? "text-black":"text-white"}`} onClick={() => { props.setReportBugOpen(true); }}>🐞 Report Bug</button>
+      </div>
     </div>
   );
 };

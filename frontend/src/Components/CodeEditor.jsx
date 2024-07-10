@@ -55,7 +55,7 @@ const CodeEditor = (props) => {
   };
 
   return (
-    <div className={`h-[90%] `}>
+    <div className={``}>
       <div className="flex justify-between m-4 items-center">
         <div className="cursor-pointer flex gap-2">
           {toolBar === true ? (
@@ -101,7 +101,7 @@ const CodeEditor = (props) => {
               className={` cursor-pointer h-10 w-10 ${
                 props.lightmode
                   ? "text-black bg-white border-black"
-                  : "text-white bg-gray-800 border-white"
+                  : "text-white bg-[#1e1e1e] border-white"
               }  p-2 flex justify-center items-center rounded border `}
             >
               <Fullscreen />
@@ -111,7 +111,7 @@ const CodeEditor = (props) => {
               onClick={() => props.handleLight()}
             >
               {props.lightmode === true ? (
-                <button className="text-white h-10 w-10 bg-gray-800  p-2 flex justify-between rounded border border-white">
+                <button className="text-white h-10 w-10 bg-[#1e1e1e]  p-2 flex justify-between rounded border border-white">
                   <AiOutlineMoon className="h-6 w-6" />
                 </button>
               ) : (
@@ -128,8 +128,8 @@ const CodeEditor = (props) => {
 
       <div
         className={`flex h-full ${
-          props.lightmode ? "bg-gray-100" : "bg-gray-800"
-        }`}
+          props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+        } `}
       >
         <ToolBar
           folderfiles={props.folderfiles}

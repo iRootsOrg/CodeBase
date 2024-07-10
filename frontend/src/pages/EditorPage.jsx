@@ -8,8 +8,8 @@ import Run from "../Components/Run.jsx";
 import RunAll from "../Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
 import light from "react-syntax-highlighter/dist/cjs/light.js";
-import { CODE_SNIPPETS,LAN_CONVERSION } from "../Utils/languages.jsx";
-
+import { CODE_SNIPPETS, LAN_CONVERSION } from "../Utils/languages.jsx";
+import Submit from "../Components/Submit.jsx";
 function EditorPage() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
@@ -18,7 +18,7 @@ function EditorPage() {
     textArea3: "",
     textArea4: "",
   });
- 
+
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
@@ -49,7 +49,7 @@ function EditorPage() {
     ],
   };
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
-   const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState("javascript");
 
   const [value, setValue] = useState("");
 
@@ -59,19 +59,17 @@ function EditorPage() {
 
     if (initialCode === null) {
       localStorage.setItem("folderfiles", JSON.stringify(initialFolderFiles));
-       setLanguage(initialFolderFiles.extraFiles[0].language);
-       setValue(initialFolderFiles.extraFiles[0].code);
+      setLanguage(initialFolderFiles.extraFiles[0].language);
+      setValue(initialFolderFiles.extraFiles[0].code);
     } else {
       const folderParsing = JSON.parse(initialCode);
       setFolderFiles(folderParsing);
-      
+
       setLanguage(folderParsing.extraFiles[0].language);
       setValue(folderParsing.extraFiles[0].code);
       setSaveLocally(true);
     }
     setExtraFileIndex(0);
-   
-    
   }, []);
 
   useEffect(() => {
@@ -213,7 +211,10 @@ function EditorPage() {
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
-          folderZip.file(`${file.name}.${LAN_CONVERSION[file.language]}`, file.code);
+          folderZip.file(
+            `${file.name}.${LAN_CONVERSION[file.language]}`,
+            file.code
+          );
         });
       });
       folderfiles.extraFiles.forEach((file) => {
@@ -269,12 +270,13 @@ function EditorPage() {
   };
 
   const [infoOpen, setInfoOpen] = useState(false);
+  const [reportBugOpen, setReportBugOpen] = useState(false);
 
   return (
     <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className=" flex flex-col overflow-hidden">
         <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 h-[96%] ">
+          <div className="flex-1 h-auto ">
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -323,7 +325,11 @@ function EditorPage() {
             <Output lightmode={lightmode} />
           </div>
         </div>
-        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4`}>
+        <div
+          className={`${
+            lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+          } pl-4 h-auto`}
+        >
           <div className={`flex p-4 justify-between `}>
             <label
               className={`font-bold text-xl ${
@@ -361,6 +367,8 @@ function EditorPage() {
               testCases={testCases}
               setTestCases={setTestCases}
               lightmode={lightmode}
+              reportBugOpen={reportBugOpen}
+              setReportBugOpen={setReportBugOpen}
             />
           ) : (
             ""
@@ -491,6 +499,85 @@ function EditorPage() {
             <div className="mb-0 font-bold">
               &copy; iRoots Data and Publishing Company Private Limited
             </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
+      {reportBugOpen === true ? (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-gray-100 bg-opacity-90 text-black border-black"
+                : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
+            } p-6 rounded-lg shadow-lg relative w-[70vw]`}
+          >
+            <div className="flex items-center">
+              <button
+                onClick={() => {
+                  setReportBugOpen(false);
+                }}
+                className={`absolute top-3 right-2 ${
+                  lightmode
+                    ? "text-black hover:text-gray-700"
+                    : "text-white hover:text-gray-200"
+                }`}
+              >
+                <FaTimes size={24} />
+              </button>
+              <h2 className={`text-xl font-bold top-3 left-[45%] absolute `}>
+                Report Bug
+              </h2>
+            </div>
+
+            <form
+              action="POST"
+              className="flex flex-col gap-3 mt-4 font-semibold w-full"
+            >
+              <p>Tell us some details:</p>
+              <label>Name :</label>
+              <input
+                type="text"
+                placeholder="Name"
+                name="Name"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+              ></input>
+              <label>Email :</label>
+              <input
+                type="email"
+                placeholder="Email"
+                name="Email"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+              ></input>
+              <label>Tell us what issue/bug, you met :</label>
+              <textarea
+                type="text"
+                placeholder="Issue"
+                name="Issue"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+                rows={6}
+              ></textarea>
+              <div className="flex justify-end pr-2 w-full">
+                <button
+                  className={`block w-24 px-2 py-1 text-center rounded ${
+                    lightmode
+                      ? "bg-custom-gradient"
+                      : "bg-custom-gradient-inverted"
+                  } text-white`}
+                  type="submit"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       ) : (
