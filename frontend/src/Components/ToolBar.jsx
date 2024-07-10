@@ -90,11 +90,21 @@ const ToolBar = (props) => {
   return (
     <div className="flex p-0">
       {props.toolBar === true ? (
-        <div className="border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 bg-gray-100">
+        <div
+          className={`border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 ${
+            props.lightmode ? "bg-gray-100" : "bg-black"
+          }`}
+        >
           <div
             className={`ml-1 h-8 flex justify-center items-center  w-full pt-2 ${
-              props.selected === 1 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900  `}
+              props.selected === 1
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(1)}
           >
             <img
@@ -104,9 +114,15 @@ const ToolBar = (props) => {
             />
           </div>
           <div
-            className={`     ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 2 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900 `}
+            className={`ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 2
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(2)}
           >
             <img
@@ -116,9 +132,15 @@ const ToolBar = (props) => {
             />
           </div>
           <div
-            className={`      ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 3 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+            className={`ml-1 h-8 flex justify-center items-center w-full ${
+              props.selected === 3
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(3)}
           >
             <img
@@ -129,8 +151,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`      ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 4 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 4
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(4)}
           >
             <img
@@ -141,8 +169,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 5 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 5
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(5)}
           >
             <img
@@ -153,8 +187,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`      ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 6 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 6
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(6)}
           >
             <img
@@ -166,8 +206,14 @@ const ToolBar = (props) => {
 
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full  ${
-              props.selected === 7 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 7
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
           >
             <img
               onClick={() => handleSelected(7)}
@@ -178,10 +224,10 @@ const ToolBar = (props) => {
 
             {props.settingsopen === true ? (
               <div
-                className={`absolute left-14  py-2 z-10 rounded ${
+                className={`absolute left-14  py-2 z-10 rounded bg-transparent ${
                   props.lightmode === true
-                    ? "bg-gray-100 text-black"
-                    : "bg-black text-gray-100"
+                    ? " text-black"
+                    : "text-white"
                 }`}
               >
                 <Settings
@@ -197,8 +243,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 8 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 8
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(8)}
           >
             <img
@@ -209,8 +261,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 9 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 9
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(9)}
           >
             <img
@@ -221,8 +279,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 10 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 10
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(10)}
           >
             <label>
@@ -243,8 +307,14 @@ const ToolBar = (props) => {
           </div>
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
-              props.selected === 11 ? "border-l-4 border-blue-900" : ""
-            } cursor-pointer hover:border-l-4 hover:border-blue-900`}
+              props.selected === 11
+                ? `border-l-4 ${
+                    props.lightmode ? "border-blue-900" : "border-white"
+                  }`
+                : ""
+            } cursor-pointer hover:border-l-4 ${
+              props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+            }`}
             onClick={() => handleSelected(11)}
           >
             <img

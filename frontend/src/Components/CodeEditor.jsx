@@ -11,7 +11,7 @@ import History from "./History";
 
 const CodeEditor = (props) => {
   const editorRef = useRef();
-  const [toolBar, setToolBar] = useState(false);
+  const [toolBar, setToolBar] = useState(true);
    const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -57,7 +57,7 @@ const CodeEditor = (props) => {
   };
 
   return (
-    <div className="h-[90%]">
+    <div className={`h-[90%] `}>
       <div className="flex justify-between m-4 items-center">
         <div className="cursor-pointer flex gap-2">
           {toolBar === true ? (
@@ -81,21 +81,21 @@ const CodeEditor = (props) => {
           )}
 
           {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
-            <DropDown language={props.language} onSelect={onSelect} />
+            <DropDown language={props.language} onSelect={onSelect} lightmode={props.lightmode} />
           ) : (
             ""
           )}
         </div>
 
-        <div className="flex justify-between items-center gap-4">
+        <div className={`flex justify-between items-center gap-4 `}>
           <div className=" flex gap-5 h-10">
             <button
-              className="h-10 w-10  flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hover:bg-blue-600"
+              className="h-10 w-10  flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 "
               onClick={formatCode}
             >
               <BiCodeAlt className="text-xl" />
             </button>
-            <div className=" cursor-pointer h-10 w-10 text-black bg-white  p-2 flex justify-center items-center rounded border border-black">
+            <div className={` cursor-pointer h-10 w-10 ${props.lightmode ?  "text-black bg-white border-black":"text-white bg-black border-white"}  p-2 flex justify-center items-center rounded border `}>
               <Fullscreen />
             </div>
             <div
@@ -113,12 +113,12 @@ const CodeEditor = (props) => {
               )}
             </div>
 
-            <Submit />
+            <Submit lightmode={props.lightmode} />
           </div>
         </div>
       </div>
 
-      <div className="flex h-full bg-gray-100">
+      <div className={`flex h-full ${props.lightmode ? "bg-gray-100":"bg-black"}`}>
         <ToolBar
           folderfiles={props.folderfiles}
           setFolderFiles={props.setFolderFiles}
@@ -189,6 +189,9 @@ const CodeEditor = (props) => {
                 newFolderName={props.newFolderName}
                 handleFolderName={props.handleFolderName}
                 addNewFolder={props.addNewFolder}
+                lightmode={props.lightmode}
+                setNewFolderName={props.setNewFolderName}
+              
               />
             </div>
           ) : (
@@ -198,7 +201,7 @@ const CodeEditor = (props) => {
 
         <div className="">
           {historyOpen === true ? (
-            <div className="w-48 ">
+            <div className={`w-48 ${props.lightmode ? "text-black":"text-white"}`}>
               <History />
             </div>
           ) : (
@@ -208,11 +211,11 @@ const CodeEditor = (props) => {
         <Editor
           options={{
             minimap: {
-              enabled: false,
+              enabled: true,
             },
           }}
           height=""
-          theme="vs-dark"
+          theme={props.lightmode ? "light" : "vs-dark"}
           language={props.language}
           defaultValue={CODE_SNIPPETS[props.language]}
           onMount={onMount}

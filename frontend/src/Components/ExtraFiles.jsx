@@ -38,8 +38,11 @@ const ExtraFiles = (props) => {
         return (
           <div
             key={index}
-            className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
-              props.extraFileIndex === index ? "text-blue-700 shadow-md" : ""
+            className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between ${
+              props.lightmode ? "hover:text-blue-700" : "hover:text-[#00BFFF]"
+            }
+            ${
+              props.extraFileIndex === index ? `${props.lightmode ? `text-blue-700`:`text-[#00BFFF]`} shadow-md` : ""
             }`}
             onClick={() => {
               openFile({ file, index });

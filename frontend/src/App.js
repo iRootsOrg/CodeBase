@@ -8,6 +8,7 @@ import { saveAs } from "file-saver";
 import Run from "./Components/Run.jsx";
 import RunAll from "./Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
+import light from "react-syntax-highlighter/dist/cjs/light.js";
 
 function App() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
@@ -65,7 +66,7 @@ function App() {
     }
   }, [folderfiles]);
 
-  const [lightmode, setLightMode] = useState(true);
+  const [lightmode, setLightMode] = useState(false);
 
   const handleLight = () => {
     setLightMode(!lightmode);
@@ -253,7 +254,7 @@ function App() {
   const [infoOpen, setInfoOpen] = useState(false);
 
   return (
-    <div className="flex h-screen">
+    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-black"}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex overflow-hidden">
           <div className="flex-1 h-[96%] ">
@@ -305,12 +306,18 @@ function App() {
             <Output />
           </div>
         </div>
-        <div className="bg-gray-100 pl-4">
+        <div className={`${lightmode ? "bg-gray-100" : "bg-black"} pl-4`}>
           <div className={`flex p-4 justify-between `}>
-            <label className="font-bold text-xl">Test Cases :</label>
+            <label
+              className={`font-bold text-xl ${
+                lightmode ? "text-black" : "text-white"
+              }`}
+            >
+              Test Cases :
+            </label>
             <div className="flex items-center gap-4">
-              <Run />
-              <RunAll />
+              <Run lightmode={lightmode} />
+              <RunAll lightmode={lightmode} />
               <button
                 onClick={() => {
                   handleClick();
@@ -329,7 +336,11 @@ function App() {
             </div>
           </div>
           {testcaseOpen === true ? (
-            <TestCase testCases={testCases} setTestCases={setTestCases} />
+            <TestCase
+              testCases={testCases}
+              setTestCases={setTestCases}
+              lightmode={lightmode}
+            />
           ) : (
             ""
           )}
@@ -363,8 +374,14 @@ function App() {
       </div>
 
       {shareOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+        <div
+          className={`fixed inset-0 flex items-center justify-center backdrop-blur-sm   `}
+        >
+          <div
+            className={`border ${
+              lightmode ? "bg-white text-black border-black" : "bg-black text-white border-white"
+            } p-6 rounded-lg shadow-lg relative `}
+          >
             <button
               onClick={() => {
                 setShareOpen(false);
@@ -378,11 +395,15 @@ function App() {
               type="text"
               value={window.location.href}
               readOnly
-              className="w-full p-2 border border-gray-300 rounded mb-4"
+              className={`w-full p-2 border border-gray-300 rounded mb-4 ${
+                lightmode ? "bg-white" : "bg-black"
+              } `}
             />
             <button
               onClick={copyToClipboard}
-              className="bg-blue-500 text-white p-2 rounded w-full mb-4"
+              className={`${
+                lightmode ? "bg-blue-500 text-white" : "bg-[#00BFFF] text-black"
+              }  p-2 rounded w-full mb-4`}
             >
               Copy URL
             </button>
@@ -416,8 +437,14 @@ function App() {
       )}
 
       {infoOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-white text-black  border-black"
+                : "bg-black text-white border-white"
+            } p-6 rounded-lg shadow-lg relative `}
+          >
             <div>
               <button
                 onClick={() => {

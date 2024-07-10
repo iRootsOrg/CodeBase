@@ -37,7 +37,7 @@ const File = (props) => {
       {props.files.map((file, index) => {
         return (
           <div key={index}
-            className={`w-full text-sm  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
+            className={`text-black w-full text-sm  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
               (props.folderIndex === props.folderKey && props.fileIndex === index ) === true ? "text-blue-700 shadow-md" : ""
             }`}
             onClick={() => {

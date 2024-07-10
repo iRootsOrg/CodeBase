@@ -15,48 +15,102 @@ const Settings = (props) => {
   };
 
   return (
-    <div className={`w-72 rounded font-semibold select-none `}>
+    <div
+      className={`w-72 border shadow-sm rounded font-semibold select-none ${
+        props.lightmode
+          ? " border-black shadow-black bg-gray-100"
+          : "border-white shadow-white bg-black"
+      }`}
+    >
       <div className="text-lg px-2 font-bold">Settings</div>
 
-      <div
-        className="flex gap-2 items-center hover:bg-white w-full hover:text-blue-600 px-2.5 py-2"
+      <button
+        className={`flex gap-2 items-center hover:${
+          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
+        } w-full  px-2.5 py-2`}
         onClick={props.formatCode()}
       >
-        <img className=" mix-blend-multiply !h-[24px] !w-[24px] "src="./Icons/CodeFormatter.png" alt="Code Formatter"></img>
+        <img
+          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          src={
+            props.lightmode
+              ? "./Icons/CodeFormatter.png"
+              : "./Icons/CodeFormatterLight.png"
+          }
+          alt="Code Formatter"
+        ></img>
         <div>Code Format</div>
-      </div>
-      <button className="flex items-center gap-2 hover:bg-white w-full hover:text-blue-600 px-2.5 py-2">
-        <img className=" mix-blend-multiply !h-[24px] !w-[24px] "src="./Icons/Invite.png" alt="Invite"></img>
+      </button>
+      <button
+        className={`flex gap-2 items-center hover:${
+          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
+        } w-full  px-2.5 py-2`}
+      >
+        <img
+          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          src={
+            props.lightmode ? "./Icons/Invite.png" : "./Icons/InviteLight.png"
+          }
+          alt="Invite"
+        ></img>
         <div>Invite Others</div>
       </button>
-      <div className="flex gap-2 items-center hover:bg-white w-full hover:text-blue-600 px-2.5 py-2">
-        <img className=" mix-blend-multiply !h-[24px] !w-[24px] "src="./Icons/KeyBoardShortcut.png" alt="Code Formatter"></img>
+      <div
+        className={`flex gap-2 items-center hover:${
+          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
+        } w-full  px-2.5 py-2`}
+      >
+        <img
+          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          src={
+            props.lightmode
+              ? "./Icons/KeyBoardShortcut.png"
+              : "./Icons/KeyBoardShortcutLight.png"
+          }
+          alt="Code Formatter"
+        ></img>
         <div>Keyboard Shortcuts</div>
       </div>
-      <div className="flex gap-2 items-center justify-start w-full px-2.5 py-2 hover:bg-white hover:text-blue-600">
-        <img className=" mix-blend-multiply !h-[24px] !w-[24px] "src="./Icons/FontSize.png" alt="FontSize"></img>
+      <div
+        className={`flex gap-2 items-center hover:${
+          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
+        } w-full  px-2.5 py-2`}
+      >
+        <img
+          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          src={
+            props.lightmode
+              ? "./Icons/FontSize.png"
+              : "./Icons/FontSizeLight.png"
+          }
+          alt="FontSize"
+        ></img>
         <div className="mr-4">Font Size</div>
-        <button
-          className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-          onClick={decreaseFontSize}
-        >
+        <button className="px-2 py-1  rounded" onClick={decreaseFontSize}>
           -
         </button>
         <span className="mx-2">{fontSize}px</span>
-        <button
-          className="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-          onClick={increaseFontSize}
-        >
+        <button className="px-2 py-1  rounded" onClick={increaseFontSize}>
           +
         </button>
       </div>
       <div
-        className="flex items-center gap-2 hover:bg-white w-full hover:text-blue-600 px-2.5 py-2 "
+        className={`flex gap-2 items-center hover:${
+          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
+        } w-full  px-2.5 py-2`}
         onClick={() => {
           setWordWrap(!wordWrap);
         }}
       >
-        <img className=" mix-blend-multiply !h-[24px] !w-[24px] "src="./Icons/WordWrap.png" alt="Word Wrap"></img>
+        <img
+          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          src={
+            props.lightmode
+              ? "./Icons/WordWrap.png"
+              : "./Icons/WordWrapLight.png"
+          }
+          alt="Word Wrap"
+        ></img>
         <div>Word Wrap</div>
         {wordWrap === true ? (
           <div>
@@ -69,7 +123,9 @@ const Settings = (props) => {
         )}
       </div>
       <div
-        className=" hover:bg-white w-full hover:text-blue-600 px-2.5 py-2"
+        className={`flex gap-2 items-center hover:${
+          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
+        } w-full  px-2.5 py-2`}
         onClick={() => {
           props.handleLight();
         }}
