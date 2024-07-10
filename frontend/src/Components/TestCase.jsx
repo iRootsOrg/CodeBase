@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-
 const TestCase = (props) => {
   const [selected, setSelected] = useState(1);
 
@@ -50,7 +49,7 @@ const TestCase = (props) => {
         className={`border-l-4 w-full p-2 ${
           props.lightmode
             ? "bg-gray-100 text-black border-[#d1d5db] scrollbar-light"
-            : "bg-black text-white border-[#2e2a24] scrollbar-dark"
+            : "bg-[#1e1e1e] text-white border-[#2e2a24] scrollbar-dark"
         } focus:outline-none focus:border-t`}
         placeholder="Please input your test cases..."
         name={`textArea${selected}`}

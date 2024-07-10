@@ -148,14 +148,26 @@ const Folder = (props) => {
         {props.folderfiles.folders.map((folder, index) => (
           <div
             key={index}
-            className={`w-full text-base gap-2 p-2 font-semibold cursor-pointer hover:bg-white hover:text-blue-600 ${
-              props.folderIndex === index ? "shadow-2xl bg-white" : ""
+            className={`w-full text-base gap-2 p-2 font-semibold cursor-pointer ${
+              props.lightmode
+                ? `hover:text-white  ${
+                    props.folderIndex === index
+                      ? "shadow-2xl bg-white !hover:bg-white"
+                      : "hover:bg-blue-600"
+                  }`
+                : `hover:text-white  ${
+                    props.folderIndex === index
+                      ? "shadow-2xl bg-white !hover:bg-white"
+                      : "hover:bg-cyan-600"
+                  }`
             }`}
           >
             <div
-              className={`flex gap-1  items-center ${
+              className={`flex gap-1  items-center ${props.lightmode ? `${
                 props.folderIndex === index ? "text-blue-600" : ""
-              }`}
+              }`:`${
+                props.folderIndex === index ? "text-cyan-600" : ""
+              }`}`}
             >
               {props.folderIndex === index ? "📂 " : "📁 "}
               <div className="flex justify-between w-full select-none">
@@ -172,7 +184,7 @@ const Folder = (props) => {
             </div>
 
             {props.folderIndex === index ? (
-              <div className="pl-6 w-full">
+              <div className="w-full">
                 <File
                   folderKey={index}
                   files={props.folderfiles.folders[props.folderIndex].files}
@@ -282,7 +294,9 @@ const Folder = (props) => {
           {props.openExtraNewFile === true ? (
             <div
               className={`flex gap-2  font-medium text-sm p-1 items-center ${
-                props.lightmode ? " hover:text-blue-600" : "hover:text-[#00BFFF]"
+                props.lightmode
+                  ? " hover:text-blue-600"
+                  : "hover:text-[#00BFFF]"
               }`}
             >
               <div>🗃️</div>

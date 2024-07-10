@@ -1,4 +1,3 @@
-
 import Output from "../Components/Output.jsx";
 import CodeEditor from "../Components/CodeEditor";
 import TestCase from "../Components/TestCase.jsx";
@@ -9,6 +8,7 @@ import Run from "../Components/Run.jsx";
 import RunAll from "../Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
 import light from "react-syntax-highlighter/dist/cjs/light.js";
+import { CODE_SNIPPETS,LAN_CONVERSION } from "../Utils/languages.jsx";
 
 function EditorPage() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
@@ -18,9 +18,7 @@ function EditorPage() {
     textArea3: "",
     textArea4: "",
   });
-  const [language, setLanguage] = useState("js");
-
-  const [value, setValue] = useState("");
+ 
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
@@ -42,9 +40,18 @@ function EditorPage() {
   const [folderopen, setFolderOpen] = useState(false);
   const initialFolderFiles = {
     folders: [],
-    extraFiles: [],
+    extraFiles: [
+      {
+        name: "Sample File",
+        code: CODE_SNIPPETS["javascript"],
+        language: "javascript",
+      },
+    ],
   };
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
+   const [language, setLanguage] = useState("javascript");
+
+  const [value, setValue] = useState("");
 
   useEffect(() => {
     const initialCode = localStorage.getItem("folderfiles");
@@ -52,10 +59,19 @@ function EditorPage() {
 
     if (initialCode === null) {
       localStorage.setItem("folderfiles", JSON.stringify(initialFolderFiles));
+       setLanguage(initialFolderFiles.extraFiles[0].language);
+       setValue(initialFolderFiles.extraFiles[0].code);
     } else {
-      setFolderFiles(JSON.parse(initialCode));
+      const folderParsing = JSON.parse(initialCode);
+      setFolderFiles(folderParsing);
+      
+      setLanguage(folderParsing.extraFiles[0].language);
+      setValue(folderParsing.extraFiles[0].code);
       setSaveLocally(true);
     }
+    setExtraFileIndex(0);
+   
+    
   }, []);
 
   useEffect(() => {
@@ -64,7 +80,7 @@ function EditorPage() {
     }
   }, [folderfiles]);
 
-  const [lightmode, setLightMode] = useState(false);
+  const [lightmode, setLightMode] = useState(true);
 
   const handleLight = () => {
     setLightMode(!lightmode);
@@ -197,11 +213,11 @@ function EditorPage() {
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
-          folderZip.file(`${file.name}.${file.language}`, file.code);
+          folderZip.file(`${file.name}.${LAN_CONVERSION[file.language]}`, file.code);
         });
       });
       folderfiles.extraFiles.forEach((file) => {
-        zip.file(`${file.name}.${file.language}`, file.code);
+        zip.file(`${file.name}.${LAN_CONVERSION[file.language]}`, file.code);
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
@@ -216,7 +232,10 @@ function EditorPage() {
       const folderZip = zip.folder(folder.name);
 
       folder.files.forEach((file) => {
-        folderZip.file(`${file.name}.${file.language}`, file.code);
+        folderZip.file(
+          `${file.name}.${LAN_CONVERSION[file.language]}`,
+          file.code
+        );
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
@@ -230,7 +249,7 @@ function EditorPage() {
       const blob = new Blob([file.code], {
         type: "text/plain;charset=utf-8",
       });
-      saveAs(blob, `${file.name}.${file.language}`);
+      saveAs(blob, `${file.name}.${LAN_CONVERSION[file.language]}`);
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -242,7 +261,7 @@ function EditorPage() {
       const blob = new Blob([file.code], {
         type: "text/plain;charset=utf-8",
       });
-      saveAs(blob, `${file.name}.${file.language}`);
+      saveAs(blob, `${file.name}.${LAN_CONVERSION[file.language]}`);
     } else {
       alert("No File Selected");
       console.error("Invalid file index");
@@ -252,7 +271,7 @@ function EditorPage() {
   const [infoOpen, setInfoOpen] = useState(false);
 
   return (
-    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-black"}`}>
+    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex overflow-hidden">
           <div className="flex-1 h-[96%] ">
@@ -301,10 +320,10 @@ function EditorPage() {
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
           <div className="flex-1 h-full overflow-y-auto">
-            <Output />
+            <Output lightmode={lightmode} />
           </div>
         </div>
-        <div className={`${lightmode ? "bg-gray-100" : "bg-black"} pl-4`}>
+        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4`}>
           <div className={`flex p-4 justify-between `}>
             <label
               className={`font-bold text-xl ${
@@ -323,9 +342,13 @@ function EditorPage() {
               >
                 <img
                   src={
-                    testcaseOpen === true
-                      ? "./Icons/Down.png"
-                      : "./Icons/Up.png"
+                    testcaseOpen
+                      ? lightmode
+                        ? "./Icons/Down.png"
+                        : "./Icons/DownLight.png"
+                      : lightmode
+                      ? "./Icons/Up.png"
+                      : "./Icons/UpLight.png"
                   }
                   alt="Arrow"
                   className="h-[32px] w-[32px]"
@@ -379,7 +402,7 @@ function EditorPage() {
             className={`border ${
               lightmode
                 ? "bg-white text-black border-black"
-                : "bg-black text-white border-white"
+                : "bg-[#1e1e1e] text-white border-white"
             } p-6 rounded-lg shadow-lg relative `}
           >
             <button
@@ -396,7 +419,7 @@ function EditorPage() {
               value={window.location.href}
               readOnly
               className={`w-full p-2 border border-gray-300 rounded mb-4 ${
-                lightmode ? "bg-white" : "bg-black"
+                lightmode ? "bg-white" : "bg-[#1e1e1e]"
               } `}
             />
             <button
@@ -442,7 +465,7 @@ function EditorPage() {
             className={`border ${
               lightmode
                 ? "bg-white text-black  border-black"
-                : "bg-black text-white border-white"
+                : "bg-[#1e1e1e] text-white border-white"
             } p-6 rounded-lg shadow-lg relative `}
           >
             <div>

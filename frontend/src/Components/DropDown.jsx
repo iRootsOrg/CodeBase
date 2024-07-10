@@ -4,12 +4,10 @@ const languages = Object.entries(CODE_SNIPPETS);
 
 const DropDown = ({ language, onSelect, lightmode }) => {
   return (
-    <div
-      className={`  flex gap-2 items-center ${
-        lightmode ? "text-black " : "text-white"
-      } `}
-    >
-      <label className="block text-lg font-semibold">Language:</label>
+    <div className={`  flex gap-2 items-center `}>
+      <label className={`block text-lg font-semibold ${lightmode ? "text-black" : "text-white"}`}>
+        Language:
+      </label>
       <select
         className="block px-2 py-1 rounded border border-gray-700 focus:outline-none"
         value={language}
@@ -22,10 +20,14 @@ const DropDown = ({ language, onSelect, lightmode }) => {
             className={
               lightmode
                 ? `bg-${lang === language ? "white" : "gray-100"} ${
-                    lang === language ? "text-blue-600 font-semibold" : "text-black"
+                    lang === language
+                      ? "text-blue-600 font-semibold"
+                      : ""
                   }`
                 : `bg-${lang === language ? "black" : "gray-100"} ${
-                    lang === language ? "text-blue-600 font-semibold" : "text-white"
+                    lang === language
+                      ? "text-blue-600 font-semibold"
+                      : ""
                   }`
             }
           >

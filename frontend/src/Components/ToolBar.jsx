@@ -14,24 +14,22 @@ const ToolBar = (props) => {
         props.setSelected(3);
         if (props.folderIndex !== -1) {
           // console.log("For folderindex ", props.folderIndex);
-           let lastFileIndex =
+          let lastFileIndex =
             props.folderfiles.folders[props.folderIndex].files.length - 1;
           lastFileIndex = lastFileIndex >= 0 ? lastFileIndex : 0;
-           props.setFileIndex(lastFileIndex);
+          props.setFileIndex(lastFileIndex);
           props.setOpenNewFile(true);
         } else {
           // console.log("extra file");
           props.setOpenExtraNewFile(true);
-          
-            
-           let lastExtraFileIndex =
-            props.folderfiles.extraFiles.length - 1;
+
+          let lastExtraFileIndex = props.folderfiles.extraFiles.length - 1;
           lastExtraFileIndex = lastExtraFileIndex >= 0 ? lastExtraFileIndex : 0;
-           props.setExtraFileIndex(lastExtraFileIndex);
+          props.setExtraFileIndex(lastExtraFileIndex);
         }
 
-         props.setLanguage("Choose_Language");
-         props.setValue(CODE_SNIPPETS["Choose_Language"]);
+        props.setLanguage("Choose_Language");
+        props.setValue(CODE_SNIPPETS["Choose_Language"]);
 
         break;
 
@@ -92,7 +90,7 @@ const ToolBar = (props) => {
       {props.toolBar === true ? (
         <div
           className={`border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 ${
-            props.lightmode ? "bg-gray-100" : "bg-black"
+            props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
           }`}
         >
           <div
@@ -225,9 +223,7 @@ const ToolBar = (props) => {
             {props.settingsopen === true ? (
               <div
                 className={`absolute left-14  py-2 z-10 rounded bg-transparent ${
-                  props.lightmode === true
-                    ? " text-black"
-                    : "text-white"
+                  props.lightmode === true ? " text-black" : "text-white"
                 }`}
               >
                 <Settings

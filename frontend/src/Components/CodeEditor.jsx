@@ -8,14 +8,14 @@ import Fullscreen from "./FullScreen";
 import ToolBar from "./ToolBar";
 import Folder from "./Folder";
 import History from "./History";
+import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 
 const CodeEditor = (props) => {
   const editorRef = useRef();
   const [toolBar, setToolBar] = useState(true);
-   const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  
 
   useEffect(() => {
     props.setLanguage("Choose_Language");
@@ -27,13 +27,12 @@ const CodeEditor = (props) => {
     editor.focus();
   };
   const onSelect = (language) => {
-   
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
     }
 
-     props.setLanguage(language);
-     console.log(language);
+    props.setLanguage(language);
+    console.log(language);
   };
 
   const setToolbarNull = () => {
@@ -45,7 +44,6 @@ const CodeEditor = (props) => {
     props.setShareOpen(false);
     props.setInfoOpen(false);
   };
-
 
   const formatCode = () => {
     editorRef.current.getAction("editor.action.formatDocument").run();
@@ -81,7 +79,11 @@ const CodeEditor = (props) => {
           )}
 
           {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
-            <DropDown language={props.language} onSelect={onSelect} lightmode={props.lightmode} />
+            <DropDown
+              language={props.language}
+              onSelect={onSelect}
+              lightmode={props.lightmode}
+            />
           ) : (
             ""
           )}
@@ -95,7 +97,13 @@ const CodeEditor = (props) => {
             >
               <BiCodeAlt className="text-xl" />
             </button>
-            <div className={` cursor-pointer h-10 w-10 ${props.lightmode ?  "text-black bg-white border-black":"text-white bg-black border-white"}  p-2 flex justify-center items-center rounded border `}>
+            <div
+              className={` cursor-pointer h-10 w-10 ${
+                props.lightmode
+                  ? "text-black bg-white border-black"
+                  : "text-white bg-gray-800 border-white"
+              }  p-2 flex justify-center items-center rounded border `}
+            >
               <Fullscreen />
             </div>
             <div
@@ -103,12 +111,12 @@ const CodeEditor = (props) => {
               onClick={() => props.handleLight()}
             >
               {props.lightmode === true ? (
-                <button className="text-white h-10 w-10 bg-black  p-2 flex justify-between rounded border border-white">
-                  <div>🌙</div>
+                <button className="text-white h-10 w-10 bg-gray-800  p-2 flex justify-between rounded border border-white">
+                  <AiOutlineMoon className="h-6 w-6" />
                 </button>
               ) : (
                 <button className="text-black  h-10 w-10 bg-white  p-2 flex justify-between rounded border border-black">
-                  <div>☀️</div>
+                  <AiOutlineSun className="h-6 w-6" />
                 </button>
               )}
             </div>
@@ -118,7 +126,11 @@ const CodeEditor = (props) => {
         </div>
       </div>
 
-      <div className={`flex h-full ${props.lightmode ? "bg-gray-100":"bg-black"}`}>
+      <div
+        className={`flex h-full ${
+          props.lightmode ? "bg-gray-100" : "bg-gray-800"
+        }`}
+      >
         <ToolBar
           folderfiles={props.folderfiles}
           setFolderFiles={props.setFolderFiles}
@@ -191,7 +203,6 @@ const CodeEditor = (props) => {
                 addNewFolder={props.addNewFolder}
                 lightmode={props.lightmode}
                 setNewFolderName={props.setNewFolderName}
-              
               />
             </div>
           ) : (
@@ -201,7 +212,11 @@ const CodeEditor = (props) => {
 
         <div className="">
           {historyOpen === true ? (
-            <div className={`w-48 ${props.lightmode ? "text-black":"text-white"}`}>
+            <div
+              className={`w-48 ${
+                props.lightmode ? "text-black" : "text-white"
+              }`}
+            >
               <History />
             </div>
           ) : (

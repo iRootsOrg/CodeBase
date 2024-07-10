@@ -5,7 +5,12 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 const Settings = (props) => {
   const [fontSize, setFontSize] = useState(24); // Default font size
   const [wordWrap, setWordWrap] = useState(false);
-
+  const [invite, setInvite] = useState(false);
+  const [selected, setSelected] = useState(0);
+  const handleInvite = () => {
+    setInvite(!invite);
+    setSelected(2);
+  };
   const increaseFontSize = () => {
     setFontSize(fontSize + 1);
   };
@@ -19,7 +24,7 @@ const Settings = (props) => {
       className={`w-72 border shadow-sm rounded font-semibold select-none ${
         props.lightmode
           ? " border-black shadow-black bg-gray-100"
-          : "border-white shadow-white bg-black"
+          : "border-white shadow-white bg-[#1e1e1e] "
       }`}
     >
       <div className="text-lg px-2 font-bold">Settings</div>
@@ -31,7 +36,7 @@ const Settings = (props) => {
         onClick={props.formatCode()}
       >
         <img
-          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          className=" mix-blend-multiply !h-[24px] !w-[24px] z-10"
           src={
             props.lightmode
               ? "./Icons/CodeFormatter.png"
@@ -41,20 +46,43 @@ const Settings = (props) => {
         ></img>
         <div>Code Format</div>
       </button>
-      <button
-        className={`flex gap-2 items-center hover:${
-          props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
-        } w-full  px-2.5 py-2`}
-      >
-        <img
-          className=" mix-blend-multiply !h-[24px] !w-[24px] "
-          src={
-            props.lightmode ? "./Icons/Invite.png" : "./Icons/InviteLight.png"
-          }
-          alt="Invite"
-        ></img>
-        <div>Invite Others</div>
-      </button>
+      <div className="flex">
+        <button
+          className={`flex gap-2 items-center ${
+            props.lightmode
+              ? `hover:text-blue-600 ${invite ? "text-blue-600" : ""}`
+              : `hover:text-[#00BFFF] ${invite ? "text-cyan-400" : ""}`
+          } w-full  px-2.5 py-2
+           ${invite ? "text-blue-600" : ""}`}
+          onClick={() => {
+            handleInvite();
+          }}
+        >
+          <img
+            className=" mix-blend-multiply !h-[24px] !w-[24px] "
+            src={
+              props.lightmode ? "./Icons/Invite.png" : "./Icons/InviteLight.png"
+            }
+            alt="Invite"
+          ></img>
+          <div>Invite Others</div>
+        </button>
+
+        {invite ? (
+          <div
+            className={`left-72 absolute ml-2 border rounded ${props.lightmode ? "border-black bg-gray-100 text-black":"border-gray-100 bg-[#1e1e1e] text-white"} p-2.5`}
+          >
+            <div className="  ">
+              <input
+                placeholder="Add user's email"
+                className={`focus:outline-none ${props.lightmode ? "bg-gray-100":"bg-[#1e1e1e]"}  `}
+              ></input>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
       <div
         className={`flex gap-2 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
