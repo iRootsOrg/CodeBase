@@ -29,12 +29,18 @@ const PORT = process.env.PORT;
 const wssPort = process.env.WSS_PORT;
 // console.log(wssPort)
 const wss = new WebSocket.Server({ port: wssPort });
-// console.log(wss)
+
 wss.on("connection", (ws) => {
     console.log("Client connected to WebSocket server");
 
     ws.on("message", (message) => {
         console.log(`Received message => ${message}`);
+        // Broadcast the message to all connected clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
     });
 
     ws.on("error", (error) => {

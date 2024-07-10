@@ -1,7 +1,7 @@
 const express = require("express");
-const { startWebSocket } = require("../controllers/webSocketController");
+const { startWebSocket } = require("../controllers/websocketController");
 const router = express.Router();
 
-router.get("/websocket", startWebSocket);
+router.get("/ws", startWebSocket);
 
 module.exports = router;
