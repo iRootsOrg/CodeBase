@@ -5,9 +5,12 @@ const cors = require("cors");
 const path = require("path")
 const fileRoutes = require("./routes/fileRoutes")
 const userRoutes = require("./routes/userRoutes")
+const reviewRoutes = require("./routes/reviewRoutes")
 const connectDB = require("./config/db")
 const fileUpload = require("express-fileupload");
 const WebSocket = require("ws");
+const errorMiddleware = require("./middlewares/errorMiddleware");
+const webSocketRoute = require("./routes/websocketRoutes")
 
 const app = express();
 dotenv.config();
@@ -18,6 +21,9 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 const PORT = process.env.PORT;
 const wssPort = process.env.WSS_PORT;
@@ -52,11 +58,19 @@ app.get('/health-check', (req, res) => {
 
 app.use("/api/v1/file", fileRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/review",reviewRoutes)
+app.use(webSocketRoute);
+
 
 app.get("/", (req, res) => {
     res.send({
         message: "Welcome to compiler backend",
     });
+});
+
+app.use(errorMiddleware); 
+app.get('/wss', (req, res) => {
+    res.render('index', { title: 'Collaborative Editing' });
 });
 
 // listen server
