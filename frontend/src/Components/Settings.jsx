@@ -4,7 +4,7 @@ import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 const Settings = (props) => {
   const [fontSize, setFontSize] = useState(24); // Default font size
-  
+
   const [invite, setInvite] = useState(false);
   const [selected, setSelected] = useState(0);
   const handleInvite = () => {
@@ -89,10 +89,15 @@ const Settings = (props) => {
           ""
         )}
       </div>
-      <div
+      <button
         className={`flex gap-2 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
         } w-full  px-2.5 py-2`}
+        onClick={() => {
+          props.setKeyboardShortcut(true);
+          props.setSettingsOpen(!props.settingsopen);
+          props.setSelected(0);
+        }}
       >
         <img
           className=" mix-blend-multiply !h-[24px] !w-[24px] "
@@ -104,7 +109,7 @@ const Settings = (props) => {
           alt="Code Formatter"
         ></img>
         <div>Keyboard Shortcuts</div>
-      </div>
+      </button>
       <div
         className={`flex gap-2 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"

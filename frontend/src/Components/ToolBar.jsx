@@ -302,6 +302,8 @@ const ToolBar = (props) => {
                     settingsopen={props.settingsopen}
                     setSettingsOpen={props.setSettingsOpen}
                     setSelected={props.setSelected}
+                    keyboardShortcut={props.keyboardShortcut}
+                    setKeyboardShortcut={props.setKeyboardShortcut}
                   />
                 </div>
               ) : (

@@ -7,9 +7,10 @@ import { saveAs } from "file-saver";
 import Run from "../Components/Run.jsx";
 import RunAll from "../Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
-import light from "react-syntax-highlighter/dist/cjs/light.js";
 import { CODE_SNIPPETS, LAN_CONVERSION } from "../Utils/languages.jsx";
-import Submit from "../Components/Submit.jsx";
+import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
+import light from "react-syntax-highlighter/dist/cjs/light.js";
+
 function EditorPage() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
@@ -271,6 +272,7 @@ function EditorPage() {
 
   const [infoOpen, setInfoOpen] = useState(false);
   const [reportBugOpen, setReportBugOpen] = useState(false);
+  const [keyboardShortcut, setKeyboardShortcut] = useState(false);
 
   return (
     <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
@@ -318,6 +320,8 @@ function EditorPage() {
               setOpenExtraNewFile={setOpenExtraNewFile}
               extraNewFileName={extraNewFileName}
               setExtraNewFileName={setExtraNewFileName}
+              keyboardShortcut={keyboardShortcut}
+              setKeyboardShortcut={setKeyboardShortcut}
             />
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
@@ -576,6 +580,12 @@ function EditorPage() {
             </form>
           </div>
         </div>
+      ) : (
+        ""
+      )}
+
+      {keyboardShortcut === true ? (
+        <KeyBoardShortcuts lightmode={lightmode} setLightMode={setLightMode} keyboardShortcut={keyboardShortcut} setKeyboardShortcut={setKeyboardShortcut} />
       ) : (
         ""
       )}

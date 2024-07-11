@@ -181,6 +181,8 @@ const CodeEditor = (props) => {
           setLanguage={props.setLanguage}
           wordWrap={wordWrap}
           setWordWrap={setWordWrap}
+          keyboardShortcut={props.keyboardShortcut}
+          setKeyboardShortcut={props.setKeyboardShortcut}
         />
         <div className="h-full">
           {props.folderopen === true ? (
