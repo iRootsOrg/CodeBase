@@ -4,7 +4,7 @@ import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 const Settings = (props) => {
   const [fontSize, setFontSize] = useState(24); // Default font size
-  const [wordWrap, setWordWrap] = useState(false);
+  
   const [invite, setInvite] = useState(false);
   const [selected, setSelected] = useState(0);
   const handleInvite = () => {
@@ -70,12 +70,18 @@ const Settings = (props) => {
 
         {invite ? (
           <div
-            className={`left-72 absolute ml-2 border rounded ${props.lightmode ? "border-black bg-gray-100 text-black":"border-gray-100 bg-[#1e1e1e] text-white"} p-2.5`}
+            className={`left-72 absolute ml-2 border rounded ${
+              props.lightmode
+                ? "border-black bg-gray-100 text-black"
+                : "border-gray-100 bg-[#1e1e1e] text-white"
+            } p-2.5`}
           >
             <div className="  ">
               <input
                 placeholder="Add user's email"
-                className={`focus:outline-none ${props.lightmode ? "bg-gray-100":"bg-[#1e1e1e]"}  `}
+                className={`focus:outline-none ${
+                  props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+                }  `}
               ></input>
             </div>
           </div>
@@ -122,25 +128,29 @@ const Settings = (props) => {
           +
         </button>
       </div>
-      <div
-        className={`flex gap-2 items-center hover:${
+      <button
+        className={`flex justify-between pr-6 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
         } w-full  px-2.5 py-2`}
         onClick={() => {
-          setWordWrap(!wordWrap);
+          props.setWordWrap(!props.wordWrap);
+          props.setSettingsOpen(!props.settingsopen);
+          props.setSelected(0);
         }}
       >
-        <img
-          className=" mix-blend-multiply !h-[24px] !w-[24px] "
-          src={
-            props.lightmode
-              ? "./Icons/WordWrap.png"
-              : "./Icons/WordWrapLight.png"
-          }
-          alt="Word Wrap"
-        ></img>
-        <div>Word Wrap</div>
-        {wordWrap === true ? (
+        <div className="flex gap-2 items-center">
+          <img
+            className=" mix-blend-multiply !h-[24px] !w-[24px] "
+            src={
+              props.lightmode
+                ? "./Icons/WordWrap.png"
+                : "./Icons/WordWrapLight.png"
+            }
+            alt="Word Wrap"
+          ></img>
+          <div>Word Wrap</div>
+        </div>
+        {props.wordWrap === true ? (
           <div>
             <BiCheckCircle className="text-green-500 h-6 w-6 mr-4" />
           </div>
@@ -149,7 +159,7 @@ const Settings = (props) => {
             <BiXCircle className="text-red-500 h-6 w-6 mr-4" />
           </div>
         )}
-      </div>
+      </button>
       <div
         className={`flex gap-2 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"

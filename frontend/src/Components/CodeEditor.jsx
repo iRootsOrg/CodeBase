@@ -16,16 +16,24 @@ const CodeEditor = (props) => {
   const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [wordWrap, setWordWrap] = useState(true);
 
   useEffect(() => {
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
   }, []);
 
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({ wordWrap: wordWrap ? "on" : "off" });
+    }
+  }, [wordWrap]);
+
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
   };
+
   const onSelect = (language) => {
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
@@ -55,7 +63,7 @@ const CodeEditor = (props) => {
   };
 
   return (
-    <div className={``}>
+    <div className={`h-full`}>
       <div className="flex justify-between m-4 items-center">
         <div className="cursor-pointer flex gap-2">
           {toolBar === true ? (
@@ -171,8 +179,10 @@ const CodeEditor = (props) => {
           setHistoryOpen={setHistoryOpen}
           language={props.language}
           setLanguage={props.setLanguage}
+          wordWrap={wordWrap}
+          setWordWrap={setWordWrap}
         />
-        <div className="">
+        <div className="h-full">
           {props.folderopen === true ? (
             <div className="w-48 ">
               <Folder
@@ -223,13 +233,15 @@ const CodeEditor = (props) => {
             ""
           )}
         </div>
+        {console.log(wordWrap)}
         <Editor
           options={{
             minimap: {
               enabled: true,
             },
+            wordWrap: wordWrap ? "on" : "off",
           }}
-          height=""
+          height="100%"
           theme={props.lightmode ? "light" : "vs-dark"}
           language={props.language}
           defaultValue={CODE_SNIPPETS[props.language]}
@@ -244,4 +256,5 @@ const CodeEditor = (props) => {
     </div>
   );
 };
+
 export default CodeEditor;

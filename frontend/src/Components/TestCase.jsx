@@ -17,7 +17,7 @@ const TestCase = (props) => {
   }, [props.testCases, selected]);
 
   return (
-    <div className="flex h-52">
+    <div className="flex h-52 ">
       <div
         className={`w-56 font-bold h-full overflow-y-scroll ${
           props.lightmode

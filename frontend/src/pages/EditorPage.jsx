@@ -274,9 +274,9 @@ function EditorPage() {
 
   return (
     <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
-      <div className=" flex flex-col overflow-hidden">
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 h-auto ">
+      <div className=" flex flex-col overflow-x-hidden h-full">
+        <div className="flex-1 h-full flex overflow-x-hidden">
+          <div className="flex-1 h-[87.4%]">
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -325,12 +325,8 @@ function EditorPage() {
             <Output lightmode={lightmode} />
           </div>
         </div>
-        <div
-          className={`${
-            lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
-          } pl-4 h-auto`}
-        >
-          <div className={`flex p-4 justify-between `}>
+        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4 `}>
+          <div className={`flex p-4 justify-between h-[10vh]`}>
             <label
               className={`font-bold text-xl ${
                 lightmode ? "text-black" : "text-white"

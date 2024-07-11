@@ -288,7 +288,7 @@ const ToolBar = (props) => {
 
               {props.settingsopen === true ? (
                 <div
-                  className={`absolute left-14  py-2 z-10 rounded bg-transparent ${
+                  className={`absolute left-14 bottom-16 py-2 z-10 rounded bg-transparent ${
                     props.lightmode === true ? " text-black" : "text-white"
                   }`}
                 >
@@ -297,6 +297,11 @@ const ToolBar = (props) => {
                     setLightMode={props.setLightMode}
                     handleLight={props.handleLight}
                     formatCode={props.formatCode}
+                    wordWrap={props.wordWrap}
+                    setWordWrap={props.setWordWrap}
+                    settingsopen={props.settingsopen}
+                    setSettingsOpen={props.setSettingsOpen}
+                    setSelected={props.setSelected}
                   />
                 </div>
               ) : (
