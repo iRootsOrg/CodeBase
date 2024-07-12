@@ -58,7 +58,7 @@ async function loginUser(req, res, next) {
 async function startEditingSession(req, res) {
     const { code } = req.body;
     const user = req.user;
-    const editingSession = new mongoose.model('EditingSession')({ code, users: [user._id] });
+    const editingSession = new mongoose.model('EditingSession')({ code, users: [user._id], sessionId: new mongoose.Types.ObjectId().toString() });
     await editingSession.save();
     user.editingSessionId = editingSession.sessionId;
     await user.save();
