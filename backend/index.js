@@ -33,7 +33,7 @@ wss.on("connection", (ws) => {
     ws.on("message", (message) => {
         console.log(`Received message => ${message}`);
     });
-
+  
     ws.on("error", (error) => {
         console.log("Error occurred in WebSocket connection");
         console.error(error);
