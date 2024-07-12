@@ -2,6 +2,14 @@ import subprocess
 import os
 import hashlib
 import pickle
+import logging
+
+# Set the time limit in seconds
+TIME_LIMIT = 5
+
+# Set up logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 # Define the cache file location
 cache_file = 'cache.pkl'
@@ -81,20 +89,23 @@ def execute_code(file_path, cache):
         if cached_input == input_data:
             return cache[file_hash]['output']
 
+    def timeout_handler(signum, frame):
+        raise TimeoutError("Time limit exceeded")
+
     try:
         # Compile the code if necessary
         if compile_cmd:
             compile_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in compile_cmd]
-            compile_process = subprocess.run(compile_cmd, capture_output=True, text=True)
+            compile_process = subprocess.run(compile_cmd, capture_output=True, text=True, timeout=TIME_LIMIT)
             if compile_process.returncode != 0:
                 return f"Compilation Error:\n{compile_process.stderr.strip()}"
 
         # Run the code
         if input_data:
             run_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in run_cmd]
-            run_process = subprocess.run(run_cmd, input=input_data, capture_output=True, text=True)
+            run_process = subprocess.run(run_cmd, input=input_data, capture_output=True, text=True, timeout=TIME_LIMIT)
         else:
-            run_process = subprocess.run(run_cmd, capture_output=True, text=True)
+            run_process = subprocess.run(run_cmd, capture_output=True, text=True, timeout=TIME_LIMIT)
 
         if run_process.returncode != 0:
             return f"Runtime Error:\n{run_process.stderr.strip()}"
@@ -105,6 +116,11 @@ def execute_code(file_path, cache):
         save_cache(cache)
         return output
 
+    except subprocess.TimeoutExpired:
+        logger.error("Time limit exceeded")
+        print("Time limit exceeded")
+        return "Time limit exceeded"
+
     finally:
         # Check if the files are present before removing them
         if compile_cmd:
@@ -112,8 +128,8 @@ def execute_code(file_path, cache):
                 os.remove(f"{file_base}.out")
             elif file_extension == '.java' and os.path.exists(f"{file_base}.class"):
                 os.remove(f"{file_base}.class")
-
 # Main script
+output = 'None'
 if __name__ == '__main__':
     cache = load_cache()
     print("Files available in the current directory:")
@@ -127,3 +143,8 @@ if __name__ == '__main__':
     else:
         output = execute_code(file_to_execute, cache)
         print(f"Output:\n{output}")
+
+        # Write the output to output.txt file
+with open('output.txt', 'w') as f:
+    f.write(output)
+print("Output written to output.txt file.")

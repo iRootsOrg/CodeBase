@@ -12,6 +12,7 @@ const WebSocket = require("ws");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 const webSocketRoute = require("./routes/websocketRoutes");
 
+
 const app = express();
 dotenv.config();
 

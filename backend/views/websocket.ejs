@@ -6,6 +6,7 @@
 <body>
   <h1>WebSocket</h1>
   <textarea id="code" cols="30" rows="10"></textarea>
+
   <script>
     const token = localStorage.getItem('token');
     const isSecure = window.location.protocol === 'https:';
@@ -53,7 +54,7 @@
     socket.onclose = () => {
       console.log('Disconnected from WebSocket');
     };
-
+    
     document.getElementById('code').addEventListener('input', (event) => {
       const code = event.target.value;
       socket.send(JSON.stringify({ code }));
@@ -63,4 +64,3 @@
   </script>
 </body>
 </html>
-
