@@ -274,6 +274,7 @@ function EditorPage() {
   const [reportBugOpen, setReportBugOpen] = useState(false);
   const [keyboardShortcut, setKeyboardShortcut] = useState(false);
 
+
   return (
     <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
       <div className=" flex flex-col overflow-x-hidden h-full">

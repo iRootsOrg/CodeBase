@@ -3,7 +3,7 @@ import { useState } from "react";
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 const Settings = (props) => {
-  const [fontSize, setFontSize] = useState(24); // Default font size
+  
 
   const [invite, setInvite] = useState(false);
   const [selected, setSelected] = useState(0);
@@ -11,12 +11,9 @@ const Settings = (props) => {
     setInvite(!invite);
     setSelected(2);
   };
-  const increaseFontSize = () => {
-    setFontSize(fontSize + 1);
-  };
-
-  const decreaseFontSize = () => {
-    setFontSize(fontSize - 1);
+  
+  const handleFontSizeChange = (e) => {
+    props.setFontSize(parseInt(e.target.value, 10));
   };
 
   return (
@@ -125,13 +122,17 @@ const Settings = (props) => {
           alt="FontSize"
         ></img>
         <div className="mr-4">Font Size</div>
-        <button className="px-2 py-1  rounded" onClick={decreaseFontSize}>
-          -
-        </button>
-        <span className="mx-2">{fontSize}px</span>
-        <button className="px-2 py-1  rounded" onClick={increaseFontSize}>
-          +
-        </button>
+        <select
+          value={props.fontSize}
+          onChange={handleFontSizeChange}
+          className={`px-2 py-1 rounded border focus:outline-none ${props.lightmode ? "text-black bg-white border-black":"text-white bg-[#1e1e1e] border-white"}`}
+        >
+          {[10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30].map((size) => (
+            <option key={size} value={size}>
+              {size}px
+            </option>
+          ))}
+        </select>
       </div>
       <button
         className={`flex justify-between pr-6 items-center hover:${

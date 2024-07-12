@@ -17,6 +17,7 @@ const CodeEditor = (props) => {
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [wordWrap, setWordWrap] = useState(true);
+  const [fontSize, setFontSize] = useState(16);
 
   useEffect(() => {
     props.setLanguage("Choose_Language");
@@ -183,6 +184,8 @@ const CodeEditor = (props) => {
           setWordWrap={setWordWrap}
           keyboardShortcut={props.keyboardShortcut}
           setKeyboardShortcut={props.setKeyboardShortcut}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
         />
         <div className="h-full">
           {props.folderopen === true ? (
@@ -235,13 +238,14 @@ const CodeEditor = (props) => {
             ""
           )}
         </div>
-        {console.log(wordWrap)}
+
         <Editor
           options={{
             minimap: {
               enabled: true,
             },
             wordWrap: wordWrap ? "on" : "off",
+            fontSize: fontSize,
           }}
           height="100%"
           theme={props.lightmode ? "light" : "vs-dark"}
