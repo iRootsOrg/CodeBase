@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path")
 const fileRoutes = require("./routes/fileRoutes")
 const userRoutes = require("./routes/userRoutes")
+const reviewRoutes = require("./routes/reviewRoutes")
 const connectDB = require("./config/db")
 const fileUpload = require("express-fileupload");
 const WebSocket = require("ws");
@@ -32,7 +33,7 @@ wss.on("connection", (ws) => {
     ws.on("message", (message) => {
         console.log(`Received message => ${message}`);
     });
-
+  
     ws.on("error", (error) => {
         console.log("Error occurred in WebSocket connection");
         console.error(error);
@@ -54,6 +55,7 @@ app.get('/health-check', (req, res) => {
 
 app.use("/api/v1/file", fileRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/review",reviewRoutes);
 
 app.get("/", (req, res) => {
     res.send({
