@@ -306,6 +306,8 @@ const ToolBar = (props) => {
                     setKeyboardShortcut={props.setKeyboardShortcut}
                     fontSize={props.fontSize}
                     setFontSize={props.setFontSize}
+                    email={props.email}
+                    setEmail={props.setEmail}
                   />
                 </div>
               ) : (

@@ -186,6 +186,8 @@ const CodeEditor = (props) => {
           setKeyboardShortcut={props.setKeyboardShortcut}
           fontSize={fontSize}
           setFontSize={setFontSize}
+          email={props.email}
+          setEmail={props.setEmail}
         />
         <div className="h-full">
           {props.folderopen === true ? (

@@ -1,20 +1,50 @@
 import { useState } from "react";
-
+import { FaPlus, FaUserPlus } from "react-icons/fa";
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
+import { IoPersonAdd } from "react-icons/io5";
 const Settings = (props) => {
-  
-
   const [invite, setInvite] = useState(false);
+  const [isValidEmail, setIsValidEmail] = useState(false);
+  const [addCollab, setAddCollab] = useState(true);
+  const [showInviteSuccessfull, setShowInviteSuccessfull] = useState(false);
+  const [inviteSuccessfull, setInviteSuccessfull] = useState(false);
   const [selected, setSelected] = useState(0);
   const handleInvite = () => {
     setInvite(!invite);
     setSelected(2);
   };
-  
+
   const handleFontSizeChange = (e) => {
     props.setFontSize(parseInt(e.target.value, 10));
   };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    props.setEmail(email);
+    setIsValidEmail(validateEmail(email));
+  };
+
+  const sendEmail = () => {
+    //send post request to backend
+    //Email
+
+    setInvite(false);
+
+    //Successfull
+    setInviteSuccessfull(true);
+
+    setShowInviteSuccessfull(true);
+    setTimeout(() => {
+      setShowInviteSuccessfull(false);
+    }, 3000);
+
+  }
 
   return (
     <div
@@ -62,7 +92,22 @@ const Settings = (props) => {
             }
             alt="Invite"
           ></img>
-          <div>Invite Others</div>
+          <div className="flex justify-between w-full pr-4 items-center">
+            <div>Invite Others </div>
+            {showInviteSuccessfull ? (
+              inviteSuccessfull ? (
+                <div>
+                  <BiCheckCircle className="text-green-500 h-6 w-6 mr-4" />
+                </div>
+              ) : (
+                <div>
+                  <BiXCircle className="text-red-500 h-6 w-6 mr-4" />
+                </div>
+              )
+            ) : (
+              ""
+            )}
+          </div>
         </button>
 
         {invite ? (
@@ -73,13 +118,56 @@ const Settings = (props) => {
                 : "border-gray-100 bg-[#1e1e1e] text-white"
             } p-2.5`}
           >
-            <div className="  ">
-              <input
-                placeholder="Add user's email"
-                className={`focus:outline-none ${
-                  props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
-                }  `}
-              ></input>
+            <div className=" w-64 p-2 gap-3 flex flex-col">
+              {addCollab === true ? (
+                <div className="flex justify-between">
+                  <div className="font-semibold underline">
+                    Add a collaborator individual
+                  </div>
+                  <button
+                    onClick={() => {
+                      setAddCollab(!addCollab);
+                    }}
+                  >
+                    <IoPersonAdd />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex justify-between">
+                  <div className="font-semibold underline">
+                    Add a collaborator institute
+                  </div>
+                  <button
+                    onClick={() => {
+                      setAddCollab(!addCollab);
+                    }}
+                  >
+                    <IoPersonAdd />
+                  </button>
+                </div>
+              )}
+
+              <div className="w-full flex gap-4">
+                <input
+                  placeholder="Add user's email"
+                  className={`focus:outline-none ${
+                    props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+                  } w-full `}
+                  onChange={(e) => handleEmailChange(e)}
+                ></input>
+
+                <button onClick={() => sendEmail()}>
+                  <FaPlus />
+                </button>
+              </div>
+
+              {isValidEmail === true ? (
+                <div className="text-green-600">✅ Valid Email</div>
+              ) : (
+                <div className="text-rose-600">
+                  ❌ Please enter a valid email
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -125,7 +213,11 @@ const Settings = (props) => {
         <select
           value={props.fontSize}
           onChange={handleFontSizeChange}
-          className={`px-2 py-1 rounded border focus:outline-none ${props.lightmode ? "text-black bg-white border-black":"text-white bg-[#1e1e1e] border-white"}`}
+          className={`px-2 py-1 rounded border focus:outline-none ${
+            props.lightmode
+              ? "text-black bg-white border-black"
+              : "text-white bg-[#1e1e1e] border-white"
+          }`}
         >
           {[10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30].map((size) => (
             <option key={size} value={size}>

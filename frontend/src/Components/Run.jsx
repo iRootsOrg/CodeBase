@@ -2,7 +2,15 @@
 
 const Run = (props) => {
     const onRun = () => {
-        console.log("Running");
+      console.log("Running");
+      
+      //POST Request
+
+      //Get the details
+
+      //Create a output txt file
+
+      
     }
     return (
       <button

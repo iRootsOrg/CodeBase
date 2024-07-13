@@ -46,6 +46,11 @@ function EditorPage() {
         name: "Sample File",
         code: CODE_SNIPPETS["javascript"],
         language: "javascript",
+        output: "",
+        tc: [{
+          input: "",
+          output:""
+        }]
       },
     ],
   };
@@ -273,7 +278,7 @@ function EditorPage() {
   const [infoOpen, setInfoOpen] = useState(false);
   const [reportBugOpen, setReportBugOpen] = useState(false);
   const [keyboardShortcut, setKeyboardShortcut] = useState(false);
-
+  const [email, setEmail] = useState("");
 
   return (
     <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
@@ -323,6 +328,8 @@ function EditorPage() {
               setExtraNewFileName={setExtraNewFileName}
               keyboardShortcut={keyboardShortcut}
               setKeyboardShortcut={setKeyboardShortcut}
+              email={email}
+              setEmail={setEmail}
             />
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
