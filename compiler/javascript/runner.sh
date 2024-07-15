@@ -39,5 +39,3 @@ done
 
 # Wait for all background processes to finish
 wait
-
-# No need to copy files since output directory is already mounted to host
