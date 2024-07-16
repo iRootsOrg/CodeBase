@@ -1,9 +1,3 @@
-a = []
-try:
-    i=1
-    while i<10:
-        i+=1
-        a.append(' ' * 10**1)
-        print("Memory used: {}".format(len(a)))
-except MemoryError:
-    print("Memory used: {}".format(len(a) * 10**6))
+a=[1,2,3,4]
+for i in range(len(a)+1):
+    print(a[i])

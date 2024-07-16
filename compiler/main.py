@@ -119,7 +119,9 @@ def execute_code(file_path, cache):
             compile_cmd = [arg.format(file_path=file_path, file_base=file_base) for arg in compile_cmd]
             compile_process = subprocess.run(compile_cmd, capture_output=True, text=True, timeout=TIME_LIMIT)
             if compile_process.returncode != 0:
-                return f"Compilation Error:\n{compile_process.stderr.strip()}"
+                error_message = f"Compilation Error:\n{compile_process.stderr.strip()}"
+                logger.error(error_message)
+                return error_message
 
         # Run the code
         if input_data:
@@ -151,7 +153,9 @@ def execute_code(file_path, cache):
             return "Memory limit exceeded"
 
         if process.returncode != 0:
-            return f"Runtime Error:\n{stderr.strip()}"
+            error_message = f"Runtime Error:\n{stderr.strip()}"
+            logger.error(error_message)
+            return error_message
 
         # Cache the result along with the input
         output = stdout
@@ -160,8 +164,9 @@ def execute_code(file_path, cache):
         return output
 
     except Exception as e:
-        logger.error(f"Error: {e}")
-        return f"Error:\n{str(e)}"
+        error_message = f"Error:\n{str(e)}"
+        logger.error(error_message)
+        return error_message
     finally:
         # Check if the files are present before removing them
         if compile_cmd:
