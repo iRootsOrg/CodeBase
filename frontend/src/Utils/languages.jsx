@@ -11,3 +11,19 @@ export const CODE_SNIPPETS = {
   cpp: `#include <iostream>\n\nint main() {\n\tstd::cout << "Hello, World!";\n\treturn 0;\n}\n`,
   c: `#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!\\n");\n\treturn 0;\n}\n`,
 };
+
+
+export const LAN_CONVERSION = {
+  Choose_Language: `txt`,
+  javascript: `js`,
+  typescript: `ts`,
+  python: `py`,
+  java: `java`,
+  csharp:
+    'cs',
+  php: "php",
+  r: `R`,
+  matlab: `m`,
+  cpp: `cpp`,
+  c: `c`,
+};
