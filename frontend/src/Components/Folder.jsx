@@ -26,6 +26,7 @@ const Folder = (props) => {
       props.setFileIndex(lastFileIndex);
     props.setFolderIndex(index);
     props.setOpenNewFile(true);
+    props.setOutputFile(props.initialOutput);
    
     
   };
@@ -53,6 +54,7 @@ const Folder = (props) => {
               name: props.newFileName,
               code: CODE_SNIPPETS[props.language],
               language: props.language,
+              output:props.outputFile,
             },
           ],
         };
@@ -71,6 +73,7 @@ const Folder = (props) => {
       name: props.extraNewFileName,
       code: CODE_SNIPPETS[props.language],
       language: props.language,
+      output:props.outputFile,
     };
 
     const newExtraFiles = [...props.folderfiles.extraFiles, newExtraFile];
@@ -113,7 +116,8 @@ const Folder = (props) => {
     props.setFolderIndex(-1);
     props.setFileIndex(-1);
     props.setExtraFileIndex(-1);
-     props.setValue("No File Selected");
+    props.setValue("No File Selected");
+    props.setOutputFile(props.initialOutput);
   };
 
   const setAllNull = () => {
@@ -125,6 +129,7 @@ const Folder = (props) => {
     props.setExtraFileIndex(-1);
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
+    props.setOutputFile(props.initialOutput);
   };
 
   return (
@@ -163,11 +168,11 @@ const Folder = (props) => {
             }`}
           >
             <div
-              className={`flex gap-1  items-center ${props.lightmode ? `${
-                props.folderIndex === index ? "text-blue-600" : ""
-              }`:`${
-                props.folderIndex === index ? "text-cyan-600" : ""
-              }`}`}
+              className={`flex gap-1  items-center ${
+                props.lightmode
+                  ? `${props.folderIndex === index ? "text-blue-600" : ""}`
+                  : `${props.folderIndex === index ? "text-cyan-600" : ""}`
+              }`}
             >
               {props.folderIndex === index ? "📂 " : "📁 "}
               <div className="flex justify-between w-full select-none">
@@ -200,6 +205,9 @@ const Folder = (props) => {
                   extraFileIndex={props.extraFileIndex}
                   setExtraFileIndex={props.setExtraFileIndex}
                   lightmode={props.lightmode}
+                  outputFile={props.outputFile}
+                  setOutputFile={props.setOutputFile}
+                  initialOutput={props.initialOutput}
                 />
 
                 {props.opennewfile ? (
@@ -289,6 +297,9 @@ const Folder = (props) => {
             folderIndex={props.folderIndex}
             setFolderIndex={props.setFolderIndex}
             lightmode={props.lightmode}
+            outputFile={props.outputFile}
+            setOutputFile={props.setOutputFile}
+            initialOutput={props.initialOutput}
           />
 
           {props.openExtraNewFile === true ? (

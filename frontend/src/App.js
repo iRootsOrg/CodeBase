@@ -5,16 +5,15 @@ import EditorPage from './pages/EditorPage.jsx';
 import ReviewPage from './pages/ReviewPage.jsx';
 
 function App() {
-  return(
-
-  <BrowserRouter>
-  <Routes>
-  <Route path="/" element={<EditorPage />} />
-  <Route path="/r" element={<ReviewPage />} />
-
-  </Routes>
-  </BrowserRouter>
-  )
+  return (
+    <BrowserRouter>
+      <Routes>
+        
+        <Route path="/" element={<EditorPage />} />
+        <Route path="/r" element={<ReviewPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
   
 }
 
