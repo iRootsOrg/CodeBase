@@ -1,5 +1,7 @@
 import Settings from "./Settings.jsx";
 import { CODE_SNIPPETS } from "../Utils/languages.jsx";
+import ToolTip from "./ToolTip.jsx";
+
 const ToolBar = (props) => {
   const handleSelected = (e) => {
     if (props.selected === e) {
@@ -14,24 +16,22 @@ const ToolBar = (props) => {
         props.setSelected(3);
         if (props.folderIndex !== -1) {
           // console.log("For folderindex ", props.folderIndex);
-           let lastFileIndex =
+          let lastFileIndex =
             props.folderfiles.folders[props.folderIndex].files.length - 1;
           lastFileIndex = lastFileIndex >= 0 ? lastFileIndex : 0;
-           props.setFileIndex(lastFileIndex);
+          props.setFileIndex(lastFileIndex);
           props.setOpenNewFile(true);
         } else {
           // console.log("extra file");
           props.setOpenExtraNewFile(true);
-          
-            
-           let lastExtraFileIndex =
-            props.folderfiles.extraFiles.length - 1;
+
+          let lastExtraFileIndex = props.folderfiles.extraFiles.length - 1;
           lastExtraFileIndex = lastExtraFileIndex >= 0 ? lastExtraFileIndex : 0;
-           props.setExtraFileIndex(lastExtraFileIndex);
+          props.setExtraFileIndex(lastExtraFileIndex);
         }
 
-         props.setLanguage("Choose_Language");
-         props.setValue(CODE_SNIPPETS["Choose_Language"]);
+        props.setLanguage("Choose_Language");
+        props.setValue(CODE_SNIPPETS["Choose_Language"]);
 
         break;
 
@@ -90,7 +90,9 @@ const ToolBar = (props) => {
   return (
     <div className="flex p-0">
       {props.toolBar === true ? (
+        
         <div className="border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 bg-gray-100">
+          <ToolTip text="Select File">
           <div
             className={`ml-1 h-8 flex justify-center items-center  w-full pt-2 ${
               props.selected === 1 ? "border-l-4 border-blue-900" : ""
@@ -102,7 +104,9 @@ const ToolBar = (props) => {
               alt="Select File"
               className="!h-[24px] !w-[24px]"
             />
-          </div>
+          </div> 
+          </ToolTip>
+          <ToolTip text="Save">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 2 ? "border-l-4 border-blue-900" : ""
@@ -115,6 +119,8 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
+          <ToolTip text="Folders">
           <div
             className={`      ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 3 ? "border-l-4 border-blue-900" : ""
@@ -127,6 +133,8 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
+          <ToolTip text="Download">
           <div
             className={`      ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 4 ? "border-l-4 border-blue-900" : ""
@@ -139,6 +147,8 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
+          <ToolTip text="History">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 5 ? "border-l-4 border-blue-900" : ""
@@ -151,6 +161,8 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
+          <ToolTip text="Copy to Clipboard">
           <div
             className={`      ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 6 ? "border-l-4 border-blue-900" : ""
@@ -162,8 +174,10 @@ const ToolBar = (props) => {
               alt="Clipboard"
               className="!h-[24px] !w-[24px]"
             />
+           
           </div>
-
+          </ToolTip>
+            <ToolTip text="Settings">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full  ${
               props.selected === 7 ? "border-l-4 border-blue-900" : ""
@@ -195,6 +209,8 @@ const ToolBar = (props) => {
               ""
             )}
           </div>
+          </ToolTip>
+          <ToolTip text="Share">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 8 ? "border-l-4 border-blue-900" : ""
@@ -207,6 +223,8 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
+          <ToolTip text="More Info">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 9 ? "border-l-4 border-blue-900" : ""
@@ -219,6 +237,8 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
+          <ToolTip text="Upload Code">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 10 ? "border-l-4 border-blue-900" : ""
@@ -241,6 +261,8 @@ const ToolBar = (props) => {
               />
             </label>
           </div>
+          </ToolTip>
+          <ToolTip text="">
           <div
             className={`     ml-1 h-8 flex justify-center items-center w-full ${
               props.selected === 11 ? "border-l-4 border-blue-900" : ""
@@ -253,6 +275,7 @@ const ToolBar = (props) => {
               className="!h-[24px] !w-[24px]"
             />
           </div>
+          </ToolTip>
         </div>
       ) : (
         ""

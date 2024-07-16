@@ -248,6 +248,8 @@ function EditorPage() {
       console.error("Invalid file index");
     }
   };
+  
+
 
   const [infoOpen, setInfoOpen] = useState(false);
 

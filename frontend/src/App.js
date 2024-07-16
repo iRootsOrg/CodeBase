@@ -10,7 +10,7 @@ function App() {
   <BrowserRouter>
   <Routes>
   <Route path="/" element={<EditorPage />} />
-  <Route path="/r" element={<ReviewPage />} />
+  <Route path="/review" element={<ReviewPage />} />
 
   </Routes>
   </BrowserRouter>
