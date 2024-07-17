@@ -2,36 +2,69 @@ const express = require("express");
 const colors = require("colors");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const path = require("path")
-const fileRoutes = require("./routes/fileRoutes")
-const userRoutes = require("./routes/userRoutes")
-const reviewRoutes = require("./routes/reviewRoutes")
-const connectDB = require("./config/db")
+const path = require("path");
+const fileRoutes = require("./routes/fileRoutes");
+const userRoutes = require("./routes/userRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const connectDB = require("./config/db");
 const fileUpload = require("express-fileupload");
 const WebSocket = require("ws");
 const errorMiddleware = require("./middlewares/errorMiddleware");
+const webSocketRoute = require("./routes/websocketRoutes");
+
 
 const app = express();
 dotenv.config();
 
 connectDB();
 
-//middlewares
+// middlewares
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-const PORT = process.env.PORT;
-const wssPort = process.env.WSS_PORT;
-// console.log(wssPort)
+const PORT = process.env.PORT || 3000;
+const wssPort = process.env.WSS_PORT || 8081;
+
+const activeConnections = {};
+
 const wss = new WebSocket.Server({ port: wssPort });
-// console.log(wss)
+
 wss.on("connection", (ws) => {
+    const token = req.url.split('?token=')[1];
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!user) {
+        ws.close();
+        return;
+    }
+
+    ws.userId = user.userId;
+    activeConnections[user.userId] = ws;
+
     console.log("Client connected to WebSocket server");
 
     ws.on("message", (message) => {
         console.log(`Received message => ${message}`);
+        const messageString = typeof message === 'string' ? message : message.toString();
+        const parsedMessage = JSON.parse(message);
+        const { sessionId, code } = parsedMessage;
+        // Broadcast the message to all connected clients
+        Object.values(activeConnections).forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(messageString);
+                client.send(JSON.stringify({ sessionId, code }));
+            }
+        });
     });
 
     ws.on("error", (error) => {
@@ -41,6 +74,7 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
         console.log("Client disconnected from WebSocket server");
+        delete activeConnections[ws.userId];
     });
 });
 
@@ -54,7 +88,8 @@ app.get('/health-check', (req, res) => {
 
 app.use("/api/v1/file", fileRoutes);
 app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/review",reviewRoutes);
+app.use("/api/v1/review", reviewRoutes);
+app.use(webSocketRoute);
 
 app.get("/", (req, res) => {
     res.send({
@@ -62,12 +97,12 @@ app.get("/", (req, res) => {
     });
 });
 
+app.use(errorMiddleware);
 
-app.use(errorMiddleware); 
+app.get('/wss', (req, res) => {
+    res.render('index', { title: 'Collaborative Editing' });
+});
 
-// listen server
 app.listen(PORT, () => {
-    console.log(
-        `Server running on PORT: ${PORT}`.bgBlue,
-    );
+    console.log(`Server running on PORT: ${PORT}`.bgBlue);
 });

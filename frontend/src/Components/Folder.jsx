@@ -128,7 +128,11 @@ const Folder = (props) => {
   };
 
   return (
-    <div className="flex flex-col w-full  gap-1  border-r-4 border-[#d1d5db]">
+    <div
+      className={`flex flex-col w-full  gap-1  border-r-4 border-[#d1d5db] ${
+        props.lightmode ? "text-black" : "text-white"
+      }`}
+    >
       <div className="font-bold text-lg p-2 flex justify-between items-center h-10">
         <div className="h-full">Files</div>
         <div className="flex gap-1 items-center h-full">
@@ -144,14 +148,26 @@ const Folder = (props) => {
         {props.folderfiles.folders.map((folder, index) => (
           <div
             key={index}
-            className={`w-full text-base gap-2 p-2 font-semibold cursor-pointer hover:bg-white ${
-              props.folderIndex === index ? "shadow-2xl bg-white" : ""
+            className={`w-full text-base gap-2 p-2 font-semibold cursor-pointer ${
+              props.lightmode
+                ? `hover:text-white  ${
+                    props.folderIndex === index
+                      ? "shadow-2xl bg-white !hover:bg-white"
+                      : "hover:bg-blue-600"
+                  }`
+                : `hover:text-white  ${
+                    props.folderIndex === index
+                      ? "shadow-2xl bg-white !hover:bg-white"
+                      : "hover:bg-cyan-600"
+                  }`
             }`}
           >
             <div
-              className={`flex gap-1 hover:text-blue-600 items-center ${
+              className={`flex gap-1  items-center ${props.lightmode ? `${
                 props.folderIndex === index ? "text-blue-600" : ""
-              }`}
+              }`:`${
+                props.folderIndex === index ? "text-cyan-600" : ""
+              }`}`}
             >
               {props.folderIndex === index ? "📂 " : "📁 "}
               <div className="flex justify-between w-full select-none">
@@ -168,7 +184,7 @@ const Folder = (props) => {
             </div>
 
             {props.folderIndex === index ? (
-              <div className="pl-6 w-full">
+              <div className="w-full">
                 <File
                   folderKey={index}
                   files={props.folderfiles.folders[props.folderIndex].files}
@@ -183,10 +199,11 @@ const Folder = (props) => {
                   setFolderIndex={props.setFolderIndex}
                   extraFileIndex={props.extraFileIndex}
                   setExtraFileIndex={props.setExtraFileIndex}
+                  lightmode={props.lightmode}
                 />
 
                 {props.opennewfile ? (
-                  <div className="flex gap-2 hover:text-blue-600 font-medium text-sm p-1 items-center">
+                  <div className="flex gap-2 hover:text-blue-600 font-medium text-sm p-1 items-center text-black">
                     <div>🗃️</div>
                     <input
                       value={props.newFileName}
@@ -207,9 +224,13 @@ const Folder = (props) => {
                       </button>
                     </div>
                   </div>
-                ):""}
+                ) : (
+                  ""
+                )}
               </div>
-            ):""}
+            ) : (
+              ""
+            )}
           </div>
         ))}
 
@@ -267,10 +288,17 @@ const Folder = (props) => {
             setLanguage={props.setLanguage}
             folderIndex={props.folderIndex}
             setFolderIndex={props.setFolderIndex}
+            lightmode={props.lightmode}
           />
 
           {props.openExtraNewFile === true ? (
-            <div className="flex gap-2 hover:text-blue-600 font-medium text-sm p-1 items-center">
+            <div
+              className={`flex gap-2  font-medium text-sm p-1 items-center ${
+                props.lightmode
+                  ? " hover:text-blue-600"
+                  : "hover:text-[#00BFFF]"
+              }`}
+            >
               <div>🗃️</div>
               <input
                 value={props.newExtraFileName}

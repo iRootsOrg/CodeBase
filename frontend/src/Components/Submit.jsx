@@ -1,13 +1,13 @@
 
 
 
-const Submit = () => {
+const Submit = (props) => {
   const onSubmit = () => {
     console.log("Submitting");
   };
   return (
     <button
-      className="border border-custom-gradient block w-24 px-2 py-1 text-center rounded bg-custom-gradient text-white"
+      className={`block w-24 px-2 py-1 text-center rounded ${props.lightmode ? "bg-custom-gradient":"bg-custom-gradient-inverted"} text-white`}
       onClick={() => {
         onSubmit();
       }}
