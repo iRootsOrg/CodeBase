@@ -1,33 +1,5 @@
 const mongoose = require("mongoose");
 
-const inputOutputSchema = new mongoose.Schema({
-    type: {
-        type: String,
-        enum: ['file', 'direct'],
-        required: true
-    },
-    fileReference: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'File',
-        required: function() { return this.type === 'file'; }
-    },
-    filePath: {
-        type: String,
-        required: function() { return this.type === 'file'; }
-    },
-    content: {
-        type: String,
-        required: function() { return this.type === 'direct'; } 
-    },
-    _id: false
-});
-
-const testCaseSchema = new mongoose.Schema({
-    inputs: [inputOutputSchema],
-    outputs: [inputOutputSchema],
-    _id: false
-});
-
 const fileSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -65,7 +37,14 @@ const fileSchema = new mongoose.Schema({
     },
     tags: [String],
     description: String,
-    testCases: [testCaseSchema]
+    isInput: {
+        type: Boolean,
+        default: false
+    },
+    isOutput: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true
 });
@@ -83,7 +62,9 @@ fileSchema.statics.createFolderStructure = async function(structure, parentId = 
             path: item.path,
             isFolder: item.isFolder,
             authorId: authorId,
-            parentFolder: parentId
+            parentFolder: parentId,
+            isInput: item.isInput || false,
+            isOutput: item.isOutput || false
         };
 
         if (!item.isFolder) {
