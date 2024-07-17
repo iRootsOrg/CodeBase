@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const CustomError = require("../utils/CustomError.js");
 const Role = require('../models/roleModel');
 const CustomError = require('../utils/CustomError');
 const transporter = require('../utils/emailService');
@@ -55,6 +56,30 @@ async function loginUser(req, res, next) {
     } catch (error) {
         next(error);
     }
+}
+
+async function startEditingSession(req, res) {
+    const { code } = req.body;
+    const user = req.user;
+    const editingSession = new mongoose.model('EditingSession')({ code, users: [user._id], sessionId: new mongoose.Types.ObjectId().toString() });
+    await editingSession.save();
+    user.editingSessionId = editingSession.sessionId;
+    await user.save();
+    res.json({ sessionId: editingSession.sessionId });
+}
+
+async function joinEditingSession(req, res) {
+    const { sessionId } = req.body;
+    const user = req.user;
+    const editingSession = await mongoose.model('EditingSession').findOne({ sessionId });
+    if (!editingSession) {
+        return res.status(404).json({ message: 'Editing session not found.' });
+    }
+    editingSession.users.push(user._id);
+    await editingSession.save();
+    user.editingSessionId = editingSession.sessionId;
+    await user.save();
+    res.json({ message: 'Joined editing session successfully.' });
 }
 
 async function assignRole(req, res, next) {
@@ -158,6 +183,8 @@ async function addCoauthor(req, res, next) {
 module.exports = { 
     registerUser, 
     loginUser,
+    startEditingSession, 
+    joinEditingSession,
     assignRole,
     getUserRoles,
     removeRoleFromUser,

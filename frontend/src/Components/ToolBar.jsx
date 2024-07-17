@@ -88,8 +88,9 @@ const ToolBar = (props) => {
   };
 
   return (
-    <div className="flex p-0">
+    <div className="flex p-0 h-full bg-gray-100">
       {props.toolBar === true ? (
+<<<<<<< HEAD
         
         <div className="border-r-2 border-[#d1d5db] flex flex-col items-center w-12 gap-3 bg-gray-100">
           <ToolTip text="Select File">
@@ -246,21 +247,188 @@ const ToolBar = (props) => {
             onClick={() => handleSelected(10)}
           >
             <label>
+=======
+        <div
+          className={`border-r-2 border-[#d1d5db] flex flex-col items-center  justify-between gap-3 w-12  ${
+            props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+          }`}
+        >
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className={`ml-1  h-auto py-1 flex justify-center items-center  w-full pt-2 ${
+                props.selected === 1
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(1)}
+            >
+>>>>>>> 8b24744dad48e2f4dd09fcecaaaeeda5308d2d7a
               <img
-                src={"./Icons/Upload.png"}
-                alt="Upload"
-                className="!h-[24px] !w-[24px] cursor-pointer"
+                src={"./Icons/SelectFile.png"}
+                alt="Select File"
+                className="!h-[24px] !w-[24px]"
               />
-              <input
-                type="file"
-                multiple
-                webkitdirectory="true"
-                onChange={props.handleFileUpload}
-                className="hidden"
-                name="upload"
+            </div>
+            <div
+              className={`ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 2
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(2)}
+            >
+              <img
+                src={"./Icons/Save.png"}
+                alt="Save"
+                className="!h-[24px] !w-[24px]"
               />
-            </label>
+            </div>
+            <div
+              className={`ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 3
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(3)}
+            >
+              <img
+                src={"./Icons/Folder.png"}
+                alt="Folder"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+            <div
+              className={`      ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 4
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(4)}
+            >
+              <img
+                src={"./Icons/Download.png"}
+                alt="Download"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+            <div
+              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 5
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(5)}
+            >
+              <img
+                src={"./Icons/History.png"}
+                alt="History"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+            <div
+              className={`      ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 6
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(6)}
+            >
+              <img
+                src={"./Icons/Clipboard.png"}
+                alt="Clipboard"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+            <div
+              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 8
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(8)}
+            >
+              <img
+                src={"./Icons/Share.png"}
+                alt="Share"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+            <div
+              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 9
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(9)}
+            >
+              <img
+                src={"./Icons/Info.png"}
+                alt="Info"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+            <div
+              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 10
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(10)}
+            >
+              <label>
+                <img
+                  src={"./Icons/Upload.png"}
+                  alt="Upload"
+                  className="!h-[24px] !w-[24px] cursor-pointer"
+                />
+                <input
+                  type="file"
+                  multiple
+                  webkitdirectory="true"
+                  onChange={props.handleFileUpload}
+                  className="hidden"
+                  name="upload"
+                />
+              </label>
+            </div>
           </div>
+<<<<<<< HEAD
           </ToolTip>
           <ToolTip text="">
           <div
@@ -274,6 +442,73 @@ const ToolBar = (props) => {
               alt="Info"
               className="!h-[24px] !w-[24px]"
             />
+=======
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full  ${
+                props.selected === 7
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+            >
+              <img
+                onClick={() => handleSelected(7)}
+                src={"./Icons/Settings.png"}
+                alt="Settings"
+                className="!h-[24px] !w-[24px]"
+              />
+
+              {props.settingsopen === true ? (
+                <div
+                  className={`absolute left-14 bottom-16 py-2 z-10 rounded bg-transparent ${
+                    props.lightmode === true ? " text-black" : "text-white"
+                  }`}
+                >
+                  <Settings
+                    lightmode={props.lightmode}
+                    setLightMode={props.setLightMode}
+                    handleLight={props.handleLight}
+                    formatCode={props.formatCode}
+                    wordWrap={props.wordWrap}
+                    setWordWrap={props.setWordWrap}
+                    settingsopen={props.settingsopen}
+                    setSettingsOpen={props.setSettingsOpen}
+                    setSelected={props.setSelected}
+                    keyboardShortcut={props.keyboardShortcut}
+                    setKeyboardShortcut={props.setKeyboardShortcut}
+                    fontSize={props.fontSize}
+                    setFontSize={props.setFontSize}
+                    email={props.email}
+                    setEmail={props.setEmail}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
+            <div
+              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                props.selected === 11
+                  ? `border-l-4 ${
+                      props.lightmode ? "border-blue-900" : "border-white"
+                    }`
+                  : ""
+              } cursor-pointer hover:border-l-4 ${
+                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
+              }`}
+              onClick={() => handleSelected(11)}
+            >
+              <img
+                src={"./Icons/More.png"}
+                alt="Info"
+                className="!h-[24px] !w-[24px]"
+              />
+            </div>
+>>>>>>> 8b24744dad48e2f4dd09fcecaaaeeda5308d2d7a
           </div>
           </ToolTip>
         </div>
