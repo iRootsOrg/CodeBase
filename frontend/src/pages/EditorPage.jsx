@@ -1,12 +1,15 @@
 import Output from "../Components/Output.jsx";
 import CodeEditor from "../Components/CodeEditor";
 import TestCase from "../Components/TestCase.jsx";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Run from "../Components/Run.jsx";
 import RunAll from "../Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
+import { CODE_SNIPPETS, LAN_CONVERSION } from "../Utils/languages.jsx";
+import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
+import light from "react-syntax-highlighter/dist/cjs/light.js";
 
 function EditorPage() {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
@@ -16,9 +19,7 @@ function EditorPage() {
     textArea3: "",
     textArea4: "",
   });
-  const [language, setLanguage] = useState("js");
 
-  const [value, setValue] = useState("");
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
@@ -40,11 +41,23 @@ function EditorPage() {
   const [folderopen, setFolderOpen] = useState(false);
   const initialFolderFiles = {
     folders: [],
-    extraFiles: [],
+    extraFiles: [
+      {
+        name: "Sample File",
+        code: CODE_SNIPPETS["javascript"],
+        language: "javascript",
+        output: "",
+        tc: [{
+          input: "",
+          output:""
+        }]
+      },
+    ],
   };
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
+  const [language, setLanguage] = useState("javascript");
 
-
+  const [value, setValue] = useState("");
 
   useEffect(() => {
     const initialCode = localStorage.getItem("folderfiles");
@@ -52,10 +65,17 @@ function EditorPage() {
 
     if (initialCode === null) {
       localStorage.setItem("folderfiles", JSON.stringify(initialFolderFiles));
+      setLanguage(initialFolderFiles.extraFiles[0].language);
+      setValue(initialFolderFiles.extraFiles[0].code);
     } else {
-      setFolderFiles(JSON.parse(initialCode));
+      const folderParsing = JSON.parse(initialCode);
+      setFolderFiles(folderParsing);
+
+      setLanguage(folderParsing.extraFiles[0].language);
+      setValue(folderParsing.extraFiles[0].code);
       setSaveLocally(true);
     }
+    setExtraFileIndex(0);
   }, []);
 
   useEffect(() => {
@@ -197,11 +217,14 @@ function EditorPage() {
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
-          folderZip.file(`${file.name}.${file.language}`, file.code);
+          folderZip.file(
+            `${file.name}.${LAN_CONVERSION[file.language]}`,
+            file.code
+          );
         });
       });
       folderfiles.extraFiles.forEach((file) => {
-        zip.file(`${file.name}.${file.language}`, file.code);
+        zip.file(`${file.name}.${LAN_CONVERSION[file.language]}`, file.code);
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
@@ -216,7 +239,10 @@ function EditorPage() {
       const folderZip = zip.folder(folder.name);
 
       folder.files.forEach((file) => {
-        folderZip.file(`${file.name}.${file.language}`, file.code);
+        folderZip.file(
+          `${file.name}.${LAN_CONVERSION[file.language]}`,
+          file.code
+        );
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
@@ -230,7 +256,7 @@ function EditorPage() {
       const blob = new Blob([file.code], {
         type: "text/plain;charset=utf-8",
       });
-      saveAs(blob, `${file.name}.${file.language}`);
+      saveAs(blob, `${file.name}.${LAN_CONVERSION[file.language]}`);
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -242,7 +268,7 @@ function EditorPage() {
       const blob = new Blob([file.code], {
         type: "text/plain;charset=utf-8",
       });
-      saveAs(blob, `${file.name}.${file.language}`);
+      saveAs(blob, `${file.name}.${LAN_CONVERSION[file.language]}`);
     } else {
       alert("No File Selected");
       console.error("Invalid file index");
@@ -250,12 +276,15 @@ function EditorPage() {
   };
 
   const [infoOpen, setInfoOpen] = useState(false);
+  const [reportBugOpen, setReportBugOpen] = useState(false);
+  const [keyboardShortcut, setKeyboardShortcut] = useState(false);
+  const [email, setEmail] = useState("");
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 h-[96%] ">
+    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
+      <div className=" flex flex-col overflow-x-hidden h-full">
+        <div className="flex-1 h-full flex overflow-x-hidden">
+          <div className="flex-1 h-[87.4%]">
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -297,19 +326,29 @@ function EditorPage() {
               setOpenExtraNewFile={setOpenExtraNewFile}
               extraNewFileName={extraNewFileName}
               setExtraNewFileName={setExtraNewFileName}
+              keyboardShortcut={keyboardShortcut}
+              setKeyboardShortcut={setKeyboardShortcut}
+              email={email}
+              setEmail={setEmail}
             />
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
           <div className="flex-1 h-full overflow-y-auto">
-            <Output />
+            <Output lightmode={lightmode} />
           </div>
         </div>
-        <div className="bg-gray-100 pl-4">
-          <div className={`flex p-4 justify-between `}>
-            <label className="font-bold text-xl">Test Cases :</label>
+        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4 `}>
+          <div className={`flex p-4 justify-between h-[10vh]`}>
+            <label
+              className={`font-bold text-xl ${
+                lightmode ? "text-black" : "text-white"
+              }`}
+            >
+              Test Cases :
+            </label>
             <div className="flex items-center gap-4">
-              <Run />
-              <RunAll />
+              <Run lightmode={lightmode} />
+              <RunAll lightmode={lightmode} />
               <button
                 onClick={() => {
                   handleClick();
@@ -317,9 +356,13 @@ function EditorPage() {
               >
                 <img
                   src={
-                    testcaseOpen === true
-                      ? "./Icons/Down.png"
-                      : "./Icons/Up.png"
+                    testcaseOpen
+                      ? lightmode
+                        ? "./Icons/Down.png"
+                        : "./Icons/DownLight.png"
+                      : lightmode
+                      ? "./Icons/Up.png"
+                      : "./Icons/UpLight.png"
                   }
                   alt="Arrow"
                   className="h-[32px] w-[32px]"
@@ -328,7 +371,13 @@ function EditorPage() {
             </div>
           </div>
           {testcaseOpen === true ? (
-            <TestCase testCases={testCases} setTestCases={setTestCases} />
+            <TestCase
+              testCases={testCases}
+              setTestCases={setTestCases}
+              lightmode={lightmode}
+              reportBugOpen={reportBugOpen}
+              setReportBugOpen={setReportBugOpen}
+            />
           ) : (
             ""
           )}
@@ -362,8 +411,16 @@ function EditorPage() {
       </div>
 
       {shareOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+        <div
+          className={`fixed inset-0 flex items-center justify-center backdrop-blur-sm   `}
+        >
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-white text-black border-black"
+                : "bg-[#1e1e1e] text-white border-white"
+            } p-6 rounded-lg shadow-lg relative `}
+          >
             <button
               onClick={() => {
                 setShareOpen(false);
@@ -377,11 +434,15 @@ function EditorPage() {
               type="text"
               value={window.location.href}
               readOnly
-              className="w-full p-2 border border-gray-300 rounded mb-4"
+              className={`w-full p-2 border border-gray-300 rounded mb-4 ${
+                lightmode ? "bg-white" : "bg-[#1e1e1e]"
+              } `}
             />
             <button
               onClick={copyToClipboard}
-              className="bg-blue-500 text-white p-2 rounded w-full mb-4"
+              className={`${
+                lightmode ? "bg-blue-500 text-white" : "bg-[#00BFFF] text-black"
+              }  p-2 rounded w-full mb-4`}
             >
               Copy URL
             </button>
@@ -415,8 +476,14 @@ function EditorPage() {
       )}
 
       {infoOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-white text-black  border-black"
+                : "bg-[#1e1e1e] text-white border-white"
+            } p-6 rounded-lg shadow-lg relative `}
+          >
             <div>
               <button
                 onClick={() => {
@@ -445,7 +512,93 @@ function EditorPage() {
       ) : (
         ""
       )}
+
+      {reportBugOpen === true ? (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-gray-100 bg-opacity-90 text-black border-black"
+                : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
+            } p-6 rounded-lg shadow-lg relative w-[70vw]`}
+          >
+            <div className="flex items-center">
+              <button
+                onClick={() => {
+                  setReportBugOpen(false);
+                }}
+                className={`absolute top-3 right-2 ${
+                  lightmode
+                    ? "text-black hover:text-gray-700"
+                    : "text-white hover:text-gray-200"
+                }`}
+              >
+                <FaTimes size={24} />
+              </button>
+              <h2 className={`text-xl font-bold top-3 left-[45%] absolute `}>
+                Report Bug
+              </h2>
+            </div>
+
+            <form
+              action="POST"
+              className="flex flex-col gap-3 mt-4 font-semibold w-full"
+            >
+              <p>Tell us some details:</p>
+              <label>Name :</label>
+              <input
+                type="text"
+                placeholder="Name"
+                name="Name"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+              ></input>
+              <label>Email :</label>
+              <input
+                type="email"
+                placeholder="Email"
+                name="Email"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+              ></input>
+              <label>Tell us what issue/bug, you met :</label>
+              <textarea
+                type="text"
+                placeholder="Issue"
+                name="Issue"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+                rows={6}
+              ></textarea>
+              <div className="flex justify-end pr-2 w-full">
+                <button
+                  className={`block w-24 px-2 py-1 text-center rounded ${
+                    lightmode
+                      ? "bg-custom-gradient"
+                      : "bg-custom-gradient-inverted"
+                  } text-white`}
+                  type="submit"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
+      {keyboardShortcut === true ? (
+        <KeyBoardShortcuts lightmode={lightmode} setLightMode={setLightMode} keyboardShortcut={keyboardShortcut} setKeyboardShortcut={setKeyboardShortcut} />
+      ) : (
+        ""
+      )}
     </div>
   );
 }
+
 export default EditorPage;
