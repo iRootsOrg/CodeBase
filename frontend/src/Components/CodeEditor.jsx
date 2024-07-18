@@ -83,9 +83,7 @@ const CodeEditor = (props) => {
     setToolBar(!toolBar);
     setToolbarNull();
   };
-  const formatCode = () => {
-    editorRef.current.getAction('editor.action.formatDocument').run();
-  };
+  
 
   return (
     <div className={`h-full`}>

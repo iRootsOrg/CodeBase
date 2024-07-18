@@ -165,14 +165,12 @@ const EditorPage = () => {
   };
 
   const handleFolderName = (e) => {
-   
     const name = e.target.value;
     let isValid = true;
 
     restrictedPatterns.forEach((pattern) => {
       if (pattern.test(name)) {
         isValid = false;
-
         return; // Exit the forEach loop early
       }
     });
@@ -182,10 +180,12 @@ const EditorPage = () => {
       setNewFolderName(name);
     } else {
       console.log("Restricted characters detected");
-      toast.error("Your input contains restricted characters");
+      toast.error("Your input contains restricted characters", {
+        id: "restricted-chars-error-folder",
+      });
     }
-    
   };
+
 
   const addNewFolder = () => {
     setFolderFiles((prevState) => ({

@@ -1,12 +1,15 @@
-
-import File from "./File";
-import { CODE_SNIPPETS } from "../Utils/languages";
+import React, { useRef } from "react";
 import { FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
+import File from "./File";
 import ExtraFiles from "./ExtraFiles";
-import toast from "react-hot-toast";
+import { CODE_SNIPPETS } from "../Utils/languages";
 import { restrictedPatterns } from "../Utils/restrictedtext";
+import toast from "react-hot-toast";
 
 const Folder = (props) => {
+  const lastInvalidFileNameRef = useRef("");
+  const lastInvalidExtraFileNameRef = useRef("");
+
   const openFolder = (index) => {
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
@@ -25,12 +28,10 @@ const Folder = (props) => {
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
     let lastFileIndex = props.folderfiles.folders[index].files.length - 1;
     lastFileIndex = lastFileIndex >= 0 ? lastFileIndex : 0;
-      props.setFileIndex(lastFileIndex);
+    props.setFileIndex(lastFileIndex);
     props.setFolderIndex(index);
     props.setOpenNewFile(true);
     props.setOutputFile(props.initialOutput);
-   
-    
   };
 
   const addNewFolder = () => {
@@ -38,45 +39,53 @@ const Folder = (props) => {
   };
 
   const handleFileName = (e) => {
-     const name = e.target.value;
-     let isValid = true;
+    const name = e.target.value;
+    let isValid = true;
 
-     restrictedPatterns.forEach((pattern) => {
-       if (pattern.test(name)) {
-         isValid = false;
+    restrictedPatterns.forEach((pattern) => {
+      if (pattern.test(name)) {
+        isValid = false;
+        return; // Exit the forEach loop early
+      }
+    });
 
-         return; // Exit the forEach loop early
-       }
-     });
-
-     if (isValid) {
-        props.setNewFileName(e.target.value);
-     } else {
-       console.log("Restricted characters detected");
-       toast.error("Your input contains restricted characters");
-     }
-   
+    if (isValid) {
+      props.setNewFileName(e.target.value);
+      lastInvalidFileNameRef.current = ""; // Reset the last invalid input
+    } else {
+      if (lastInvalidFileNameRef.current !== name) {
+        lastInvalidFileNameRef.current = name;
+        console.log("Restricted characters detected");
+        toast.error("Your input contains restricted characters", {
+          id: "restricted-chars-error",
+        });
+      }
+    }
   };
 
   const handleExtraFileName = (e) => {
-     const name = e.target.value;
-     let isValid = true;
+    const name = e.target.value;
+    let isValid = true;
 
-     restrictedPatterns.forEach((pattern) => {
-       if (pattern.test(name)) {
-         isValid = false;
+    restrictedPatterns.forEach((pattern) => {
+      if (pattern.test(name)) {
+        isValid = false;
+        return; // Exit the forEach loop early
+      }
+    });
 
-         return; // Exit the forEach loop early
-       }
-     });
-
-     if (isValid) {
-       props.setExtraNewFileName(e.target.value);
-     } else {
-       console.log("Restricted characters detected");
-       toast.error("Your input contains restricted characters");
-     }
-   
+    if (isValid) {
+      props.setExtraNewFileName(e.target.value);
+      lastInvalidExtraFileNameRef.current = ""; // Reset the last invalid input
+    } else {
+      if (lastInvalidExtraFileNameRef.current !== name) {
+        lastInvalidExtraFileNameRef.current = name;
+        console.log("Restricted characters detected");
+        toast.error("Your input contains restricted characters", {
+          id: "restricted-chars-error-extra",
+        });
+      }
+    }
   };
 
   const addNewFile = (folderIndex) => {
@@ -90,7 +99,7 @@ const Folder = (props) => {
               name: props.newFileName,
               code: CODE_SNIPPETS[props.language],
               language: props.language,
-              output:props.outputFile,
+              output: props.outputFile,
             },
           ],
         };
@@ -109,7 +118,7 @@ const Folder = (props) => {
       name: props.extraNewFileName,
       code: CODE_SNIPPETS[props.language],
       language: props.language,
-      output:props.outputFile,
+      output: props.outputFile,
     };
 
     const newExtraFiles = [...props.folderfiles.extraFiles, newExtraFile];
@@ -123,7 +132,6 @@ const Folder = (props) => {
     props.setOpenExtraNewFile(false);
     props.setExtraNewFileName("");
   };
-
 
   const updateFiles = (folderIndex, newFiles) => {
     const newFolders = props.folderfiles.folders.map((folder, index) => {
