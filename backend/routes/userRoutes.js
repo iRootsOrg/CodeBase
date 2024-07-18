@@ -1,4 +1,5 @@
 const express = require("express");
+const authMiddleware = require("../middlewares/authMiddleware");
 const authenticateToken = require("../middlewares/authMiddleware");
 const { registerUser,
     loginUser,
