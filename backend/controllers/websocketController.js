@@ -1,5 +1,6 @@
 async function startWebSocket(req, res) {
-    res.render('websocket');
+    const wssPort = process.env.WSS_PORT;
+    res.render('websocket', {wssPort});
 }
 
 module.exports = { startWebSocket };
