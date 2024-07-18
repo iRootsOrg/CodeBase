@@ -21,7 +21,7 @@
         transports: ['websocket', 'xhr-polling'],
       });
     }
-
+    
     socket.onmessage = (event) => {
       if (typeof event.data === 'string') {
         const code = JSON.parse(event.data).code;

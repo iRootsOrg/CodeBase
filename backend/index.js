@@ -99,5 +99,3 @@ app.use(errorMiddleware);
 app.listen(PORT, () => {
     console.log(`Server running on PORT: ${PORT}`.bgBlue);
 });
-
-
