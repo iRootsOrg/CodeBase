@@ -1,4 +1,5 @@
 const express = require("express");
+const authMiddleware = require("../middlewares/authMiddleware");
 const authenticateToken = require("../middlewares/authMiddleware");
 const { registerUser,
     loginUser,
@@ -9,6 +10,7 @@ const { registerUser,
     removeRoleFromUser,
     addCoauthor
 } = require("../controllers/userController");
+
 const router = express.Router();
 
 router.post("/signup", registerUser);
