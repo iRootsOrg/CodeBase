@@ -1,12 +1,30 @@
 import Settings from "./Settings.jsx";
 import { CODE_SNIPPETS } from "../Utils/languages.jsx";
+import { useState } from "react";
+import toast from "react-hot-toast";
 const ToolBar = (props) => {
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
+  const handleFileChecked = () => {
+    props.setFileChecked(!props.fileChecked);
+  };
+
+  const handleOutputChecked = () => {
+    props.setOutputChecked(!props.outputChecked);
+  };
+
+  const handleCheckboxSubmit = () => {
+    props.zipAndDownload();
+    props.setSelected(0);
+    setShowDownloadOptions(false);
+    
+  }
   const handleSelected = (e) => {
     if (props.selected === e) {
       props.setSelected(0);
     } else {
       props.setSelected(e);
     }
+
 
     switch (e) {
       case 1:
@@ -45,8 +63,10 @@ const ToolBar = (props) => {
         break;
 
       case 4:
-        props.zipAndDownload();
-        props.setSelected(0);
+        setShowDownloadOptions(true);
+        if (props.selected === 4) { props.setSelected(0); }
+        // props.zipAndDownload();
+        // props.setSelected(0);
         break;
       case 5:
         props.setHistoryOpen(!props.historyOpen);
@@ -56,10 +76,10 @@ const ToolBar = (props) => {
           .writeText(props.value)
           .then(() => {
             props.setSelected(0);
-            alert("Code successfully copied to Clipboard!");
+            toast.success("Code successfully copied to Clipboard!");
           })
           .catch((err) => {
-            console.error("Error in copying ", err);
+            toast.error("Error in copying ");
           });
         break;
 
@@ -86,11 +106,11 @@ const ToolBar = (props) => {
   };
 
   return (
-    <div className="flex p-0 h-full bg-gray-100">
+    <div className="flex p-0 h-full ">
       {props.toolBar === true ? (
         <div
           className={`border-r-2 border-[#d1d5db] flex flex-col items-center  justify-between gap-3 w-12  ${
-            props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+            props.lightmode ? "" : "bg-[#1e1e1e]"
           }`}
         >
           <div className="flex flex-col items-center gap-3">
@@ -148,23 +168,90 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
-            <div
-              className={`      ml-1  h-auto py-1 flex justify-center items-center w-full ${
-                props.selected === 4
-                  ? `border-l-4 ${
-                      props.lightmode ? "border-blue-900" : "border-white"
-                    }`
-                  : ""
-              } cursor-pointer hover:border-l-4 ${
-                props.lightmode ? `hover:border-blue-900` : `hover:border-white`
-              }`}
-              onClick={() => handleSelected(4)}
-            >
-              <img
-                src={"./Icons/Download.png"}
-                alt="Download"
-                className="!h-[24px] !w-[24px]"
-              />
+            <div>
+              <div
+                className={`      ml-1  h-auto py-1 flex justify-center items-center w-full ${
+                  props.selected === 4
+                    ? `border-l-4 ${
+                        props.lightmode ? "border-blue-900" : "border-white"
+                      }`
+                    : ""
+                } cursor-pointer hover:border-l-4 ${
+                  props.lightmode
+                    ? `hover:border-blue-900`
+                    : `hover:border-white`
+                }`}
+                onClick={() => handleSelected(4)}
+              >
+                <img
+                  src={"./Icons/Download.png"}
+                  alt="Download"
+                  className="!h-[24px] !w-[24px]"
+                />
+              </div>
+              {/* Download Options */}
+
+              {showDownloadOptions === true ? (
+                <div
+                  className={`absolute left-14 py-4 px-6 flex flex-col items-start  justify-center z-10 rounded-lg shadow-lg border ${
+                    props.lightmode === true
+                      ? "bg-gray-100 text-[#1e1e1e]"
+                      : "bg-[#1e1e1e] text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-6">
+                  <div className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      name="files"
+                      checked={props.fileChecked}
+                      onChange={handleFileChecked}
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="files"
+                      className={`flex items-center ${
+                        props.fileChecked === true ? "font-bold" : ""
+                      }`}
+                    >
+                      Files
+                      
+                    </label>
+                  </div>
+                  <div className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      name="output"
+                      checked={props.outputChecked}
+                      onChange={handleOutputChecked}
+                      className="mr-2"
+                    />
+                    <label
+                      htmlFor="output"
+                      className={`flex items-center ${
+                        props.outputChecked === true ? "font-bold" : ""
+                      }`}
+                    >
+                      Output
+                      
+                    </label>
+                  </div>
+                  </div>
+                  <button
+                    onClick={handleCheckboxSubmit}
+                    className={`mt-4 py-2 px-4 rounded ${
+                      props.fileChecked || props.outputChecked
+                        ? "bg-blue-500 text-white cursor-pointer"
+                        : "bg-gray-400 text-gray-700 cursor-not-allowed disabled"
+                    } w-full`}
+                    disabled={!props.fileChecked && !props.outputChecked}
+                  >
+                    Submit
+                  </button>
+                </div>
+              ) : (
+                ""
+              )}
             </div>
             <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
@@ -258,8 +345,8 @@ const ToolBar = (props) => {
                 />
                 <input
                   type="file"
+                  
                   multiple
-                  webkitdirectory="true"
                   onChange={props.handleFileUpload}
                   className="hidden"
                   name="upload"

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { FaPlus, FaUserPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import { IoPersonAdd } from "react-icons/io5";
+import toast from "react-hot-toast";
 const Settings = (props) => {
   const [invite, setInvite] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
@@ -40,6 +41,7 @@ const Settings = (props) => {
     setInviteSuccessfull(true);
 
     setShowInviteSuccessfull(true);
+    toast.success("Invite Successful");
     setTimeout(() => {
       setShowInviteSuccessfull(false);
     }, 3000);
@@ -60,7 +62,7 @@ const Settings = (props) => {
         className={`flex gap-2 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
         } w-full  px-2.5 py-2`}
-        onClick={props.formatCode()}
+        onClick={() => { props.formatCode() }}
       >
         <img
           className=" mix-blend-multiply !h-[24px] !w-[24px] z-10"

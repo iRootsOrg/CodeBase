@@ -9,7 +9,7 @@ import ToolBar from "./ToolBar";
 import Folder from "./Folder";
 import History from "./History";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
-
+import toast from "react-hot-toast";
 const CodeEditor = (props) => {
   const editorRef = useRef();
   const [toolBar, setToolBar] = useState(true);
@@ -56,6 +56,7 @@ const CodeEditor = (props) => {
 
   const formatCode = () => {
     editorRef.current.getAction("editor.action.formatDocument").run();
+    toast.success("Code Formatted");
   };
 
   const handleToolBar = () => {
@@ -137,7 +138,7 @@ const CodeEditor = (props) => {
 
       <div
         className={`flex h-full ${
-          props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+          props.lightmode ? "" : "bg-[#1e1e1e]"
         } `}
       >
         <ToolBar
@@ -188,6 +189,10 @@ const CodeEditor = (props) => {
           setFontSize={setFontSize}
           email={props.email}
           setEmail={props.setEmail}
+          fileChecked={props.fileChecked}
+          outputChecked={props.outputChecked}
+          setFileChecked={props.setFileChecked}
+          setOutputChecked={props.setOutputChecked}
         />
         <div className="h-full">
           {props.folderopen === true ? (
@@ -220,6 +225,9 @@ const CodeEditor = (props) => {
                 addNewFolder={props.addNewFolder}
                 lightmode={props.lightmode}
                 setNewFolderName={props.setNewFolderName}
+                outputFile={props.outputFile}
+                setOutputFile={props.setOutputFile}
+                initialOutput={props.initialOutput}
               />
             </div>
           ) : (
