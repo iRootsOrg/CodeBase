@@ -2,11 +2,11 @@ const express = require("express");
 const colors = require("colors");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const path = require("path");
-const fileRoutes = require("./routes/fileRoutes");
-const userRoutes = require("./routes/userRoutes");
-const reviewRoutes = require("./routes/reviewRoutes");
-const connectDB = require("./config/db");
+const path = require("path")
+const fileRoutes = require("./routes/fileRoutes")
+const userRoutes = require("./routes/userRoutes")
+const reviewRoutes = require("./routes/reviewRoutes")
+const connectDB = require("./config/db")
 const fileUpload = require("express-fileupload");
 const WebSocket = require("ws");
 const errorMiddleware = require("./middlewares/errorMiddleware");
@@ -16,7 +16,7 @@ dotenv.config();
 
 connectDB();
 
-// middlewares
+//middlewares
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
@@ -33,7 +33,7 @@ wss.on("connection", (ws) => {
     ws.on("message", (message) => {
         console.log(`Received message => ${message}`);
     });
-
+  
     ws.on("error", (error) => {
         console.log("Error occurred in WebSocket connection");
         console.error(error);
@@ -55,7 +55,7 @@ app.get('/health-check', (req, res) => {
 
 app.use("/api/v1/file", fileRoutes);
 app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/review", reviewRoutes);
+app.use("/api/v1/review",reviewRoutes);
 
 app.get("/", (req, res) => {
     res.send({
@@ -64,11 +64,11 @@ app.get("/", (req, res) => {
 });
 
 
-app.use(errorMiddleware);
+app.use(errorMiddleware); 
 
 // listen server
 app.listen(PORT, () => {
     console.log(
-        `Server running on PORT: ${PORT}`.bgBlue
+        `Server running on PORT: ${PORT}`.bgBlue,
     );
 });
