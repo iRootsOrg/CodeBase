@@ -24,3 +24,9 @@ RUN touch /var/log/cron.log
 
 # Run the cron service and tail the log file
 CMD cron && tail -f /var/log/cron.log
+
+
+
+# Remember to change the End of Line sequence to LF of each file (Dockerfile, check_and_run.sh, runner.sh)
+# docker build -t cron-monitor-container .
+# docker run -d -v "$(pwd)/input:/usr/src/app/input" -v "$(pwd)/output:/usr/src/app/output" cron-monitor-container
