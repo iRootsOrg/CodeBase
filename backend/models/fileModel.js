@@ -6,16 +6,20 @@ const inputOutputSchema = new mongoose.Schema({
         enum: ['file', 'direct'],
         required: true
     },
-    reference: {
+    fileReference: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'File',
+        required: function() { return this.type === 'file'; }
+    },
+    filePath: {
+        type: String,
         required: function() { return this.type === 'file'; }
     },
     content: {
         type: String,
         required: function() { return this.type === 'direct'; } 
     },
-    _id:false
+    _id: false
 });
 
 const testCaseSchema = new mongoose.Schema({
@@ -25,43 +29,82 @@ const testCaseSchema = new mongoose.Schema({
 });
 
 const fileSchema = new mongoose.Schema({
-    filename:{
-        type:String,
-        required:true
+    name: {
+        type: String,
+        required: true
     },
-    language: {
-        type:String,
-        required:true
-    }, 
-    file: {
+    path: {
+        type: String,
+        required: true
+    },
+    isFolder: {
+        type: Boolean,
+        default: false
+    },
+    content: {
         type: Buffer,
-        required:true
-    }, 
+        required: function() { return !this.isFolder; }
+    },
+    files: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File'
+    }],
+    parentFolder: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File',
+        default: null
+    },
     authorId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        unique:true,
+        ref: 'User',
         required: true,
     },
-    createdAt: {
-        type:Date,
-        required:true
-    }, 
-    updatedAt: {
-        type:Date,
-        default: Date.now
+    language: {
+        type: String,
+        required: function() { return !this.isFolder; }
     },
-    tags: {
-        type:[String],
-    }, 
-    description: {
-        type:String
-    },
+    tags: [String],
+    description: String,
     testCases: [testCaseSchema]
+}, {
+    timestamps: true
 });
+
+fileSchema.virtual('fullPath').get(function() {
+    return this.path + '/' + this.name;
+});
+
+fileSchema.statics.createFolderStructure = async function(structure, parentId = null, authorId) {
+    const createdFiles = [];
+
+    for (const item of structure) {
+        const fileData = {
+            name: item.name,
+            path: item.path,
+            isFolder: item.isFolder,
+            authorId: authorId,
+            parentFolder: parentId
+        };
+
+        if (!item.isFolder) {
+            fileData.content = item.content;
+            fileData.language = item.language;
+        }
+
+        const file = await this.create(fileData);
+
+        if (item.isFolder && item.files) {
+            const childFiles = await this.createFolderStructure(item.files, file._id, authorId);
+            file.files = childFiles.map(f => f._id);
+            await file.save();
+        }
+
+        createdFiles.push(file);
+    }
+
+    return createdFiles;
+};
 
 const File = mongoose.model("File", fileSchema);
 
 module.exports = File;
-
-
