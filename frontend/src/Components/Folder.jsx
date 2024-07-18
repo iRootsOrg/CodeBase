@@ -3,6 +3,8 @@ import File from "./File";
 import { CODE_SNIPPETS } from "../Utils/languages";
 import { FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
 import ExtraFiles from "./ExtraFiles";
+import toast from "react-hot-toast";
+import { restrictedPatterns } from "../Utils/restrictedtext";
 
 const Folder = (props) => {
   const openFolder = (index) => {
@@ -36,11 +38,45 @@ const Folder = (props) => {
   };
 
   const handleFileName = (e) => {
-    props.setNewFileName(e.target.value);
+     const name = e.target.value;
+     let isValid = true;
+
+     restrictedPatterns.forEach((pattern) => {
+       if (pattern.test(name)) {
+         isValid = false;
+
+         return; // Exit the forEach loop early
+       }
+     });
+
+     if (isValid) {
+        props.setNewFileName(e.target.value);
+     } else {
+       console.log("Restricted characters detected");
+       toast.error("Your input contains restricted characters");
+     }
+   
   };
 
   const handleExtraFileName = (e) => {
-    props.setExtraNewFileName(e.target.value);
+     const name = e.target.value;
+     let isValid = true;
+
+     restrictedPatterns.forEach((pattern) => {
+       if (pattern.test(name)) {
+         isValid = false;
+
+         return; // Exit the forEach loop early
+       }
+     });
+
+     if (isValid) {
+       props.setExtraNewFileName(e.target.value);
+     } else {
+       console.log("Restricted characters detected");
+       toast.error("Your input contains restricted characters");
+     }
+   
   };
 
   const addNewFile = (folderIndex) => {

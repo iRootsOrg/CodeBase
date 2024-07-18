@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-
+import { restrictedPatterns } from "../Utils/restrictedtext";
+import toast from "react-hot-toast";
 const TestCase = (props) => {
   const [selected, setSelected] = useState(1);
 
@@ -7,11 +8,25 @@ const TestCase = (props) => {
     setSelected(e);
   };
 
-  const handleTestCase = (e) => {
-    const { name, value } = e.target;
-    props.setTestCases({ ...props.testCases, [name]: value });
-  };
+    const handleTestCase = async (e) => {
+      const { name, value } = e.target;
+      let isValid = true;
 
+      restrictedPatterns.forEach((pattern) => {
+        if (pattern.test(value)) {
+          isValid = false;
+          
+          return; // Exit the forEach loop early
+        }
+      });
+
+      if (isValid) {
+        props.setTestCases({ ...props.testCases, [name]: value });
+      } else {
+        console.log("Restricted characters detected");
+        toast.error("Your input contains restricted characters.");
+      }
+    };
   useEffect(() => {
     console.log(props.testCases[`textArea${selected}`]);
   }, [props.testCases, selected]);
@@ -55,9 +70,16 @@ const TestCase = (props) => {
           placeholder="Please input your test cases..."
           name={`textArea${selected}`}
           value={props.testCases[`textArea${selected}`]}
-          onChange={(e) => handleTestCase(e)}
+          onChange={(e) => { handleTestCase(e) }}
         />
-        <button className={`p-2.5 ${props.lightmode ? "text-black":"text-white"}`} onClick={() => { props.setReportBugOpen(true); }}>🐞 Report Bug</button>
+        <button
+          className={`p-2.5 ${props.lightmode ? "text-black" : "text-white"}`}
+          onClick={() => {
+            props.setReportBugOpen(true);
+          }}
+        >
+          🐞 Report Bug
+        </button>
       </div>
     </div>
   );

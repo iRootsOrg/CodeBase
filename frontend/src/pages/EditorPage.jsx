@@ -11,7 +11,7 @@ import { CODE_SNIPPETS, LAN_CONVERSION } from "../Utils/languages.jsx";
 import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
-
+import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
 const EditorPage = () => {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
@@ -165,8 +165,26 @@ const EditorPage = () => {
   };
 
   const handleFolderName = (e) => {
-    console.log(e.target.value);
-    setNewFolderName(e.target.value);
+   
+    const name = e.target.value;
+    let isValid = true;
+
+    restrictedPatterns.forEach((pattern) => {
+      if (pattern.test(name)) {
+        isValid = false;
+
+        return; // Exit the forEach loop early
+      }
+    });
+
+    if (isValid) {
+      console.log(name);
+      setNewFolderName(name);
+    } else {
+      console.log("Restricted characters detected");
+      toast.error("Your input contains restricted characters");
+    }
+    
   };
 
   const addNewFolder = () => {
