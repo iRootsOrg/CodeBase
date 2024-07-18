@@ -10,6 +10,7 @@ const { registerUser,
     removeRoleFromUser,
     addCoauthor
 } = require("../controllers/userController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
