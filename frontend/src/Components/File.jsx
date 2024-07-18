@@ -17,7 +17,8 @@ const File = (props) => {
       //Can be merged with selectfile
       props.setValue(file.code);
       props.setLanguage(file.language);
-      props.setExtraFileIndex(-1);
+        props.setExtraFileIndex(-1);
+        props.setOutputFile(file.output);
     }
 
 
@@ -29,6 +30,7 @@ const File = (props) => {
     props.setFileIndex(-1);
     props.setExtraFileIndex(-1);
     props.setValue("No File Selected");
+    props.setOutputFile(props.initialOutput);
   };
 
 
