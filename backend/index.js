@@ -11,6 +11,8 @@ const fileUpload = require("express-fileupload");
 const WebSocket = require("ws");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 const webSocketRoute = require("./routes/websocketRoutes");
+const session = require("express-session");
+
 
 const app = express();
 dotenv.config();
@@ -39,29 +41,19 @@ const activeConnections = {};
 const wss = new WebSocket.Server({ port: wssPort });
 
 wss.on("connection", (ws) => {
-    const token = req.url.split('?token=')[1];
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (!user) {
-        ws.close();
-        return;
-    }
-
-    ws.userId = user.userId;
-    activeConnections[user.userId] = ws;
+    const id = Date.now(); 
+    activeConnections[id] = ws;
 
     console.log("Client connected to WebSocket server");
 
     ws.on("message", (message) => {
         console.log(`Received message => ${message}`);
-        const messageString = typeof message === 'string' ? message : message.toString();
         const parsedMessage = JSON.parse(message);
-        const { sessionId, code } = parsedMessage;
-        // Broadcast the message to all connected clients
-        Object.values(activeConnections).forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(messageString);
-                client.send(JSON.stringify({ sessionId, code }));
+        const { code } = parsedMessage;
+        // Broadcast the message to all connected clients except the sender
+        Object.keys(activeConnections).forEach((key) => {
+            if (activeConnections[key] !== ws && activeConnections[key].readyState === WebSocket.OPEN) {
+                activeConnections[key].send(JSON.stringify({ code }));
             }
         });
     });
@@ -73,7 +65,7 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
         console.log("Client disconnected from WebSocket server");
-        delete activeConnections[ws.userId];
+        delete activeConnections[id];
     });
 });
 
@@ -96,12 +88,15 @@ app.get("/", (req, res) => {
     });
 });
 
-app.use(errorMiddleware);
 
 app.get('/wss', (req, res) => {
-    res.render('index', { title: 'Collaborative Editing' });
+    res.render('websockets');
 });
+
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
     console.log(`Server running on PORT: ${PORT}`.bgBlue);
 });
+
+
