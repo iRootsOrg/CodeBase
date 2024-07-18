@@ -34,7 +34,6 @@ const CodeEditor = (props) => {
     editorRef.current = editor;
     editor.focus();
   };
-
   const onSelect = (language) => {
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
@@ -62,6 +61,9 @@ const CodeEditor = (props) => {
   const handleToolBar = () => {
     setToolBar(!toolBar);
     setToolbarNull();
+  };
+  const formatCode = () => {
+    editorRef.current.getAction('editor.action.formatDocument').run();
   };
 
   return (
