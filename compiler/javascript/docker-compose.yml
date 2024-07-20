@@ -1,0 +1,7 @@
+services:
+  js-compiler:
+    build: .
+    volumes:
+      - ./input:/usr/src/app/input
+      - ./output:/usr/src/app/output
+    command: ./runner.sh

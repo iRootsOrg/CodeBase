@@ -10,6 +10,7 @@ import Folder from "./Folder";
 import History from "./History";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast from "react-hot-toast";
+import { restrictedPatterns } from "../Utils/restrictedtext";
 const CodeEditor = (props) => {
   const editorRef = useRef();
   const [toolBar, setToolBar] = useState(true);
@@ -33,8 +34,27 @@ const CodeEditor = (props) => {
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
-  };
 
+    editor.onDidChangeModelContent((event) => {
+      const value = editor.getValue();
+      for (let pattern of restrictedPatterns) {
+        if (pattern.test(value)) {
+          // toast.error("Not allowed");
+          
+          // Remove the restricted text by restoring the previous value
+          editor.executeEdits("", [
+            {
+              range: editor.getModel().getFullModelRange(),
+              text: value.replace(pattern, ""),
+              
+            },
+          ]);
+          break;
+        }
+      }
+      return;
+    });
+  };
   const onSelect = (language) => {
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
@@ -63,6 +83,7 @@ const CodeEditor = (props) => {
     setToolBar(!toolBar);
     setToolbarNull();
   };
+  
 
   return (
     <div className={`h-full`}>
@@ -136,11 +157,7 @@ const CodeEditor = (props) => {
         </div>
       </div>
 
-      <div
-        className={`flex h-full ${
-          props.lightmode ? "" : "bg-[#1e1e1e]"
-        } `}
-      >
+      <div className={`flex h-full ${props.lightmode ? "" : "bg-[#1e1e1e]"} `}>
         <ToolBar
           folderfiles={props.folderfiles}
           setFolderFiles={props.setFolderFiles}
