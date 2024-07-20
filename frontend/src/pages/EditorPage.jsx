@@ -1,14 +1,18 @@
 import Output from "../Components/Output.jsx";
 import CodeEditor from "../Components/CodeEditor";
 import TestCase from "../Components/TestCase.jsx";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Run from "../Components/Run.jsx";
 import RunAll from "../Components/RunAll.jsx";
 import { FaFacebook, FaTwitter, FaWhatsapp, FaTimes } from "react-icons/fa";
+import { CODE_SNIPPETS, LAN_CONVERSION } from "../Utils/languages.jsx";
+import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
+import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
+import toast, { Toaster } from "react-hot-toast";
 
-function EditorPage() {
+const EditorPage = () => {
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
     textArea1: "",
@@ -16,16 +20,9 @@ function EditorPage() {
     textArea3: "",
     textArea4: "",
   });
-  const [language, setLanguage] = useState("js");
-
-  const [value, setValue] = useState("");
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
-
-  const [notify, setNotify] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [msgpositive, setMsgPositive] = useState(true);
 
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -38,13 +35,54 @@ function EditorPage() {
   //Sample Folders
   const [saveLocally, setSaveLocally] = useState(false);
   const [folderopen, setFolderOpen] = useState(false);
+
+  const testCasesSchema = {
+    input: [
+      {
+        content: "",
+      },
+    ],
+    output: [
+      {
+        error: false,
+        erorrCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "Hello JI",
+      },
+    ],
+  };
+  
+  const initialOutput = {
+    CompilationStatus: "Not Started",
+    ExecutionTime: "0.00",
+    FilesCompiled: "Still Not Compiled",
+    tc: [testCasesSchema],
+  };
+
+
   const initialFolderFiles = {
     folders: [],
-    extraFiles: [],
+    extraFiles: [
+      {
+        name: "Sample File",
+        code: CODE_SNIPPETS["javascript"],
+        language: "javascript",
+        output: initialOutput,
+      },
+    ],
   };
+
+
+ 
+
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
+  const [language, setLanguage] = useState("javascript");
 
+  const [value, setValue] = useState("");
+  const [option, setOption] = useState("Output");
 
+  const [outputFile, setOutputFile] = useState(initialOutput);
 
   useEffect(() => {
     const initialCode = localStorage.getItem("folderfiles");
@@ -52,10 +90,19 @@ function EditorPage() {
 
     if (initialCode === null) {
       localStorage.setItem("folderfiles", JSON.stringify(initialFolderFiles));
+      setLanguage(initialFolderFiles.extraFiles[0].language);
+      setValue(initialFolderFiles.extraFiles[0].code);
+      setOutputFile(initialFolderFiles.extraFiles[0].output);
     } else {
-      setFolderFiles(JSON.parse(initialCode));
+      const folderParsing = JSON.parse(initialCode);
+      setFolderFiles(folderParsing);
+
+      setLanguage(folderParsing.extraFiles[0].language);
+      setValue(folderParsing.extraFiles[0].code);
+      setOutputFile(folderParsing.extraFiles[0].output);
       setSaveLocally(true);
     }
+    setExtraFileIndex(0);
   }, []);
 
   useEffect(() => {
@@ -67,6 +114,28 @@ function EditorPage() {
   const [lightmode, setLightMode] = useState(true);
 
   const handleLight = () => {
+    
+    if (lightmode === false) {
+      toast("Hello Light!", {
+        icon: <AiOutlineSun className="h-6 w-6" />,
+        style: {
+          borderRadius: "10px",
+          background: "#fff",
+          color: "#333",
+        },
+      });
+    }
+    else {
+      toast("Hello Darkness!", {
+        icon: <AiOutlineMoon className="h-6 w-6" />,
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    }
+
     setLightMode(!lightmode);
   };
 
@@ -74,14 +143,10 @@ function EditorPage() {
   const [fileIndex, setFileIndex] = useState(-1);
   const [extraFileIndex, setExtraFileIndex] = useState(-1);
   const [selectedFiles, setSelectedFiles] = useState(null); //The uploaded files
-  const closeMsg = () => {
-    setNotify(false);
-    setMsg("");
-  };
-
+ 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("URL copied to clipboard!");
+    toast.success("URL copied to clipboard!");
   };
 
   const handleFileUpload = (event) => {
@@ -89,11 +154,9 @@ function EditorPage() {
     setSelectedFiles(files);
     console.log(files);
 
-    setNotify(true);
-    setMsg("Files Uploaded Successfully");
-    const time = setTimeout(() => {
-      closeMsg();
-    }, 4000);
+    
+    toast.success("Files Uploaded Successfully");
+    
   };
 
   const handleClick = () => {
@@ -190,23 +253,129 @@ function EditorPage() {
     // Post request sending can be implemented here
   };
 
+  const updateChangeOutput = (newOutput) => {
+    setFolderFiles((prevFolderFiles) => {
+      if (folderIndex === -1) {
+        // Update extraFiles
+        const newExtraFiles = prevFolderFiles.extraFiles.map(
+          (file, fiIndex) => {
+            if (fiIndex === extraFileIndex) {
+              console.log("Updating extra file output :", file.name);
+              return {
+                ...file,
+                output: newOutput,
+              };
+            }
+            return file;
+          }
+        );
+        console.log("Updated extraFiles:", newExtraFiles);
+        return {
+          ...prevFolderFiles,
+          extraFiles: newExtraFiles,
+        };
+      } else {
+        // Update files within a folder
+        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
+          if (fIndex === folderIndex) {
+            return {
+              ...folder,
+              files: folder.files.map((file, fiIndex) => {
+                if (fiIndex === fileIndex) {
+                  console.log(
+                    "Updating file output in folder:",
+                    folder.name,
+                    file.name
+                  );
+                  return {
+                    ...file,
+                    output: newOutput,
+                  };
+                }
+                return file;
+              }),
+            };
+          }
+          return folder;
+        });
+
+        console.log("Updated folders:", newFolders);
+        return {
+          ...prevFolderFiles,
+          folders: newFolders,
+        };
+      }
+    });
+
+    // Post request sending can be implemented here
+  };
+
+  const [fileChecked, setFileChecked] = useState(false);
+  const [outputChecked, setOutputChecked] = useState(false);
+
+ const formatOutput = (output) => {
+    let formattedString =
+      "Compilation Status: " + output.CompilationStatus + "\n";
+    formattedString += "Execution Time: " + output.ExecutionTime + "\n";
+    formattedString += "Files Compiled: " + output.FilesCompiled + "\n\n";
+
+    output.tc.forEach((testCase, index) => {
+      formattedString += `Test Case ${index + 1}:\n`;
+      testCase.input.forEach((input, iIndex) => {
+        formattedString += `  Input ${iIndex + 1}:\n`;
+        formattedString += `    Content: ${input.content}\n`;
+      });
+
+      testCase.output.forEach((output, oIndex) => {
+        formattedString += `  Output ${oIndex + 1}:\n`;
+        formattedString += `    Error: ${output.error}\n`;
+        formattedString += `    Error Count: ${output.errorCount}\n`;
+        formattedString += `    Warning: ${output.warning}\n`;
+        formattedString += `    Errors: ${output.errors}\n`;
+        formattedString += `    Content: ${output.content}\n`;
+      });
+      formattedString += "\n";
+    });
+
+    return formattedString;
+  }
+
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
-      alert("All folders and files are being downloaded!");
+      
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
-          folderZip.file(`${file.name}.${file.language}`, file.code);
+          if (fileChecked === true) {
+            folderZip.file(
+              `${file.name}.${LAN_CONVERSION[file.language]}`,
+              file.code
+            );
+          }
+          
+          if (outputChecked === true) {
+             const formattedOutput = formatOutput(file.output);
+            folderZip.file(`${file.name} Output.txt`, formattedOutput);
+          }
         });
       });
       folderfiles.extraFiles.forEach((file) => {
-        zip.file(`${file.name}.${file.language}`, file.code);
+        if (fileChecked === true) {
+          zip.file(`${file.name}.${LAN_CONVERSION[file.language]}`, file.code);
+        }
+
+        if (outputChecked === true) {
+          const formattedOutput = formatOutput(file.output);
+          zip.file(`${file.name} Output.txt`, formattedOutput);
+        }
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
         saveAs(content, "files.zip");
       });
+
+      toast.success("All folders and files are downloaded!");
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -216,21 +385,50 @@ function EditorPage() {
       const folderZip = zip.folder(folder.name);
 
       folder.files.forEach((file) => {
-        folderZip.file(`${file.name}.${file.language}`, file.code);
+        if (fileChecked === true) {
+          folderZip.file(
+            `${file.name}.${LAN_CONVERSION[file.language]}`,
+            file.code
+          );
+        }
+
+        if (outputChecked === true) {
+          const formattedOutput = formatOutput(file.output);
+          folderZip.file(`${file.name} Output.txt`, formattedOutput);
+        }
+        
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
         saveAs(content, `${folder.name}.zip`);
       });
+
+      toast.success(`${folder.name} is downloaded!`)
     } else if (
       extraFileIndex >= 0 &&
       extraFileIndex < folderfiles.extraFiles.length
     ) {
       const file = folderfiles.extraFiles[extraFileIndex];
-      const blob = new Blob([file.code], {
-        type: "text/plain;charset=utf-8",
-      });
-      saveAs(blob, `${file.name}.${file.language}`);
+      if (fileChecked === true) {
+        const blob = new Blob([file.code], {
+          type: "text/plain;charset=utf-8",
+        });
+        saveAs(blob, `${file.name}.${LAN_CONVERSION[file.language]}`);
+      }
+
+      if (outputChecked === true) {
+        
+        const formattedOutput = formatOutput(
+         file.output
+        );
+        const blob = new Blob([formattedOutput], {
+          type: "text/plain;charset=utf-8",
+        });
+        saveAs(blob, `${file.name} Output.txt`);
+      }
+
+      toast.success(`${file.name} is downloaded!`);
+      
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -239,23 +437,48 @@ function EditorPage() {
     ) {
       const folder = folderfiles.folders[folderIndex];
       const file = folder.files[fileIndex];
-      const blob = new Blob([file.code], {
-        type: "text/plain;charset=utf-8",
-      });
-      saveAs(blob, `${file.name}.${file.language}`);
+      if (fileChecked === true) {
+       
+        const blob = new Blob([file.code], {
+          type: "text/plain;charset=utf-8",
+        });
+        saveAs(blob, `${file.name}.${LAN_CONVERSION[file.language]}`);
+      }
+
+      if (outputChecked === true) {
+        
+        const formattedOutput = formatOutput(file.output);
+        const blob = new Blob([formattedOutput], {
+          type: "text/plain;charset=utf-8",
+        });
+        saveAs(blob, `${file.name} Output.txt`);
+      }
+
+      toast.success(`${file.name} is downloaded!`);
+      
     } else {
-      alert("No File Selected");
-      console.error("Invalid file index");
+      
+      toast.error("No folder/file selected");
     }
+
+
+    setFileChecked(false);
+    setOutputChecked(false);
   };
 
   const [infoOpen, setInfoOpen] = useState(false);
+  const [reportBugOpen, setReportBugOpen] = useState(false);
+  const [keyboardShortcut, setKeyboardShortcut] = useState(false);
+  const [email, setEmail] = useState("");
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 h-[96%] ">
+    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
+      <div>
+        <Toaster />
+      </div>
+      <div className=" flex flex-col overflow-x-hidden h-full">
+        <div className="flex-1 h-full flex overflow-x-hidden">
+          <div className="flex-1 h-[87.4%]">
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -297,19 +520,47 @@ function EditorPage() {
               setOpenExtraNewFile={setOpenExtraNewFile}
               extraNewFileName={extraNewFileName}
               setExtraNewFileName={setExtraNewFileName}
+              keyboardShortcut={keyboardShortcut}
+              setKeyboardShortcut={setKeyboardShortcut}
+              email={email}
+              setEmail={setEmail}
+              outputFile={outputFile}
+              setOutputFile={setOutputFile}
+              initialOutput={initialOutput}
+              fileChecked={fileChecked}
+              setFileChecked={setFileChecked}
+              setOutputChecked={setOutputChecked}
+              outputChecked={outputChecked}
             />
           </div>
           <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
           <div className="flex-1 h-full overflow-y-auto">
-            <Output />
+            <Output
+              lightmode={lightmode}
+              option={option}
+              setOption={setOption}
+              outputFile={outputFile}
+              setOutputFile={setOutputFile}
+            />
           </div>
         </div>
-        <div className="bg-gray-100 pl-4">
-          <div className={`flex p-4 justify-between `}>
-            <label className="font-bold text-xl">Test Cases :</label>
+        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4 `}>
+          <div className={`flex p-4 justify-between h-[10vh]`}>
+            <label
+              className={`font-bold text-xl ${
+                lightmode ? "text-black" : "text-white"
+              }`}
+            >
+              Test Cases :
+            </label>
             <div className="flex items-center gap-4">
-              <Run />
-              <RunAll />
+              <Run
+                lightmode={lightmode}
+                outputFile={outputFile}
+                setOutputFile={setOutputFile}
+                updateChangeOutput={updateChangeOutput}
+              />
+              <RunAll lightmode={lightmode} />
               <button
                 onClick={() => {
                   handleClick();
@@ -317,9 +568,13 @@ function EditorPage() {
               >
                 <img
                   src={
-                    testcaseOpen === true
-                      ? "./Icons/Down.png"
-                      : "./Icons/Up.png"
+                    testcaseOpen
+                      ? lightmode
+                        ? "./Icons/Down.png"
+                        : "./Icons/DownLight.png"
+                      : lightmode
+                      ? "./Icons/Up.png"
+                      : "./Icons/UpLight.png"
                   }
                   alt="Arrow"
                   className="h-[32px] w-[32px]"
@@ -328,33 +583,13 @@ function EditorPage() {
             </div>
           </div>
           {testcaseOpen === true ? (
-            <TestCase testCases={testCases} setTestCases={setTestCases} />
-          ) : (
-            ""
-          )}
-
-          {notify === true ? (
-            <div
-              className={`z-10 rounded-lg absolute bottom-2 left-[42%] h-32 w-64 shadow-3xl font-semibold text-white ${
-                msgpositive === true
-                  ? " bg-gradient-to-r from-green-500 via-green-500 to-green-300 "
-                  : " bg-gradient-to-r from-rose-500 via-rose-500 to-rose-300 "
-              } text-center text-wrap `}
-            >
-              <div className="flex justify-end p-1  animate-pulse">
-                <button
-                  className="text-black"
-                  onClick={() => {
-                    closeMsg();
-                  }}
-                >
-                  <FaTimes size={24} />
-                </button>
-              </div>
-              <div className="flex justify-center h-16 items-center shadow-3xl  animate-pulse ">
-                {msg}
-              </div>
-            </div>
+            <TestCase
+              testCases={testCases}
+              setTestCases={setTestCases}
+              lightmode={lightmode}
+              reportBugOpen={reportBugOpen}
+              setReportBugOpen={setReportBugOpen}
+            />
           ) : (
             ""
           )}
@@ -362,8 +597,16 @@ function EditorPage() {
       </div>
 
       {shareOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+        <div
+          className={`fixed inset-0 flex items-center justify-center backdrop-blur-sm   `}
+        >
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-white text-black border-black"
+                : "bg-[#1e1e1e] text-white border-white"
+            } p-6 rounded-lg shadow-lg relative `}
+          >
             <button
               onClick={() => {
                 setShareOpen(false);
@@ -377,11 +620,15 @@ function EditorPage() {
               type="text"
               value={window.location.href}
               readOnly
-              className="w-full p-2 border border-gray-300 rounded mb-4"
+              className={`w-full p-2 border border-gray-300 rounded mb-4 ${
+                lightmode ? "bg-white" : "bg-[#1e1e1e]"
+              } `}
             />
             <button
               onClick={copyToClipboard}
-              className="bg-blue-500 text-white p-2 rounded w-full mb-4"
+              className={`${
+                lightmode ? "bg-blue-500 text-white" : "bg-[#00BFFF] text-black"
+              }  p-2 rounded w-full mb-4`}
             >
               Copy URL
             </button>
@@ -415,8 +662,14 @@ function EditorPage() {
       )}
 
       {infoOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative ">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-white text-black  border-black"
+                : "bg-[#1e1e1e] text-white border-white"
+            } p-6 rounded-lg shadow-lg relative `}
+          >
             <div>
               <button
                 onClick={() => {
@@ -445,7 +698,98 @@ function EditorPage() {
       ) : (
         ""
       )}
+
+      {reportBugOpen === true ? (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div
+            className={`border ${
+              lightmode
+                ? "bg-gray-100 bg-opacity-90 text-black border-black"
+                : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
+            } p-6 rounded-lg shadow-lg relative w-[70vw]`}
+          >
+            <div className="flex items-center">
+              <button
+                onClick={() => {
+                  setReportBugOpen(false);
+                }}
+                className={`absolute top-3 right-2 ${
+                  lightmode
+                    ? "text-black hover:text-gray-700"
+                    : "text-white hover:text-gray-200"
+                }`}
+              >
+                <FaTimes size={24} />
+              </button>
+              <h2 className={`text-xl font-bold top-3 left-[45%] absolute `}>
+                Report Bug
+              </h2>
+            </div>
+
+            <form
+              action="POST"
+              className="flex flex-col gap-3 mt-4 font-semibold w-full"
+            >
+              <p>Tell us some details:</p>
+              <label>Name :</label>
+              <input
+                type="text"
+                placeholder="Name"
+                name="Name"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+              ></input>
+              <label>Email :</label>
+              <input
+                type="email"
+                placeholder="Email"
+                name="Email"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+              ></input>
+              <label>Tell us what issue/bug, you met :</label>
+              <textarea
+                type="text"
+                placeholder="Issue"
+                name="Issue"
+                className={`p-2 border rounded-md ${
+                  lightmode ? "bg-gray-200" : "bg-black"
+                }`}
+                rows={6}
+              ></textarea>
+              <div className="flex justify-end pr-2 w-full">
+                <button
+                  className={`block w-24 px-2 py-1 text-center rounded ${
+                    lightmode
+                      ? "bg-custom-gradient"
+                      : "bg-custom-gradient-inverted"
+                  } text-white`}
+                  type="submit"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
+      {keyboardShortcut === true ? (
+        <KeyBoardShortcuts
+          lightmode={lightmode}
+          setLightMode={setLightMode}
+          keyboardShortcut={keyboardShortcut}
+          setKeyboardShortcut={setKeyboardShortcut}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
-}
+};
+
 export default EditorPage;

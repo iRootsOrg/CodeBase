@@ -17,7 +17,8 @@ const File = (props) => {
       //Can be merged with selectfile
       props.setValue(file.code);
       props.setLanguage(file.language);
-      props.setExtraFileIndex(-1);
+        props.setExtraFileIndex(-1);
+        props.setOutputFile(file.output);
     }
 
 
@@ -29,6 +30,7 @@ const File = (props) => {
     props.setFileIndex(-1);
     props.setExtraFileIndex(-1);
     props.setValue("No File Selected");
+    props.setOutputFile(props.initialOutput);
   };
 
 
@@ -36,9 +38,22 @@ const File = (props) => {
     <div className="w-full">
       {props.files.map((file, index) => {
         return (
-          <div key={index}
-            className={`w-full text-sm  p-1 font-medium  cursor-pointer flex justify-between hover:text-blue-700 ${
-              (props.folderIndex === props.folderKey && props.fileIndex === index ) === true ? "text-blue-700 shadow-md" : ""
+          <div
+            key={index}
+            className={`pl-6 text-black w-full text-sm  p-1 font-medium  cursor-pointer flex justify-between ${
+              props.lightmode
+                ? `${
+                    (props.folderIndex === props.folderKey &&
+                      props.fileIndex === index) === true
+                      ? "text-white shadow-md bg-blue-600"
+                      : "hover:text-blue-700"
+                  }`
+                : `${
+                    (props.folderIndex === props.folderKey &&
+                      props.fileIndex === index) === true
+                      ? "text-white shadow-md bg-cyan-600"
+                      : "hover:text-cyan-700"
+                  }`
             }`}
             onClick={() => {
               openFile({ file, index });
