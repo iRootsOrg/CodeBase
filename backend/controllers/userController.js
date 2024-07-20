@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const CustomError = require("../utils/CustomError.js");
 const Role = require('../models/roleModel');
 const CustomError = require('../utils/CustomError');
 const transporter = require('../utils/emailService');
