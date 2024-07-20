@@ -10,27 +10,18 @@
   <script>
     const token = localStorage.getItem('token');
     const isSecure = window.location.protocol === 'https:';
-    // const socketUrl = isSecure ? 'wss://localhost:8081/ws' : 'ws://localhost:8081/ws';
     const socketUrl = isSecure ? `wss://localhost:8081/ws?token=${token}` : `ws://localhost:8081/ws?token=${token}`;
 
     let socket;
 
-    // Try to establish a native WebSocket connection
     try {
       socket = new WebSocket(socketUrl);
     } catch (e) {
-      // If it fails, fallback to SockJS
       socket = new SockJS(socketUrl.replace('ws', 'http'), null, {
         transports: ['websocket', 'xhr-polling'],
       });
     }
-
-    // socket.onmessage = (event) => {
-    //   console.log(`Received message => ${event.data}`);
-    //   const code = JSON.parse(event.data).code;
-    //   document.getElementById('code').value = code;
-    // };
-
+    
     socket.onmessage = (event) => {
       if (typeof event.data === 'string') {
         const code = JSON.parse(event.data).code;
