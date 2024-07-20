@@ -45,7 +45,7 @@ Before you begin, ensure you have met the following requirements:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/CodeBase.git
+git clone https://github.com/iRootsOrg/CodeBase.git
 ```
 2. Navigate to the backend directory:
 
