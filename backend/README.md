@@ -30,6 +30,7 @@ A robust Node.js and Express-based backend for a code compilation and execution 
 - **Logging**: Comprehensive logging of user activities and code execution results.
 - **Scalable Architecture**: Designed to handle multiple concurrent users and processes efficiently.
 - **Error Handling**: Robust error handling and validation for user inputs and code execution processes.
+- **Real-time Collaboration**: Authors can invite co-authors to collaborate in real-time on projects.
 
 ## Prerequisites
 
@@ -147,7 +148,7 @@ Development dependencies:
 - `GET /api/v1/review/reviews/:id`: Get a specific review by ID
 
 ### WebSocket Route
-- `GET /websocket`: Establish a WebSocket connection
+- `GET /wss`: This route is the main WebSocket route for real-time collaboration. It enables real-time collaboration and internally routes to `/websocket`.
 
 ### Health Check
 - `GET /health-check`: Check if the WebSocket server is running
@@ -156,7 +157,10 @@ Development dependencies:
 
 Himanshu - [GitHub Profile](https://github.com/17himanshu)
 
-For any queries or concerns about the project, please contact the author directly.
+## Contributors
+
+Himanshu - [GitHub Profile](https://github.com/17himanshu) <br>
+Kunal Singla - [GitHub Profile](https://github.com/KS963000)
 
 ## Project Status
 
