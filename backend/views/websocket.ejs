@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket</title>
+</head>
+<body>
+  <h1>WebSocket</h1>
+  <textarea id="code" cols="30" rows="10"></textarea>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const isSecure = window.location.protocol === 'https:';
+    const socketUrl = isSecure ? `wss://localhost:8081/ws?token=${token}` : `ws://localhost:8081/ws?token=${token}`;
+
+    let socket;
+
+    try {
+      socket = new WebSocket(socketUrl);
+    } catch (e) {
+      socket = new SockJS(socketUrl.replace('ws', 'http'), null, {
+        transports: ['websocket', 'xhr-polling'],
+      });
+    }
+    
+    socket.onmessage = (event) => {
+      if (typeof event.data === 'string') {
+        const code = JSON.parse(event.data).code;
+        document.getElementById('code').value = code;
+      } else if (event.data instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = function() {
+          const code = JSON.parse(reader.result).code;
+          document.getElementById('code').value = code;
+        };
+        reader.readAsText(event.data);
+      } else {
+        console.log('Received unknown data type:', event.data);
+      }
+    };
+
+    socket.onopen = () => {
+      console.log('Connected to WebSocket');
+    };
+
+    socket.onclose = () => {
+      console.log('Disconnected from WebSocket');
+    };
+    
+    document.getElementById('code').addEventListener('input', (event) => {
+      const code = event.target.value;
+      socket.send(JSON.stringify({ code }));
+    });
+
+     let currentSessionId = '';
+  </script>
+</body>
+</html>

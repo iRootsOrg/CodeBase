@@ -1,6 +1,5 @@
 # Use the official Node.js image
 FROM node:14
-
 # Install cron
 RUN apt-get update && apt-get install -y cron
 
