@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext";
 const CodeEditor = (props) => {
   const editorRef = useRef();
-  const [toolBar, setToolBar] = useState(true);
+  
   const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -80,16 +80,16 @@ const CodeEditor = (props) => {
   };
 
   const handleToolBar = () => {
-    setToolBar(!toolBar);
+    props.setToolBar(!props.toolBar);
     setToolbarNull();
   };
   
 
   return (
-    <div className={`h-full`}>
-      <div className="flex justify-between m-4 items-center">
-        <div className="cursor-pointer flex gap-2">
-          {toolBar === true ? (
+    <div className={`h-full w-full flex flex-col `}>
+      <div className="flex sm:justify-between  items-center w-full justify-end h-20 p-2">
+        <div className="cursor-pointer sm:flex gap-2 hidden ">
+          {props.toolBar === true ? (
             <img
               src="./Icons/Close.png"
               alt="Close"
@@ -120,97 +120,101 @@ const CodeEditor = (props) => {
           )}
         </div>
 
-        <div className={`flex justify-between items-center gap-4 `}>
-          <div className=" flex gap-5 h-10">
-            <button
-              className="h-10 w-10  flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 "
-              onClick={formatCode}
-            >
-              <BiCodeAlt className="text-xl" />
-            </button>
-            <div
-              className={` cursor-pointer h-10 w-10 ${
-                props.lightmode
-                  ? "text-black bg-white border-black"
-                  : "text-white bg-[#1e1e1e] border-white"
-              }  p-2 flex justify-center items-center rounded border `}
-            >
-              <Fullscreen />
-            </div>
-            <div
-              className=" cursor-pointer font-semibold"
-              onClick={() => props.handleLight()}
-            >
-              {props.lightmode === true ? (
-                <button className="text-white h-10 w-10 bg-[#1e1e1e]  p-2 flex justify-between rounded border border-white">
-                  <AiOutlineMoon className="h-6 w-6" />
-                </button>
-              ) : (
-                <button className="text-black  h-10 w-10 bg-white  p-2 flex justify-between rounded border border-black">
-                  <AiOutlineSun className="h-6 w-6" />
-                </button>
-              )}
-            </div>
-
-            <Submit lightmode={props.lightmode} />
+        <div className=" flex gap-2 h-10 items-center sm:gap-4">
+          <button
+            className="h-10 w-10  sm:flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hidden "
+            onClick={formatCode}
+          >
+            <BiCodeAlt className="text-xl" />
+          </button>
+          <div
+            className={` cursor-pointer w-10 h-[94%] ${
+              props.lightmode
+                ? "text-black bg-white border-black"
+                : "text-white bg-[#1e1e1e] border-white"
+            }   rounded border `}
+          >
+            <Fullscreen />
           </div>
+          <div
+            className=" cursor-pointer font-semibold h-full w-10 "
+            onClick={() => props.handleLight()}
+          >
+            {props.lightmode === true ? (
+              <div className="text-white h-full w-full bg-[#1e1e1e]  flex justify-center items-center rounded border border-white">
+                <AiOutlineMoon className="h-6 w-6" />
+              </div>
+            ) : (
+              <div className="text-black  bg-white h-full w-full flex justify-center items-center  rounded border border-black">
+                <AiOutlineSun className="h-6 w-6" />
+              </div>
+            )}
+          </div>
+
+          <Submit lightmode={props.lightmode} />
         </div>
       </div>
 
-      <div className={`flex h-full ${props.lightmode ? "" : "bg-[#1e1e1e]"} `}>
-        <ToolBar
-          folderfiles={props.folderfiles}
-          setFolderFiles={props.setFolderFiles}
-          folderopen={props.folderopen}
-          setFolderOpen={props.setFolderOpen}
-          value={props.value}
-          setValue={props.setValue}
-          updateChangeCode={props.updateChangeCode}
-          zipAndDownload={props.zipAndDownload}
-          handleFileUpload={props.handleFileUpload}
-          lightmode={props.lightmode}
-          setLightMode={props.setLightMode}
-          handleLight={props.handleLight}
-          shareOpen={props.shareOpen}
-          setShareOpen={props.setShareOpen}
-          infoOpen={props.infoOpen}
-          setInfoOpen={props.setInfoOpen}
-          formatCode={formatCode}
-          toolBar={toolBar}
-          setToolBar={setToolBar}
-          folderIndex={props.folderIndex}
-          setFolderIndex={props.setFolderIndex}
-          fileIndex={props.fileIndex}
-          setFileIndex={props.setFileIndex}
-          extraFileIndex={props.extraFileIndex}
-          setExtraFileIndex={props.setExtraFileIndex}
-          newFileName={props.newFileName}
-          setNewFileName={props.setNewFileName}
-          opennewfile={props.opennewfile}
-          setOpenNewFile={props.setOpenNewFile}
-          openExtraNewFile={props.openExtraNewFile}
-          setOpenExtraNewFile={props.setOpenExtraNewFile}
-          selected={selected}
-          setSelected={setSelected}
-          settingsopen={settingsopen}
-          setSettingsOpen={setSettingsOpen}
-          historyOpen={historyOpen}
-          setHistoryOpen={setHistoryOpen}
-          language={props.language}
-          setLanguage={props.setLanguage}
-          wordWrap={wordWrap}
-          setWordWrap={setWordWrap}
-          keyboardShortcut={props.keyboardShortcut}
-          setKeyboardShortcut={props.setKeyboardShortcut}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          email={props.email}
-          setEmail={props.setEmail}
-          fileChecked={props.fileChecked}
-          outputChecked={props.outputChecked}
-          setFileChecked={props.setFileChecked}
-          setOutputChecked={props.setOutputChecked}
-        />
+      <div
+        className={`flex h-full ${
+          props.lightmode ? "" : "bg-[#1e1e1e]"
+        } `}
+      >
+        <div className="hidden sm:block ">
+          <ToolBar
+            folderfiles={props.folderfiles}
+            setFolderFiles={props.setFolderFiles}
+            folderopen={props.folderopen}
+            setFolderOpen={props.setFolderOpen}
+            value={props.value}
+            setValue={props.setValue}
+            updateChangeCode={props.updateChangeCode}
+            zipAndDownload={props.zipAndDownload}
+            handleFileUpload={props.handleFileUpload}
+            lightmode={props.lightmode}
+            setLightMode={props.setLightMode}
+            handleLight={props.handleLight}
+            shareOpen={props.shareOpen}
+            setShareOpen={props.setShareOpen}
+            infoOpen={props.infoOpen}
+            setInfoOpen={props.setInfoOpen}
+            formatCode={formatCode}
+            toolBar={props.toolBar}
+            setToolBar={props.setToolBar}
+            folderIndex={props.folderIndex}
+            setFolderIndex={props.setFolderIndex}
+            fileIndex={props.fileIndex}
+            setFileIndex={props.setFileIndex}
+            extraFileIndex={props.extraFileIndex}
+            setExtraFileIndex={props.setExtraFileIndex}
+            newFileName={props.newFileName}
+            setNewFileName={props.setNewFileName}
+            opennewfile={props.opennewfile}
+            setOpenNewFile={props.setOpenNewFile}
+            openExtraNewFile={props.openExtraNewFile}
+            setOpenExtraNewFile={props.setOpenExtraNewFile}
+            selected={selected}
+            setSelected={setSelected}
+            settingsopen={settingsopen}
+            setSettingsOpen={setSettingsOpen}
+            historyOpen={historyOpen}
+            setHistoryOpen={setHistoryOpen}
+            language={props.language}
+            setLanguage={props.setLanguage}
+            wordWrap={wordWrap}
+            setWordWrap={setWordWrap}
+            keyboardShortcut={props.keyboardShortcut}
+            setKeyboardShortcut={props.setKeyboardShortcut}
+            fontSize={fontSize}
+            setFontSize={setFontSize}
+            email={props.email}
+            setEmail={props.setEmail}
+            fileChecked={props.fileChecked}
+            outputChecked={props.outputChecked}
+            setFileChecked={props.setFileChecked}
+            setOutputChecked={props.setOutputChecked}
+          />
+        </div>
         <div className="h-full">
           {props.folderopen === true ? (
             <div className="w-48 ">
@@ -266,7 +270,7 @@ const CodeEditor = (props) => {
           )}
         </div>
 
-        <Editor
+       <Editor
           options={{
             minimap: {
               enabled: true,
@@ -274,7 +278,7 @@ const CodeEditor = (props) => {
             wordWrap: wordWrap ? "on" : "off",
             fontSize: fontSize,
           }}
-          height="100%"
+          height="92%"
           theme={props.lightmode ? "light" : "vs-dark"}
           language={props.language}
           defaultValue={CODE_SNIPPETS[props.language]}
@@ -284,7 +288,7 @@ const CodeEditor = (props) => {
             props.setValue(value);
             props.setBoilerPlateCode(false);
           }}
-        />
+        /> 
       </div>
     </div>
   );

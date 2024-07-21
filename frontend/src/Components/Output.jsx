@@ -18,14 +18,14 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
 
   return (
     <div
-      className={`flex justify-center m-2 ${
+      className={`flex justify-center w-full ${
         props.lightmode ? "bg-white text-black" : "bg-[#1e1e1e] text-white"
       }`}
     >
       <div
         className={`border ${
           props.lightmode ? "" : ""
-        } flex flex-col h-auto w-[70vw]`}
+        } flex flex-col h-auto w-full `}
       >
         <div className="flex justify-between p-3 border-b border-gray-600 text-lg">
           <div className="font-semibold">{props.option} : </div>

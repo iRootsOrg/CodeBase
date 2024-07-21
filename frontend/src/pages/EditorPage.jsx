@@ -489,15 +489,18 @@ const EditorPage = () => {
   const [reportBugOpen, setReportBugOpen] = useState(false);
   const [keyboardShortcut, setKeyboardShortcut] = useState(false);
   const [email, setEmail] = useState("");
+  const [toolBar, setToolBar] = useState(true);
 
   return (
-    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
+    <div
+      className={`h-[100%] w-[100%] ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}
+    >
       <div>
         <Toaster />
       </div>
-      <div className=" flex flex-col overflow-x-hidden h-full">
-        <div className="flex-1 h-full flex overflow-x-hidden">
-          <div className="flex-1 h-[87.4%]">
+      <div className="w-full">
+        <div className="flex flex-col sm:flex-row w-full h-full">
+          <div className="h-[63vh] w-[100vw] sm:h-[100vh] sm:w-[65vw] border-b border-black">
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -550,10 +553,12 @@ const EditorPage = () => {
               setFileChecked={setFileChecked}
               setOutputChecked={setOutputChecked}
               outputChecked={outputChecked}
+              toolBar={toolBar}
+              setToolBar={setToolBar}
             />
           </div>
-          <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
-          <div className="flex-1 h-full overflow-y-auto">
+
+          <div className="h-auto w-full p-1 border-b border-black sm:h-[100vh] sm:max-md:w-[30vw] md:w-[40vw]">
             <Output
               lightmode={lightmode}
               option={option}
@@ -563,8 +568,14 @@ const EditorPage = () => {
             />
           </div>
         </div>
-        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4 `}>
-          <div className={`flex p-4 justify-between h-[10vh]`}>
+        <div
+          className={`${
+            lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+          }  sm:absolute  sm:bottom-0  ${
+            toolBar ? "sm:ml-12 sm:w-100-minus-3rem" : "sm:w-[100%]"
+          }`}
+        >
+          <div className={`flex p-4 pt-3 justify-between items-center h-auto`}>
             <label
               className={`font-bold text-xl ${
                 lightmode ? "text-black" : "text-white"
