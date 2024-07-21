@@ -557,7 +557,7 @@ const EditorPage = () => {
               setToolBar={setToolBar}
             />
           </div>
-
+          <div className="sm:w-1 sm:bg-gray-300 sm:cursor-ew-resize"></div>
           <div className="h-auto w-full p-1 border-b border-black sm:h-[100vh] sm:max-md:w-[30vw] md:w-[40vw]">
             <Output
               lightmode={lightmode}
