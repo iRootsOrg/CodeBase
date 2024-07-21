@@ -1,57 +1,29 @@
-import { useRef, useState, useEffect } from "react";
-import { Editor } from "@monaco-editor/react";
-import DropDown from "./DropDown";
-import { CODE_SNIPPETS} from "../Utils/languages";
-import { BiCodeAlt } from "react-icons/bi";
-import Run from "./Run";
-
-
-const CodeEditor = () => {
-  const editorRef = useRef();
-  const [value, setValue] = useState("");
-  const [language, setLanguage] = useState("javascript");
-
-  const onMount = (editor) => {
-    editorRef.current = editor;
-    editor.focus();
-  };
-  const onSelect = (language) => {
-    setLanguage(language);
-    setValue(CODE_SNIPPETS[language]);
-  };
-  const formatCode = () => {
-    editorRef.current.getAction('editor.action.formatDocument').run();
-  };
-
-  return (
-    <div>
-      <div className="flex justify-between mr-4 items-center">
-        <DropDown language={language} onSelect={onSelect} />
-
-        <div className="flex">
-        <button className="h-10 w-10 mx-3 flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hover:bg-blue-600" onClick={formatCode}>
-  <BiCodeAlt className="text-xl" />
-</button>
-
-        <Run />
-        </div>
-        
-      </div>
-      <Editor
-        options={{
-          minimap: {
-            enabled: false,
-          },
-        }}
-        height="75vh"
-        theme="vs-dark"
-        language={language}
-        defaultValue={CODE_SNIPPETS[language]}
-        onMount={onMount}
-        value={value}
-        onChange={(value) => setValue(value)}
-      />
-    </div>
-  );
+export const CODE_SNIPPETS = {
+  Choose_Language: `No File/Language Selected`,
+  javascript: `function greet(name) {\n\tconsole.log("Hello, " + name + "!");\n}\n\ngreet("Alex");\n`,
+  typescript: `type Params = {\n\tname: string;\n}\n\nfunction greet(data: Params) {\n\tconsole.log("Hello, " + data.name + "!");\n}\n\ngreet({ name: "Alex" });\n`,
+  python: `def greet(name):\n\tprint("Hello, " + name + "!")\n\ngreet("Alex")\n`,
+  java: `public class HelloWorld {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello World");\n\t}\n}\n`,
+  csharp: 'using System;\n\nnamespace HelloWorld\n{\n\tclass Hello { \n\t\tstatic void Main(string[] args) {\n\t\t\tConsole.WriteLine("Hello World in C#");\n\t\t}\n\t}\n}\n',
+  php: "<?php\n\n$name = 'Alex';\necho $name;\n",
+  r: `greet <- function(name) {\n\tcat("Hello, ", name, "!\n")\n}\n\ngreet("Alex")\n`,
+  matlab: `function greet(name)\n\tfprintf('Hello, %s!\n', name);\nend\n\ngreet('Alex');\n`,
+  cpp: `#include <iostream>\n\nint main() {\n\tstd::cout << "Hello, World!";\n\treturn 0;\n}\n`,
+  c: `#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!\\n");\n\treturn 0;\n}\n`,
 };
-export default CodeEditor;
+
+
+export const LAN_CONVERSION = {
+  Choose_Language: `txt`,
+  javascript: `js`,
+  typescript: `ts`,
+  python: `py`,
+  java: `java`,
+  csharp:
+    'cs',
+  php: "php",
+  r: `R`,
+  matlab: `m`,
+  cpp: `cpp`,
+  c: `c`,
+};
