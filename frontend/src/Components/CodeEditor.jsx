@@ -11,13 +11,14 @@ import History from "./History";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext";
+import { IoIosMenu } from "react-icons/io";
 const CodeEditor = (props) => {
   const editorRef = useRef();
   
   const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [wordWrap, setWordWrap] = useState(true);
+  const [wordWrap, setWordWrap] = useState(false);
   const [fontSize, setFontSize] = useState(16);
 
   useEffect(() => {
@@ -83,17 +84,41 @@ const CodeEditor = (props) => {
     props.setToolBar(!props.toolBar);
     setToolbarNull();
   };
+
+  const [editorWidth, setEditorWidth] = useState("100%");
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640 && props.toolBar === true) {
+        // Tailwind's 'sm' breakpoint is 640px
+        setEditorWidth("87%");
+      } else {
+        setEditorWidth("100%");
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Initial check
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
+
+
   
 
   return (
     <div className={`h-full w-full flex flex-col `}>
-      <div className="flex sm:justify-between  items-center w-full justify-end h-20 p-2">
-        <div className="cursor-pointer sm:flex gap-2 hidden ">
+      <div className="flex justify-between  items-center w-full  h-20 p-2">
+        <div className="cursor-pointer sm:flex gap-2  ">
           {props.toolBar === true ? (
             <img
               src="./Icons/Close.png"
               alt="Close"
-              className="h-[32px] w-[32px]"
+              className="h-[32px] w-[32px] hidden sm:block"
               onClick={() => {
                 handleToolBar();
               }}
@@ -102,12 +127,20 @@ const CodeEditor = (props) => {
             <img
               src="./Icons/More.png"
               alt="More"
-              className="h-[32px] w-[32px]"
+              className="h-[32px] w-[32px] hidden sm:block"
               onClick={() => {
                 handleToolBar();
               }}
             />
           )}
+
+          <IoIosMenu
+            size={36}
+            onClick={() => {
+              handleToolBar();
+            }}
+            className="block sm:hidden"
+          />
 
           {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
             <DropDown
@@ -156,11 +189,11 @@ const CodeEditor = (props) => {
       </div>
 
       <div
-        className={`flex h-full ${
+        className={`flex h-full w-full ${
           props.lightmode ? "" : "bg-[#1e1e1e]"
         } `}
       >
-        <div className="hidden sm:block ">
+        <div className="w-auto">
           <ToolBar
             folderfiles={props.folderfiles}
             setFolderFiles={props.setFolderFiles}
@@ -217,7 +250,7 @@ const CodeEditor = (props) => {
         </div>
         <div className="h-full">
           {props.folderopen === true ? (
-            <div className="w-48 ">
+            <div className="w-48 h-full">
               <Folder
                 folderfiles={props.folderfiles}
                 setFolderFiles={props.setFolderFiles}
@@ -270,15 +303,17 @@ const CodeEditor = (props) => {
           )}
         </div>
 
-       <Editor
+        <Editor
           options={{
             minimap: {
               enabled: true,
             },
             wordWrap: wordWrap ? "on" : "off",
             fontSize: fontSize,
+            lineNumbers: "on",
           }}
-          height="92%"
+          height="100%"
+          width={editorWidth}
           theme={props.lightmode ? "light" : "vs-dark"}
           language={props.language}
           defaultValue={CODE_SNIPPETS[props.language]}
@@ -288,7 +323,7 @@ const CodeEditor = (props) => {
             props.setValue(value);
             props.setBoilerPlateCode(false);
           }}
-        /> 
+        />
       </div>
     </div>
   );

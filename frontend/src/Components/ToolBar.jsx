@@ -106,7 +106,7 @@ const ToolBar = (props) => {
   };
 
   return (
-    <div className="flex p-0 h-full ">
+    <div className="flex p-0 h-full w-full">
       {props.toolBar === true ? (
         <div
           className={`border-r-2 border-[#d1d5db] flex flex-col items-center  justify-between gap-3 w-12  ${
@@ -356,7 +356,7 @@ const ToolBar = (props) => {
           </div>
           <div className="flex flex-col items-center gap-3">
             <div
-              className={`     ml-1  h-auto py-1 flex justify-center items-center w-full  ${
+              className={`  mb-4   ml-1  h-auto py-1 flex justify-center items-center w-full  ${
                 props.selected === 7
                   ? `border-l-4 ${
                       props.lightmode ? "border-blue-900" : "border-white"
@@ -375,7 +375,7 @@ const ToolBar = (props) => {
 
               {props.settingsopen === true ? (
                 <div
-                  className={`absolute left-14 bottom-16 py-2 z-10 rounded bg-transparent ${
+                  className={`fixed left-14 bottom-24 sm:bottom-16 py-2 z-10 rounded bg-transparent ${
                     props.lightmode === true ? " text-black" : "text-white"
                   }`}
                 >
@@ -401,7 +401,7 @@ const ToolBar = (props) => {
                 ""
               )}
             </div>
-            <div
+            {/* <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 11
                   ? `border-l-4 ${
@@ -418,7 +418,7 @@ const ToolBar = (props) => {
                 alt="Info"
                 className="!h-[24px] !w-[24px]"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       ) : (

@@ -500,7 +500,11 @@ const EditorPage = () => {
       </div>
       <div className="w-full">
         <div className="flex flex-col sm:flex-row w-full h-full">
-          <div className="h-[63vh] w-[100vw] sm:h-[100vh] sm:w-[65vw] border-b border-black">
+          <div
+            className={`h-[63vh] w-[100vw] sm:h-[100vh] sm:w-[65vw] border-b border-black ${
+              toolBar ? "" : ""
+            }`}
+          >
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -628,14 +632,14 @@ const EditorPage = () => {
 
       {shareOpen === true ? (
         <div
-          className={`fixed inset-0 flex items-center justify-center backdrop-blur-sm   `}
+          className={`fixed px-2 bottom-0  sm:inset-0 w-full flex items-center justify-center backdrop-blur-sm  sm:w-auto `}
         >
           <div
-            className={`border ${
+            className={`sm:border border-t-2 ${
               lightmode
                 ? "bg-white text-black border-black"
                 : "bg-[#1e1e1e] text-white border-white"
-            } p-6 rounded-lg shadow-lg relative `}
+            } p-6 rounded-lg shadow-lg relative w-full sm:w-auto`}
           >
             <button
               onClick={() => {
@@ -692,7 +696,7 @@ const EditorPage = () => {
       )}
 
       {infoOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+        <div className="fixed px-2 bottom-0  sm:inset-0 w-full  sm:w-auto flex items-center justify-center backdrop-blur-sm">
           <div
             className={`border ${
               lightmode
@@ -730,15 +734,15 @@ const EditorPage = () => {
       )}
 
       {reportBugOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed bottom-0 w-full sm:w-auto sm:inset-0 flex sm:items-center sm:justify-center">
           <div
             className={`border ${
               lightmode
                 ? "bg-gray-100 bg-opacity-90 text-black border-black"
                 : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
-            } p-6 rounded-lg shadow-lg relative w-[70vw]`}
+            } p-6 rounded-lg shadow-lg relative w-full sm:w-[70vw]`}
           >
-            <div className="flex items-center">
+            <div className="flex items-center w-full justify-center">
               <button
                 onClick={() => {
                   setReportBugOpen(false);
@@ -751,7 +755,7 @@ const EditorPage = () => {
               >
                 <FaTimes size={24} />
               </button>
-              <h2 className={`text-xl font-bold top-3 left-[45%] absolute `}>
+              <h2 className={`text-xl font-bold  `}>
                 Report Bug
               </h2>
             </div>
