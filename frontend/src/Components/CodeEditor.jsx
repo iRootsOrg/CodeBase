@@ -11,7 +11,8 @@ import History from "./History";
 import ToolTip from "./ToolTip";
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
-
+import toast from "react-hot-toast";
+import { restrictedPatterns } from "../Utils/restrictedtext";
 const CodeEditor = (props) => {
   const editorRef = useRef();
   const [toolBar, setToolBar] = useState(true);
@@ -40,8 +41,27 @@ const CodeEditor = (props) => {
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
-  };
 
+    editor.onDidChangeModelContent((event) => {
+      const value = editor.getValue();
+      for (let pattern of restrictedPatterns) {
+        if (pattern.test(value)) {
+          // toast.error("Not allowed");
+          
+          // Remove the restricted text by restoring the previous value
+          editor.executeEdits("", [
+            {
+              range: editor.getModel().getFullModelRange(),
+              text: value.replace(pattern, ""),
+              
+            },
+          ]);
+          break;
+        }
+      }
+      return;
+    });
+  };
   const onSelect = (language) => {
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
@@ -108,12 +128,14 @@ const CodeEditor = (props) => {
 
   const formatCode = () => {
     editorRef.current.getAction("editor.action.formatDocument").run();
+    toast.success("Code Formatted");
   };
 
   const handleToolBar = () => {
     setToolBar(!toolBar);
     setToolbarNull();
   };
+  
 
   return (
    
@@ -226,6 +248,7 @@ const CodeEditor = (props) => {
           </div>
         </div>
 
+<<<<<<< HEAD
         <div
           className={`flex h-full ${
             props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
@@ -351,6 +374,101 @@ const CodeEditor = (props) => {
               props.setBoilerPlateCode(false);
             }}
           />
+=======
+      <div className={`flex h-full ${props.lightmode ? "" : "bg-[#1e1e1e]"} `}>
+        <ToolBar
+          folderfiles={props.folderfiles}
+          setFolderFiles={props.setFolderFiles}
+          folderopen={props.folderopen}
+          setFolderOpen={props.setFolderOpen}
+          value={props.value}
+          setValue={props.setValue}
+          updateChangeCode={props.updateChangeCode}
+          zipAndDownload={props.zipAndDownload}
+          handleFileUpload={props.handleFileUpload}
+          lightmode={props.lightmode}
+          setLightMode={props.setLightMode}
+          handleLight={props.handleLight}
+          shareOpen={props.shareOpen}
+          setShareOpen={props.setShareOpen}
+          infoOpen={props.infoOpen}
+          setInfoOpen={props.setInfoOpen}
+          formatCode={formatCode}
+          toolBar={toolBar}
+          setToolBar={setToolBar}
+          folderIndex={props.folderIndex}
+          setFolderIndex={props.setFolderIndex}
+          fileIndex={props.fileIndex}
+          setFileIndex={props.setFileIndex}
+          extraFileIndex={props.extraFileIndex}
+          setExtraFileIndex={props.setExtraFileIndex}
+          newFileName={props.newFileName}
+          setNewFileName={props.setNewFileName}
+          opennewfile={props.opennewfile}
+          setOpenNewFile={props.setOpenNewFile}
+          openExtraNewFile={props.openExtraNewFile}
+          setOpenExtraNewFile={props.setOpenExtraNewFile}
+          selected={selected}
+          setSelected={setSelected}
+          settingsopen={settingsopen}
+          setSettingsOpen={setSettingsOpen}
+          historyOpen={historyOpen}
+          setHistoryOpen={setHistoryOpen}
+          language={props.language}
+          setLanguage={props.setLanguage}
+          wordWrap={wordWrap}
+          setWordWrap={setWordWrap}
+          keyboardShortcut={props.keyboardShortcut}
+          setKeyboardShortcut={props.setKeyboardShortcut}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
+          email={props.email}
+          setEmail={props.setEmail}
+          fileChecked={props.fileChecked}
+          outputChecked={props.outputChecked}
+          setFileChecked={props.setFileChecked}
+          setOutputChecked={props.setOutputChecked}
+        />
+        <div className="h-full">
+          {props.folderopen === true ? (
+            <div className="w-48 ">
+              <Folder
+                folderfiles={props.folderfiles}
+                setFolderFiles={props.setFolderFiles}
+                opennewfolder={props.opennewfolder}
+                setOpenNewFolder={props.setOpenNewFolder}
+                value={props.value}
+                setValue={props.setValue}
+                folderIndex={props.folderIndex}
+                setFolderIndex={props.setFolderIndex}
+                fileIndex={props.fileIndex}
+                setFileIndex={props.setFileIndex}
+                language={props.language}
+                setLanguage={props.setLanguage}
+                extraFileIndex={props.extraFileIndex}
+                setExtraFileIndex={props.setExtraFileIndex}
+                newFileName={props.newFileName}
+                setNewFileName={props.setNewFileName}
+                opennewfile={props.opennewfile}
+                setOpenNewFile={props.setOpenNewFile}
+                openExtraNewFile={props.openExtraNewFile}
+                setOpenExtraNewFile={props.setOpenExtraNewFile}
+                extraNewFileName={props.extraNewFileName}
+                setExtraNewFileName={props.setExtraNewFileName}
+                newFolderName={props.newFolderName}
+                handleFolderName={props.handleFolderName}
+                addNewFolder={props.addNewFolder}
+                lightmode={props.lightmode}
+                setNewFolderName={props.setNewFolderName}
+                outputFile={props.outputFile}
+                setOutputFile={props.setOutputFile}
+                initialOutput={props.initialOutput}
+              />
+            </div>
+          ) : (
+            ""
+          )}
+>>>>>>> 4d0a6912ac57e8d6d2878725f15886f784b4d9aa
         </div>
       </div>
     

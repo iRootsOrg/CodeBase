@@ -1,10 +1,15 @@
-
-import File from "./File";
-import { CODE_SNIPPETS } from "../Utils/languages";
+import React, { useRef } from "react";
 import { FaPlus, FaTrash, FaTimes, FaCheck } from "react-icons/fa";
+import File from "./File";
 import ExtraFiles from "./ExtraFiles";
+import { CODE_SNIPPETS } from "../Utils/languages";
+import { restrictedPatterns } from "../Utils/restrictedtext";
+import toast from "react-hot-toast";
 
 const Folder = (props) => {
+  const lastInvalidFileNameRef = useRef("");
+  const lastInvalidExtraFileNameRef = useRef("");
+
   const openFolder = (index) => {
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
@@ -23,11 +28,10 @@ const Folder = (props) => {
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
     let lastFileIndex = props.folderfiles.folders[index].files.length - 1;
     lastFileIndex = lastFileIndex >= 0 ? lastFileIndex : 0;
-      props.setFileIndex(lastFileIndex);
+    props.setFileIndex(lastFileIndex);
     props.setFolderIndex(index);
     props.setOpenNewFile(true);
-   
-    
+    props.setOutputFile(props.initialOutput);
   };
 
   const addNewFolder = () => {
@@ -35,11 +39,53 @@ const Folder = (props) => {
   };
 
   const handleFileName = (e) => {
-    props.setNewFileName(e.target.value);
+    const name = e.target.value;
+    let isValid = true;
+
+    restrictedPatterns.forEach((pattern) => {
+      if (pattern.test(name)) {
+        isValid = false;
+        return; // Exit the forEach loop early
+      }
+    });
+
+    if (isValid) {
+      props.setNewFileName(e.target.value);
+      lastInvalidFileNameRef.current = ""; // Reset the last invalid input
+    } else {
+      if (lastInvalidFileNameRef.current !== name) {
+        lastInvalidFileNameRef.current = name;
+        console.log("Restricted characters detected");
+        toast.error("Your input contains restricted characters", {
+          id: "restricted-chars-error",
+        });
+      }
+    }
   };
 
   const handleExtraFileName = (e) => {
-    props.setExtraNewFileName(e.target.value);
+    const name = e.target.value;
+    let isValid = true;
+
+    restrictedPatterns.forEach((pattern) => {
+      if (pattern.test(name)) {
+        isValid = false;
+        return; // Exit the forEach loop early
+      }
+    });
+
+    if (isValid) {
+      props.setExtraNewFileName(e.target.value);
+      lastInvalidExtraFileNameRef.current = ""; // Reset the last invalid input
+    } else {
+      if (lastInvalidExtraFileNameRef.current !== name) {
+        lastInvalidExtraFileNameRef.current = name;
+        console.log("Restricted characters detected");
+        toast.error("Your input contains restricted characters", {
+          id: "restricted-chars-error-extra",
+        });
+      }
+    }
   };
 
   const addNewFile = (folderIndex) => {
@@ -53,6 +99,7 @@ const Folder = (props) => {
               name: props.newFileName,
               code: CODE_SNIPPETS[props.language],
               language: props.language,
+              output: props.outputFile,
             },
           ],
         };
@@ -71,6 +118,7 @@ const Folder = (props) => {
       name: props.extraNewFileName,
       code: CODE_SNIPPETS[props.language],
       language: props.language,
+      output: props.outputFile,
     };
 
     const newExtraFiles = [...props.folderfiles.extraFiles, newExtraFile];
@@ -84,7 +132,6 @@ const Folder = (props) => {
     props.setOpenExtraNewFile(false);
     props.setExtraNewFileName("");
   };
-
 
   const updateFiles = (folderIndex, newFiles) => {
     const newFolders = props.folderfiles.folders.map((folder, index) => {
@@ -113,7 +160,8 @@ const Folder = (props) => {
     props.setFolderIndex(-1);
     props.setFileIndex(-1);
     props.setExtraFileIndex(-1);
-     props.setValue("No File Selected");
+    props.setValue("No File Selected");
+    props.setOutputFile(props.initialOutput);
   };
 
   const setAllNull = () => {
@@ -125,6 +173,7 @@ const Folder = (props) => {
     props.setExtraFileIndex(-1);
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
+    props.setOutputFile(props.initialOutput);
   };
 
   return (
@@ -163,11 +212,11 @@ const Folder = (props) => {
             }`}
           >
             <div
-              className={`flex gap-1  items-center ${props.lightmode ? `${
-                props.folderIndex === index ? "text-blue-600" : ""
-              }`:`${
-                props.folderIndex === index ? "text-cyan-600" : ""
-              }`}`}
+              className={`flex gap-1  items-center ${
+                props.lightmode
+                  ? `${props.folderIndex === index ? "text-blue-600" : ""}`
+                  : `${props.folderIndex === index ? "text-cyan-600" : ""}`
+              }`}
             >
               {props.folderIndex === index ? "📂 " : "📁 "}
               <div className="flex justify-between w-full select-none">
@@ -200,6 +249,9 @@ const Folder = (props) => {
                   extraFileIndex={props.extraFileIndex}
                   setExtraFileIndex={props.setExtraFileIndex}
                   lightmode={props.lightmode}
+                  outputFile={props.outputFile}
+                  setOutputFile={props.setOutputFile}
+                  initialOutput={props.initialOutput}
                 />
 
                 {props.opennewfile ? (
@@ -289,6 +341,9 @@ const Folder = (props) => {
             folderIndex={props.folderIndex}
             setFolderIndex={props.setFolderIndex}
             lightmode={props.lightmode}
+            outputFile={props.outputFile}
+            setOutputFile={props.setOutputFile}
+            initialOutput={props.initialOutput}
           />
 
           {props.openExtraNewFile === true ? (

@@ -1,6 +1,11 @@
 const RunAll = (props) => {
   const onRunAll = () => {
     console.log("Running All");
+   // toast.promise((), {
+  //    loading: 'Running All...',
+  //    success: <b>Run Successful!</b>,
+  //    error: <b>Could not run.</b>,
+  //  })
   };
   return (
     <button
