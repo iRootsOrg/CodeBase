@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const CustomError = require("../utils/CustomError.js");
 const Role = require('../models/roleModel');
 const CustomError = require('../utils/CustomError');
 const transporter = require('../utils/emailService');
@@ -81,7 +80,6 @@ async function joinEditingSession(req, res) {
     await user.save();
     res.json({ message: 'Joined editing session successfully.' });
 }
-
 async function assignRole(req, res, next) {
     try {
         const { userId, roleName } = req.body;
