@@ -18,13 +18,14 @@ export default function ReviewPage() {
     language: 'c',
     code: `#include <stdio.h>\n\nint main() {\n\tprintf("Hello, World!\\n");\n\treturn 0;\n}\n`,
     description:
-      " Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature.",
+      "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature.",
   };
   
   const user2 = {
     pfp: 'https://3.bp.blogspot.com/-9YDmRdOQO5Y/W7ql9HZvhDI/AAAAAAAADJc/4WizmhdNBiArkst_o_3ArR2RmSyaYCCoACLcBGAs/s1600/-social%2Bmedia%2Bprofile%2Bpicture-3.jpg',
     username: 'Ramcharan',
   };
+  
   const initialComments = [
     {
       user: user,
@@ -50,6 +51,7 @@ export default function ReviewPage() {
 
   const [comments, setComments] = useState(initialComments);
   const [reviewed, setReviewed] = useState(false);
+  const [approved, setApproved] = useState(false);
 
   const handleSubmit = (feedback) => {
     const newComment = {
@@ -61,8 +63,13 @@ export default function ReviewPage() {
     setReviewed(true);
   };
 
+  const handleApproveComment = () => {
+    setApproved(true);
+  };
+
   return (
     <div className="flex flex-col">
+      
       <div className="bg-white ml-10">
         <h1 className="text-4xl mb-2 font-bold font-actor">{user.title}</h1>
         <button
@@ -74,16 +81,16 @@ export default function ReviewPage() {
         </button>
       </div>
       <Textbox user={submission} />
-      <div className="flex">
-        <div className="w-1/2">
+      <div className="flex flex-col sm:flex-row">
+        <div className="sm:w-1/2 md:w-1/2 lg:w-1/2">
           <CodeBase user={submission} />
         </div>
-        <div className="w-1/2">
+        <div className="sm:w-1/2 md:w-1/2 lg:w-1/2">
           <TestCaseEditor />
         </div>
       </div>
       <CommentsList comments={comments} />
-      <Comment user={user2} handleSubmit={handleSubmit} />
+      <Comment user={user2} handleSubmit={handleSubmit} onApprove={handleApproveComment} />
     </div>
   );
 }

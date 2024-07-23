@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 export default function Comment(props) {
-  const { role } = props;
+  const { role, onApprove } = props; 
   const [feedback, setFeedback] = useState('');
   const [warning, setWarning] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
 
   const handleFeedbackChange = (event) => {
     if (event.target.value.length <= 500) {
@@ -29,8 +30,31 @@ export default function Comment(props) {
     }
   };
 
+  const handleApprove = () => {
+    if (onApprove) {
+      onApprove(); 
+      setShowApprovalModal(true);
+    }
+  };
+  const handleCloseModal=()=>{
+    setShowApprovalModal(false);
+  }
+
   return (
     <div className="ml-10 mr-40 mb-40 bg-white rounded-lg">
+       {showApprovalModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-8">
+            <h2 className="text-lg font-bold mb-4">Approval Submitted!</h2>
+            <button
+              onClick={handleCloseModal}
+              className="px-4 py-2 bg-gradient-to-r from-cyan-500 via-cyan-600 to-cyan-700 text-white font-bold rounded focus:outline-none"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex items-start">
         <img
           src={props.user.pfp}
@@ -64,6 +88,16 @@ export default function Comment(props) {
           </button>
         </div>
       </div>
+      {role !== 'author' && (
+        <div className="flex justify-end mt-2">
+          <button
+            onClick={handleApprove}
+            className="px-4 py-2 text-white font-bold bg-gradient-to-r from-cyan-500 via-cyan-600 to-cyan-700 focus:outline-none"
+          >
+            Approve
+          </button>
+        </div>
+      )}
     </div>
   );
 }
