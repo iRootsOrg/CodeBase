@@ -248,133 +248,6 @@ const CodeEditor = (props) => {
           </div>
         </div>
 
-<<<<<<< HEAD
-        <div
-          className={`flex h-full ${
-            props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
-          } `}
-        >
-          <ToolBar
-            folderfiles={props.folderfiles}
-            setFolderFiles={props.setFolderFiles}
-            folderopen={props.folderopen}
-            setFolderOpen={props.setFolderOpen}
-            value={props.value}
-            setValue={props.setValue}
-            updateChangeCode={props.updateChangeCode}
-            zipAndDownload={props.zipAndDownload}
-            handleFileUpload={props.handleFileUpload}
-            lightmode={props.lightmode}
-            setLightMode={props.setLightMode}
-            handleLight={props.handleLight}
-            shareOpen={props.shareOpen}
-            setShareOpen={props.setShareOpen}
-            infoOpen={props.infoOpen}
-            setInfoOpen={props.setInfoOpen}
-            formatCode={formatCode}
-            toolBar={toolBar}
-            setToolBar={setToolBar}
-            folderIndex={props.folderIndex}
-            setFolderIndex={props.setFolderIndex}
-            fileIndex={props.fileIndex}
-            setFileIndex={props.setFileIndex}
-            extraFileIndex={props.extraFileIndex}
-            setExtraFileIndex={props.setExtraFileIndex}
-            newFileName={props.newFileName}
-            setNewFileName={props.setNewFileName}
-            opennewfile={props.opennewfile}
-            setOpenNewFile={props.setOpenNewFile}
-            openExtraNewFile={props.openExtraNewFile}
-            setOpenExtraNewFile={props.setOpenExtraNewFile}
-            selected={selected}
-            setSelected={setSelected}
-            settingsopen={settingsopen}
-            setSettingsOpen={setSettingsOpen}
-            historyOpen={historyOpen}
-            setHistoryOpen={setHistoryOpen}
-            language={props.language}
-            setLanguage={props.setLanguage}
-            wordWrap={wordWrap}
-            setWordWrap={setWordWrap}
-            keyboardShortcut={props.keyboardShortcut}
-            setKeyboardShortcut={props.setKeyboardShortcut}
-            fontSize={fontSize}
-            setFontSize={setFontSize}
-            email={props.email}
-            setEmail={props.setEmail}
-          />
-          <div className="h-full">
-            {props.folderopen === true ? (
-              <div className="w-48 ">
-                <Folder
-                  folderfiles={props.folderfiles}
-                  setFolderFiles={props.setFolderFiles}
-                  opennewfolder={props.opennewfolder}
-                  setOpenNewFolder={props.setOpenNewFolder}
-                  value={props.value}
-                  setValue={props.setValue}
-                  folderIndex={props.folderIndex}
-                  setFolderIndex={props.setFolderIndex}
-                  fileIndex={props.fileIndex}
-                  setFileIndex={props.setFileIndex}
-                  language={props.language}
-                  setLanguage={props.setLanguage}
-                  extraFileIndex={props.extraFileIndex}
-                  setExtraFileIndex={props.setExtraFileIndex}
-                  newFileName={props.newFileName}
-                  setNewFileName={props.setNewFileName}
-                  opennewfile={props.opennewfile}
-                  setOpenNewFile={props.setOpenNewFile}
-                  openExtraNewFile={props.openExtraNewFile}
-                  setOpenExtraNewFile={props.setOpenExtraNewFile}
-                  extraNewFileName={props.extraNewFileName}
-                  setExtraNewFileName={props.setExtraNewFileName}
-                  newFolderName={props.newFolderName}
-                  handleFolderName={props.handleFolderName}
-                  addNewFolder={props.addNewFolder}
-                  lightmode={props.lightmode}
-                  setNewFolderName={props.setNewFolderName}
-                />
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
-
-          <div className="">
-            {historyOpen === true ? (
-              <div
-                className={`w-48 ${
-                  props.lightmode ? "text-black" : "text-white"
-                }`}
-              >
-                <History />
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
-
-          <Editor
-            options={{
-              minimap: {
-                enabled: true,
-              },
-              wordWrap: wordWrap ? "on" : "off",
-              fontSize: fontSize,
-            }}
-            height="100%"
-            theme={props.lightmode ? "light" : "vs-dark"}
-            language={props.language}
-            defaultValue={CODE_SNIPPETS[props.language]}
-            onMount={onMount}
-            value={props.value}
-            onChange={(value) => {
-              props.setValue(value);
-              props.setBoilerPlateCode(false);
-            }}
-          />
-=======
       <div className={`flex h-full ${props.lightmode ? "" : "bg-[#1e1e1e]"} `}>
         <ToolBar
           folderfiles={props.folderfiles}
@@ -468,8 +341,8 @@ const CodeEditor = (props) => {
           ) : (
             ""
           )}
->>>>>>> 4d0a6912ac57e8d6d2878725f15886f784b4d9aa
         </div>
+      </div>
       </div>
     
   );
