@@ -2,6 +2,8 @@ import Settings from "./Settings.jsx";
 import { CODE_SNIPPETS } from "../Utils/languages.jsx";
 import ToolTip from "./ToolTip.jsx";
 
+import { useState } from "react";
+import toast from "react-hot-toast";
 const ToolBar = (props) => {
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const handleFileChecked = () => {

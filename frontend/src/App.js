@@ -7,7 +7,6 @@ import Login from './pages/Login.jsx';
 import SignUp from './pages/Signup.jsx';
 
 function App() {
-<<<<<<< HEAD
   return(
 
   <BrowserRouter>
@@ -21,17 +20,6 @@ function App() {
   </Routes>
   </BrowserRouter>
   )
-=======
-  return (
-    <BrowserRouter>
-      <Routes>
-        
-        <Route path="/" element={<EditorPage />} />
-        <Route path="/r" element={<ReviewPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
->>>>>>> 4d0a6912ac57e8d6d2878725f15886f784b4d9aa
   
 }
 
