@@ -88,9 +88,9 @@ const uploadController = async (req, res, next) => {
             await rootFolder.save();
         }
 
-        res.status(201).json({ 
-            message: "Files uploaded successfully", 
-            rootFolderId: rootFolder ? rootFolder._id : null 
+        res.status(201).json({
+            message: "Files uploaded successfully",
+            rootFolderId: rootFolder ? rootFolder._id : null
         });
     } catch (error) {
         next(error);
