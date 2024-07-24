@@ -22,7 +22,6 @@ const EditorPage = () => {
     textArea3: "",
     textArea4: "",
   });
-
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
