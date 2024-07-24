@@ -1,67 +1,91 @@
 const mongoose = require("mongoose");
 
-const inputOutputSchema = new mongoose.Schema({
-    type: {
+const fileSchema = new mongoose.Schema({
+    name: {
         type: String,
-        enum: ['file', 'direct'],
         required: true
     },
-    reference: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'File',
-        required: function() { return this.type === 'file'; }
+    path: {
+        type: String,
+        required: true
+    },
+    isFolder: {
+        type: Boolean,
+        default: false
     },
     content: {
-        type: String,
-        required: function() { return this.type === 'direct'; } 
-    },
-    _id:false
-});
-
-const testCaseSchema = new mongoose.Schema({
-    inputs: [inputOutputSchema],
-    outputs: [inputOutputSchema],
-    _id: false
-});
-
-const fileSchema = new mongoose.Schema({
-    filename:{
-        type:String,
-        required:true
-    },
-    language: {
-        type:String,
-        required:true
-    }, 
-    file: {
         type: Buffer,
-        required:true
-    }, 
+        required: function () { return !this.isFolder; }
+    },
+    files: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File'
+    }],
+    parentFolder: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File',
+        default: null
+    },
     authorId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'User',
-        unique:true,
+        ref: 'User',
         required: true,
     },
-    createdAt: {
-        type:Date,
-        required:true
-    }, 
-    updatedAt: {
-        type:Date,
-        default: Date.now
+    language: {
+        type: String,
+        required: function () { return !this.isFolder; }
     },
-    tags: {
-        type:[String],
-    }, 
-    description: {
-        type:String
+    tags: [String],
+    description: String,
+    isInput: {
+        type: Boolean,
+        default: false
     },
-    testCases: [testCaseSchema]
+    isOutput: {
+        type: Boolean,
+        default: false
+    }
+}, {
+    timestamps: true
 });
+
+fileSchema.virtual('fullPath').get(function () {
+    return this.path + '/' + this.name;
+});
+
+fileSchema.statics.createFolderStructure = async function (structure, parentId = null, authorId) {
+    const createdFiles = [];
+
+    for (const item of structure) {
+        const fileData = {
+            name: item.name,
+            path: item.path,
+            isFolder: item.isFolder,
+            authorId: authorId,
+            parentFolder: parentId,
+            isInput: item.isInput || false,
+            isOutput: item.isOutput || false
+        };
+
+        if (!item.isFolder) {
+            fileData.content = item.content;
+            fileData.language = item.language;
+        }
+
+        const file = await this.create(fileData);
+
+        if (item.isFolder && item.files) {
+            const childFiles = await this.createFolderStructure(item.files, file._id, authorId);
+            file.files = childFiles.map(f => f._id);
+            await file.save();
+        }
+
+        createdFiles.push(file);
+    }
+
+    return createdFiles;
+};
 
 const File = mongoose.model("File", fileSchema);
 
 module.exports = File;
-
-
