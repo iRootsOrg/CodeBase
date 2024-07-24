@@ -1,7 +1,7 @@
 import Output from "../Components/Output.jsx";
 import CodeEditor from "../Components/CodeEditor";
 import TestCase from "../Components/TestCase.jsx";
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Run from "../Components/Run.jsx";
@@ -12,6 +12,8 @@ import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
+
+
 const EditorPage = () => {
   
 
@@ -549,6 +551,7 @@ const EditorPage = () => {
               outputFile={outputFile}
               setOutputFile={setOutputFile}
             />
+
           </div>
         </div>
         <div

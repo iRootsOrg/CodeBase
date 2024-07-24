@@ -469,7 +469,11 @@ const ToolBar = (props) => {
                   <div className=" w-64 sm:w-72 p-2 gap-2 sm:gap-3 flex flex-col">
                     {addCollab === true ? (
                       <div className="flex justify-between items-center">
-                        <button onClick={()=>{backSetting()}}>
+                        <button
+                          onClick={() => {
+                            backSetting();
+                          }}
+                        >
                           <FaArrowLeft />
                         </button>
                         <div className="font-semibold underline">
@@ -530,6 +534,8 @@ const ToolBar = (props) => {
               ) : (
                 ""
               )}
+
+              
             </div>
             {/* <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
