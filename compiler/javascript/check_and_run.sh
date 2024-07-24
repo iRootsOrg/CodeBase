@@ -48,6 +48,3 @@ while true; do
     # Sleep for a short period before checking again to avoid busy-waiting
     sleep 1
 done
-
-# only run if we get new codefile (we can check the output files)
-# run this script as service
