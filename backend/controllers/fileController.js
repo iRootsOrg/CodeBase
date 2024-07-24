@@ -125,7 +125,6 @@ const decodeController = async (req, res, next) => {
 
 const searchFiles = async (req, res, next) => {
     const { query } = req.query;
-    console.log(query)
     if (!query) {
         return res.status(400).json({ message: "No search query provided." });
     }
