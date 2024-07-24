@@ -1,7 +1,7 @@
 import Output from "../Components/Output.jsx";
 import CodeEditor from "../Components/CodeEditor";
 import TestCase from "../Components/TestCase.jsx";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Run from "../Components/Run.jsx";
@@ -13,6 +13,8 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
 const EditorPage = () => {
+  
+
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
     textArea1: "",
@@ -53,14 +55,13 @@ const EditorPage = () => {
       },
     ],
   };
-  
+
   const initialOutput = {
     CompilationStatus: "Not Started",
     ExecutionTime: "0.00",
     FilesCompiled: "Still Not Compiled",
     tc: [testCasesSchema],
   };
-
 
   const initialFolderFiles = {
     folders: [],
@@ -73,9 +74,6 @@ const EditorPage = () => {
       },
     ],
   };
-
-
- 
 
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
   const [language, setLanguage] = useState("javascript");
@@ -115,7 +113,6 @@ const EditorPage = () => {
   const [lightmode, setLightMode] = useState(true);
 
   const handleLight = () => {
-    
     if (lightmode === false) {
       toast("Hello Light!", {
         icon: <AiOutlineSun className="h-6 w-6" />,
@@ -125,8 +122,7 @@ const EditorPage = () => {
           color: "#333",
         },
       });
-    }
-    else {
+    } else {
       toast("Hello Darkness!", {
         icon: <AiOutlineMoon className="h-6 w-6" />,
         style: {
@@ -144,7 +140,7 @@ const EditorPage = () => {
   const [fileIndex, setFileIndex] = useState(-1);
   const [extraFileIndex, setExtraFileIndex] = useState(-1);
   const [selectedFiles, setSelectedFiles] = useState(null); //The uploaded files
- 
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
     toast.success("URL copied to clipboard!");
@@ -155,9 +151,7 @@ const EditorPage = () => {
     setSelectedFiles(files);
     console.log(files);
 
-    
     toast.success("Files Uploaded Successfully");
-    
   };
 
   const handleClick = () => {
@@ -185,7 +179,6 @@ const EditorPage = () => {
       });
     }
   };
-
 
   const addNewFolder = () => {
     setFolderFiles((prevState) => ({
@@ -332,7 +325,7 @@ const EditorPage = () => {
   const [fileChecked, setFileChecked] = useState(false);
   const [outputChecked, setOutputChecked] = useState(false);
 
- const formatOutput = (output) => {
+  const formatOutput = (output) => {
     let formattedString =
       "Compilation Status: " + output.CompilationStatus + "\n";
     formattedString += "Execution Time: " + output.ExecutionTime + "\n";
@@ -357,12 +350,11 @@ const EditorPage = () => {
     });
 
     return formattedString;
-  }
+  };
 
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
-      
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
@@ -372,9 +364,9 @@ const EditorPage = () => {
               file.code
             );
           }
-          
+
           if (outputChecked === true) {
-             const formattedOutput = formatOutput(file.output);
+            const formattedOutput = formatOutput(file.output);
             folderZip.file(`${file.name} Output.txt`, formattedOutput);
           }
         });
@@ -415,14 +407,13 @@ const EditorPage = () => {
           const formattedOutput = formatOutput(file.output);
           folderZip.file(`${file.name} Output.txt`, formattedOutput);
         }
-        
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
         saveAs(content, `${folder.name}.zip`);
       });
 
-      toast.success(`${folder.name} is downloaded!`)
+      toast.success(`${folder.name} is downloaded!`);
     } else if (
       extraFileIndex >= 0 &&
       extraFileIndex < folderfiles.extraFiles.length
@@ -436,10 +427,7 @@ const EditorPage = () => {
       }
 
       if (outputChecked === true) {
-        
-        const formattedOutput = formatOutput(
-         file.output
-        );
+        const formattedOutput = formatOutput(file.output);
         const blob = new Blob([formattedOutput], {
           type: "text/plain;charset=utf-8",
         });
@@ -447,7 +435,6 @@ const EditorPage = () => {
       }
 
       toast.success(`${file.name} is downloaded!`);
-      
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -457,7 +444,6 @@ const EditorPage = () => {
       const folder = folderfiles.folders[folderIndex];
       const file = folder.files[fileIndex];
       if (fileChecked === true) {
-       
         const blob = new Blob([file.code], {
           type: "text/plain;charset=utf-8",
         });
@@ -465,7 +451,6 @@ const EditorPage = () => {
       }
 
       if (outputChecked === true) {
-        
         const formattedOutput = formatOutput(file.output);
         const blob = new Blob([formattedOutput], {
           type: "text/plain;charset=utf-8",
@@ -474,12 +459,9 @@ const EditorPage = () => {
       }
 
       toast.success(`${file.name} is downloaded!`);
-      
     } else {
-      
       toast.error("No folder/file selected");
     }
-
 
     setFileChecked(false);
     setOutputChecked(false);
@@ -501,9 +483,7 @@ const EditorPage = () => {
       <div className="w-full">
         <div className="flex flex-col sm:flex-row w-full h-full">
           <div
-            className={`h-[63vh] w-[100vw] sm:h-[100vh] sm:w-[65vw] border-b border-black ${
-              toolBar ? "" : ""
-            }`}
+            className={`h-[63vh] w-[100vw] sm:h-[100vh] sm:w-[65vw] border-b border-black `}
           >
             <CodeEditor
               value={value}
@@ -755,9 +735,7 @@ const EditorPage = () => {
               >
                 <FaTimes size={24} />
               </button>
-              <h2 className={`text-xl font-bold  `}>
-                Report Bug
-              </h2>
+              <h2 className={`text-xl font-bold  `}>Report Bug</h2>
             </div>
 
             <form

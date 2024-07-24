@@ -2,6 +2,10 @@ import Settings from "./Settings.jsx";
 import { CODE_SNIPPETS } from "../Utils/languages.jsx";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { FaPlus } from "react-icons/fa";
+import { IoPersonAdd } from "react-icons/io5";
+import { FaArrowLeft } from "react-icons/fa";
+
 const ToolBar = (props) => {
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const handleFileChecked = () => {
@@ -19,14 +23,17 @@ const ToolBar = (props) => {
     
   }
   const handleSelected = (e) => {
-    if (props.selected === e) {
-      props.setSelected(0);
-    } else {
-      props.setSelected(e);
-    }
+    // if (props.selected === e) {
+    //   props.setSelected(0);
+    // } else {
+    //   props.setSelected(e);
+    // }
 
 
     switch (e) {
+      case (props.selected === e):
+        props.setSelected(0);
+        break;
       case 1:
         props.setFolderOpen(true);
         props.setSelected(3);
@@ -58,18 +65,20 @@ const ToolBar = (props) => {
 
       case 3:
         props.setFolderOpen(!props.folderopen);
+        props.setHistoryOpen(false);
         // props.setFolderIndex(-1);
         // props.setFileIndex(-1);
         break;
 
       case 4:
-        setShowDownloadOptions(true);
-        if (props.selected === 4) { props.setSelected(0); }
+        setShowDownloadOptions(!showDownloadOptions);
+        
         // props.zipAndDownload();
         // props.setSelected(0);
         break;
       case 5:
         props.setHistoryOpen(!props.historyOpen);
+        props.setFolderOpen(false);
         break;
       case 6:
         navigator.clipboard
@@ -89,13 +98,13 @@ const ToolBar = (props) => {
 
       case 8:
         props.setShareOpen(!props.shareOpen);
-        console.log("share opened");
+        // console.log("share opened");
         props.setSelected(0);
         break;
 
       case 9:
         props.setInfoOpen(!props.infoOpen);
-        console.log("info opened");
+        // console.log("info opened");
         props.setSelected(0);
         break;
 
@@ -104,6 +113,47 @@ const ToolBar = (props) => {
         break;
     }
   };
+
+  const [isValidEmail, setIsValidEmail] = useState(false);
+  const [addCollab, setAddCollab] = useState(true);
+  const [invite, setInvite] = useState(false);
+  const [showInviteSuccessfull, setShowInviteSuccessfull] = useState(false);
+  const [inviteSuccessfull, setInviteSuccessfull] = useState(false);
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    props.setEmail(email);
+    setIsValidEmail(validateEmail(email));
+  };
+
+  const sendEmail = () => {
+    //send post request to backend
+    //Email
+
+    setInvite(false);
+    props.setSettingsOpen(true);
+
+    //Successfull
+    setInviteSuccessfull(true);
+
+    setShowInviteSuccessfull(true);
+    toast.success("Invite Successful");
+    setTimeout(() => {
+      setShowInviteSuccessfull(false);
+    }, 3000);
+
+    setIsValidEmail(false);
+  };
+
+  const backSetting = () => {
+    setInvite(false);
+    props.setSettingsOpen(true);
+  }
 
   return (
     <div className="flex p-0 h-full w-full">
@@ -200,42 +250,40 @@ const ToolBar = (props) => {
                   }`}
                 >
                   <div className="flex items-center gap-6">
-                  <div className="flex items-center mb-2">
-                    <input
-                      type="checkbox"
-                      name="files"
-                      checked={props.fileChecked}
-                      onChange={handleFileChecked}
-                      className="mr-2"
-                    />
-                    <label
-                      htmlFor="files"
-                      className={`flex items-center ${
-                        props.fileChecked === true ? "font-bold" : ""
-                      }`}
-                    >
-                      Files
-                      
-                    </label>
-                  </div>
-                  <div className="flex items-center mb-2">
-                    <input
-                      type="checkbox"
-                      name="output"
-                      checked={props.outputChecked}
-                      onChange={handleOutputChecked}
-                      className="mr-2"
-                    />
-                    <label
-                      htmlFor="output"
-                      className={`flex items-center ${
-                        props.outputChecked === true ? "font-bold" : ""
-                      }`}
-                    >
-                      Output
-                      
-                    </label>
-                  </div>
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        name="files"
+                        checked={props.fileChecked}
+                        onChange={handleFileChecked}
+                        className="mr-2"
+                      />
+                      <label
+                        htmlFor="files"
+                        className={`flex items-center ${
+                          props.fileChecked === true ? "font-bold" : ""
+                        }`}
+                      >
+                        Files
+                      </label>
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        name="output"
+                        checked={props.outputChecked}
+                        onChange={handleOutputChecked}
+                        className="mr-2"
+                      />
+                      <label
+                        htmlFor="output"
+                        className={`flex items-center ${
+                          props.outputChecked === true ? "font-bold" : ""
+                        }`}
+                      >
+                        Output
+                      </label>
+                    </div>
                   </div>
                   <button
                     onClick={handleCheckboxSubmit}
@@ -345,7 +393,6 @@ const ToolBar = (props) => {
                 />
                 <input
                   type="file"
-                  
                   multiple
                   onChange={props.handleFileUpload}
                   className="hidden"
@@ -395,7 +442,90 @@ const ToolBar = (props) => {
                     setFontSize={props.setFontSize}
                     email={props.email}
                     setEmail={props.setEmail}
+                    isValidEmail={isValidEmail}
+                    setIsValidEmail={setIsValidEmail}
+                    addCollab={addCollab}
+                    setAddCollab={setAddCollab}
+                    invite={invite}
+                    setInvite={setInvite}
+                    showInviteSuccessfull={showInviteSuccessfull}
+                    setShowInviteSuccessfull={setShowInviteSuccessfull}
+                    inviteSuccessfull={inviteSuccessfull}
+                    setInviteSuccessfull={setInviteSuccessfull}
                   />
+                </div>
+              ) : (
+                ""
+              )}
+
+              {invite ? (
+                <div
+                  className={`fixed left-14 bottom-80 sm:bottom-24 sm:text-base text-sm p-2.5 z-10 rounded border ${
+                    props.lightmode
+                      ? "border-black bg-gray-100 text-black"
+                      : "border-gray-100 bg-[#1e1e1e] text-white"
+                  }`}
+                >
+                  <div className=" w-64 sm:w-72 p-2 gap-2 sm:gap-3 flex flex-col">
+                    {addCollab === true ? (
+                      <div className="flex justify-between items-center">
+                        <button onClick={()=>{backSetting()}}>
+                          <FaArrowLeft />
+                        </button>
+                        <div className="font-semibold underline">
+                          Add a collaborator individual
+                        </div>
+                        <button
+                          onClick={() => {
+                            setAddCollab(!addCollab);
+                          }}
+                        >
+                          <IoPersonAdd />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <button>
+                          <FaArrowLeft />
+                        </button>
+                        <div className="font-semibold underline">
+                          Add a collaborator institute
+                        </div>
+                        <button
+                          onClick={() => {
+                            setAddCollab(!addCollab);
+                          }}
+                        >
+                          <IoPersonAdd />
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="w-full flex gap-4">
+                      <input
+                        placeholder="Add user's email"
+                        className={`focus:outline-none ${
+                          props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+                        } w-full `}
+                        onChange={(e) => handleEmailChange(e)}
+                      ></input>
+
+                      <button
+                        className={`${isValidEmail ? "block" : "hidden"}`}
+                        onClick={() => sendEmail()}
+                      >
+                        <FaPlus />
+                      </button>
+                    </div>
+
+                    {isValidEmail === true ? (
+                      <div className="text-green-600">✅ Valid Email</div>
+                    ) : (
+                      <div className="text-rose-600">
+                        ❌ Please enter a valid email
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 ""

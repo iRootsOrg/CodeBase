@@ -106,6 +106,7 @@ const CodeEditor = (props) => {
       window.removeEventListener("resize", handleResize);
     };
   });
+  
 
 
   
@@ -250,7 +251,11 @@ const CodeEditor = (props) => {
         </div>
         <div className="h-full">
           {props.folderopen === true ? (
-            <div className="w-48 h-full">
+            <div
+              className={`absolute z-10 left-12 w-36 sm:h-[80vh] sm:w-48 h-[55vh] ${
+                props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+              }`}
+            >
               <Folder
                 folderfiles={props.folderfiles}
                 setFolderFiles={props.setFolderFiles}
@@ -289,11 +294,13 @@ const CodeEditor = (props) => {
           )}
         </div>
 
-        <div className="">
+        <div className="h-full">
           {historyOpen === true ? (
             <div
-              className={`w-48 ${
-                props.lightmode ? "text-black" : "text-white"
+              className={`absolute z-10 left-12 w-36 sm:h-[80vh] sm:w-48 h-[55vh]  ${
+                props.lightmode
+                  ? "bg-gray-100 text-black"
+                  : "bg-[#1e1e1e] text-white"
               }`}
             >
               <History />
