@@ -18,12 +18,14 @@ while true; do
         base_name=$(basename "$code_file" .js)
         echo "Processing code file: $code_file"
         
-        # Find all input files matching the pattern for this code file
+        # Flag to check if corresponding input files are found
         input_files_found=false
+
+        # Find all input files matching the pattern for this code file
         for input_file in "$INPUT_DIR"/inputfile${base_name#codefile}_*.txt; do
-            echo "Checking input file: $input_file"
             if [ -f "$input_file" ]; then
                 input_files_found=true
+                echo "Checking input file: $input_file"
                 # Derive the output file name from the input file name
                 output_base=$(basename "$input_file" .txt | sed 's/inputfile/outputfile/')
                 output_file="$OUTPUT_DIR/${output_base}.txt"
@@ -35,13 +37,11 @@ while true; do
                 else
                     echo "No changes detected for: $code_file with input file: $input_file"
                 fi
-            else
-                echo "No input files found matching pattern for: $code_file"
             fi
         done
 
         if [ "$input_files_found" = false ]; then
-            echo "No input files found matching pattern for: $code_file"
+            echo "No input files found matching pattern for: $code_file, skipping..."
         fi
     done
 
