@@ -9,6 +9,7 @@ process.stdin.on('data', function(chunk) {
 
 process.stdin.on('end', function() {
     // Process the input data
+    
     const output = input.toLowerCase(); // Example: convert input to uppercase
     console.log(output);
 });
