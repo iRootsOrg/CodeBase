@@ -15,7 +15,7 @@ const fileSchema = new mongoose.Schema({
     },
     content: {
         type: Buffer,
-        required: function() { return !this.isFolder; }
+        required: function () { return !this.isFolder; }
     },
     files: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -33,7 +33,7 @@ const fileSchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        required: function() { return !this.isFolder; }
+        required: function () { return !this.isFolder; }
     },
     tags: [String],
     description: String,
@@ -54,11 +54,11 @@ fileSchema.index(
     { default_language: "none", language_override: "none" }
 );
 
-fileSchema.virtual('fullPath').get(function() {
+fileSchema.virtual('fullPath').get(function () {
     return this.path + '/' + this.name;
 });
 
-fileSchema.statics.createFolderStructure = async function(structure, parentId = null, authorId) {
+fileSchema.statics.createFolderStructure = async function (structure, parentId = null, authorId) {
     const createdFiles = [];
 
     for (const item of structure) {
