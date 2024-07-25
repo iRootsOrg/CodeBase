@@ -1,9 +1,6 @@
-number:  1
-number:  2
-number:  3
-number:  4
-number:  5
-number:  6
-number:  7
-number:  8
-number:  9
+Runtime Error:
+Traceback (most recent call last):
+  File "C:\Users\HP\OneDrive\Desktop\CodeBase\compiler\example.py", line 3, in <module>
+    print(a[i])
+          ~^^^
+IndexError: list index out of range
