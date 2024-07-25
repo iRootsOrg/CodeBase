@@ -40,7 +40,7 @@ const File = (props) => {
         return (
           <div
             key={index}
-            className={`pl-6 text-black w-full text-sm  p-1 font-medium  cursor-pointer flex justify-between ${
+            className={`pl-6 text-black w-full text-xs sm:text-sm  p-1 font-medium  cursor-pointer flex justify-between ${
               props.lightmode
                 ? `${
                     (props.folderIndex === props.folderKey &&
