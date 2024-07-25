@@ -158,6 +158,7 @@ const searchFiles = async (req, res, next) => {
             next(error);
         }
     }
+}
 
 const getFolderStructureController = async (req, res, next) => {
     try {
