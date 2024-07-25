@@ -1,71 +1,45 @@
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
 import { BiCheckCircle, BiXCircle } from "react-icons/bi";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
-import { IoPersonAdd } from "react-icons/io5";
-import toast from "react-hot-toast";
+
+
 const Settings = (props) => {
-  const [invite, setInvite] = useState(false);
-  const [isValidEmail, setIsValidEmail] = useState(false);
-  const [addCollab, setAddCollab] = useState(true);
-  const [showInviteSuccessfull, setShowInviteSuccessfull] = useState(false);
-  const [inviteSuccessfull, setInviteSuccessfull] = useState(false);
+ 
+  
+  
   const [selected, setSelected] = useState(0);
   const handleInvite = () => {
-    setInvite(!invite);
+    props.setInvite(!props.invite);
     setSelected(2);
+    props.setSettingsOpen(false);
   };
 
   const handleFontSizeChange = (e) => {
     props.setFontSize(parseInt(e.target.value, 10));
   };
 
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
-  const handleEmailChange = (e) => {
-    const email = e.target.value;
-    props.setEmail(email);
-    setIsValidEmail(validateEmail(email));
-  };
-
-  const sendEmail = () => {
-    //send post request to backend
-    //Email
-
-    setInvite(false);
-
-    //Successfull
-    setInviteSuccessfull(true);
-
-    setShowInviteSuccessfull(true);
-    toast.success("Invite Successful");
-    setTimeout(() => {
-      setShowInviteSuccessfull(false);
-    }, 3000);
-
-  }
+  
 
   return (
     <div
-      className={`w-72 border shadow-sm rounded font-semibold select-none ${
+      className={`w-60 sm:w-72 text-sm sm:text-base border shadow-sm rounded font-semibold select-none ${
         props.lightmode
           ? " border-black shadow-black bg-gray-100"
           : "border-white shadow-white bg-[#1e1e1e] "
-      }`}
+      } `}
     >
-      <div className="text-lg px-2 font-bold">Settings</div>
+      <div className="text-sm sm:text-lg py-2 px-3 font-bold">Settings</div>
 
       <button
         className={`flex gap-2 items-center hover:${
           props.lightmode ? "text-blue-600" : "text-[#00BFFF]"
         } w-full  px-2.5 py-2`}
-        onClick={() => { props.formatCode() }}
+        onClick={() => {
+          props.formatCode();
+        }}
       >
         <img
-          className=" mix-blend-multiply !h-[24px] !w-[24px] z-10"
+          className=" mix-blend-multiply !h-[20px] !w-[20px] sm:!h-[24px]  sm:!w-[24px] z-10"
           src={
             props.lightmode
               ? "./Icons/CodeFormatter.png"
@@ -79,16 +53,16 @@ const Settings = (props) => {
         <button
           className={`flex gap-2 items-center ${
             props.lightmode
-              ? `hover:text-blue-600 ${invite ? "text-blue-600" : ""}`
-              : `hover:text-[#00BFFF] ${invite ? "text-cyan-400" : ""}`
+              ? `hover:text-blue-600 ${props.invite ? "text-blue-600" : ""}`
+              : `hover:text-[#00BFFF] ${props.invite ? "text-cyan-400" : ""}`
           } w-full  px-2.5 py-2
-           ${invite ? "text-blue-600" : ""}`}
+           ${props.invite ? "text-blue-600" : ""}`}
           onClick={() => {
             handleInvite();
           }}
         >
           <img
-            className=" mix-blend-multiply !h-[24px] !w-[24px] "
+            className=" mix-blend-multiply !h-[20px] !w-[20px] sm:!h-[24px]  sm:!w-[24px] "
             src={
               props.lightmode ? "./Icons/Invite.png" : "./Icons/InviteLight.png"
             }
@@ -96,8 +70,8 @@ const Settings = (props) => {
           ></img>
           <div className="flex justify-between w-full pr-4 items-center">
             <div>Invite Others </div>
-            {showInviteSuccessfull ? (
-              inviteSuccessfull ? (
+            {props.showInviteSuccessfull ? (
+              props.inviteSuccessfull ? (
                 <div>
                   <BiCheckCircle className="text-green-500 h-6 w-6 mr-4" />
                 </div>
@@ -112,69 +86,7 @@ const Settings = (props) => {
           </div>
         </button>
 
-        {invite ? (
-          <div
-            className={`left-72 absolute ml-2 border rounded ${
-              props.lightmode
-                ? "border-black bg-gray-100 text-black"
-                : "border-gray-100 bg-[#1e1e1e] text-white"
-            } p-2.5`}
-          >
-            <div className=" w-64 p-2 gap-3 flex flex-col">
-              {addCollab === true ? (
-                <div className="flex justify-between">
-                  <div className="font-semibold underline">
-                    Add a collaborator individual
-                  </div>
-                  <button
-                    onClick={() => {
-                      setAddCollab(!addCollab);
-                    }}
-                  >
-                    <IoPersonAdd />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex justify-between">
-                  <div className="font-semibold underline">
-                    Add a collaborator institute
-                  </div>
-                  <button
-                    onClick={() => {
-                      setAddCollab(!addCollab);
-                    }}
-                  >
-                    <IoPersonAdd />
-                  </button>
-                </div>
-              )}
-
-              <div className="w-full flex gap-4">
-                <input
-                  placeholder="Add user's email"
-                  className={`focus:outline-none ${
-                    props.lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
-                  } w-full `}
-                  onChange={(e) => handleEmailChange(e)}
-                ></input>
-
-                <button onClick={() => sendEmail()}>
-                  <FaPlus />
-                </button>
-              </div>
-
-              {isValidEmail === true ? (
-                <div className="text-green-600">✅ Valid Email</div>
-              ) : (
-                <div className="text-rose-600">
-                  ❌ Please enter a valid email
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
+        
       </div>
       <button
         className={`flex gap-2 items-center hover:${
@@ -187,7 +99,7 @@ const Settings = (props) => {
         }}
       >
         <img
-          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          className=" mix-blend-multiply !h-[20px] !w-[20px] sm:!h-[24px]  sm:!w-[24px] "
           src={
             props.lightmode
               ? "./Icons/KeyBoardShortcut.png"
@@ -203,7 +115,7 @@ const Settings = (props) => {
         } w-full  px-2.5 py-2`}
       >
         <img
-          className=" mix-blend-multiply !h-[24px] !w-[24px] "
+          className=" mix-blend-multiply !h-[20px] !w-[20px] sm:!h-[24px]  sm:!w-[24px] "
           src={
             props.lightmode
               ? "./Icons/FontSize.png"
@@ -240,7 +152,7 @@ const Settings = (props) => {
       >
         <div className="flex gap-2 items-center">
           <img
-            className=" mix-blend-multiply !h-[24px] !w-[24px] "
+            className=" mix-blend-multiply !h-[20px] !w-[20px] sm:!h-[24px]  sm:!w-[24px] "
             src={
               props.lightmode
                 ? "./Icons/WordWrap.png"

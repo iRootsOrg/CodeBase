@@ -41,7 +41,7 @@ const ExtraFiles = (props) => {
         return (
           <div
             key={index}
-            className={`w-full text-base  p-1 font-medium  cursor-pointer flex justify-between 
+            className={`w-full text-xs sm:text-base  p-1 font-medium  cursor-pointer flex justify-between 
               ${
                 props.lightmode
                   ? `${
