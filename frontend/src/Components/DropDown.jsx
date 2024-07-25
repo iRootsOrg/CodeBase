@@ -4,7 +4,7 @@ const languages = Object.entries(CODE_SNIPPETS);
 
 const DropDown = ({ language, onSelect, lightmode }) => {
   return (
-    <div className={`  flex gap-2 items-center `}>
+    <div className={`hidden  sm:flex gap-2 items-center `}>
       <label className={`block text-lg font-semibold ${lightmode ? "text-black" : "text-white"}`}>
         Language:
       </label>

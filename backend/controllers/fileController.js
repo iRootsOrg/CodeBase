@@ -1,5 +1,6 @@
 const fs = require("fs");
 const File = require("../models/fileModel.js");
+const Project = require("../models/projectModel.js");
 const dotenv = require("dotenv");
 const path = require("path");
 const CustomError = require("../utils/CustomError.js");
@@ -70,8 +71,20 @@ const uploadController = async (req, res, next) => {
             throw new CustomError("User not authenticated.", 401);
         }
 
+        let tags = [];
+        if (req.body.tags) {
+            tags = req.body.tags.replace(/^\[|\]$/g, '').split(',').map(tag => tag.trim());
+        }
+
+        const project = await Project.create({
+            name: req.body.projectName || "Untitled Project",
+            description: req.body.description || "",
+            authorId: req.userId,
+            tags: tags
+        });
+
         const folderStructure = prepareFileStructure(req.files);
-        const createdFiles = await File.createFolderStructure(folderStructure, null, req.userId);
+        const createdFiles = await File.createFolderStructure(folderStructure, null, req.userId, project._id);
 
         const inputFile = createdFiles.find(f => f.isInput);
         const outputFile = createdFiles.find(f => f.isOutput);
@@ -80,17 +93,16 @@ const uploadController = async (req, res, next) => {
             throw new CustomError("Input or output file not found in uploaded files.", 400);
         }
 
-        // Update the root folder with metadata
         const rootFolder = createdFiles.find(f => f.parentFolder === null && f.isFolder);
         if (rootFolder) {
-            rootFolder.tags = req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()) : [];
-            rootFolder.description = req.body.description || '';
-            await rootFolder.save();
+            project.rootFolder = rootFolder._id;
+            await project.save();
         }
 
-        res.status(201).json({
-            message: "Files uploaded successfully",
-            rootFolderId: rootFolder ? rootFolder._id : null
+        res.status(201).json({ 
+            message: "Project created and files uploaded successfully", 
+            projectId: project._id,
+            rootFolderId: rootFolder ? rootFolder._id : null 
         });
     } catch (error) {
         next(error);
@@ -146,10 +158,36 @@ const searchFiles = async (req, res, next) => {
             next(error);
         }
     }
+}
+
+const getFolderStructureController = async (req, res, next) => {
+    try {
+        const { projectId } = req.params;
+        const userId = req.userId;
+
+        const project = await Project.findOne({ _id: projectId, authorId: userId });
+        if (!project) {
+            throw new CustomError("Project not found or you don't have access to it.", 404);
+        }
+
+        const structure = await File.getProjectFileStructure(projectId);
+        const response = {
+            projectId: project._id,
+            projectName: project.name,
+            description: project.description,
+            tags: project.tags,
+            fileStructure: structure
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
 };
 
 module.exports = {
     uploadController,
     decodeController,
-    searchFiles
+    searchFiles,
+    getFolderStructureController
 };

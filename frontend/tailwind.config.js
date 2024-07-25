@@ -14,6 +14,9 @@ module.exports = {
         "custom-gradient-inverted":
           "linear-gradient(118deg, #2CA7C6 0%, #029AB4 55%, #077187 100%)",
       },
+      width: {
+        "100-minus-3rem": "calc(100% - 3rem)",
+      },
     },
   },
   plugins: [],
