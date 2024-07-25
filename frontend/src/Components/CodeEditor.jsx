@@ -135,6 +135,28 @@ const CodeEditor = (props) => {
     setToolBar(!toolBar);
     setToolbarNull();
   };
+  const [editorWidth, setEditorWidth] = useState("100%");
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640 && props.toolBar === true) {
+        // Tailwind's 'sm' breakpoint is 640px
+        setEditorWidth("87%");
+      } else {
+        setEditorWidth("100%");
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Initial check
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  });
+
   
 
   return (
@@ -342,6 +364,28 @@ const CodeEditor = (props) => {
             ""
           )}
         </div>
+        <Editor
+          options={{
+            minimap: {
+              enabled: true,
+            },
+            wordWrap: wordWrap ? "on" : "off",
+            fontSize: fontSize,
+            lineNumbers: "on",
+          }}
+          height="100%"
+          width={editorWidth}
+          theme={props.lightmode ? "light" : "vs-dark"}
+          language={props.language}
+          defaultValue={CODE_SNIPPETS[props.language]}
+          onMount={onMount}
+          value={props.value}
+          onChange={(value) => {
+            props.setValue(value);
+            props.setBoilerPlateCode(false);
+          }}
+        />
+
       </div>
       </div>
     
