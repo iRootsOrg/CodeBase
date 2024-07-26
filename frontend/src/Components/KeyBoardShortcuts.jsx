@@ -5,13 +5,13 @@ const KeyBoardShortcuts = (props) => {
     
 
     return (
-      <div className="fixed inset-0 flex items-center justify-center ">
+      <div className="fixed bottom-0 w-full h-full sm:w-auto sm:h-auto sm:inset-0 flex items-end sm:items-center sm:justify-center ">
         <div
           className={`border ${
             props.lightmode
               ? "bg-gray-100 bg-opacity-90 text-black border-black"
               : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
-          } p-6 rounded-lg shadow-lg relative w-[70dvw]`}
+          } p-6 rounded-lg shadow-lg relative w-full sm:w-[70vw]  sm:h-auto`}
         >
           <div className="flex items-center justify-center">
             <button
@@ -30,7 +30,7 @@ const KeyBoardShortcuts = (props) => {
           </div>
 
           <div
-            className={`overflow-x-auto overflow-y-auto h-[80dvh] mt-2  ${
+            className={`overflow-x-auto overflow-y-auto sm:h-[80vh] h-[40vh] mt-2  ${
               props.lightmode ? "scrollbar-light" : "scrollbar-dark"
             }`}
           >
