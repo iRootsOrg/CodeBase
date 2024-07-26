@@ -188,43 +188,54 @@ const getFolderStructureController = async (req, res, next) => {
 
 const addOutputToTestcase = async (req, res, next) => {
     try {
-        const { mainFileId, testcaseIndex } = req.params;
-        const outputFileContent = req.body.outputContent;
+        const { mainFileId } = req.params;
+
+        if (!req.files || Object.keys(req.files).length === 0) {
+            throw new CustomError("No output files uploaded.", 400);
+        }
 
         const mainFile = await File.findById(mainFileId);
         if (!mainFile) {
             throw new CustomError("Main file not found.", 404);
         }
 
-        if (!mainFile.testcases[testcaseIndex]) {
-            throw new CustomError("Testcase not found.", 404);
+        const outputFiles = Array.isArray(req.files.outputFile) ? req.files.outputFile : [req.files.outputFile];
+
+        if (outputFiles.length !== mainFile.testcases.length) {
+            throw new CustomError("Number of output files does not match number of testcases.", 400);
         }
 
-        // Create new output file
-        const outputFile = await File.create({
-            name: `output_${testcaseIndex}.txt`,
-            path: '/outputs',
-            isFolder: false,
-            content: Buffer.from(outputFileContent),
-            authorId: req.userId,
-            projectId: mainFile.projectId,
-            language: 'txt',
-            fileType: 'output'
-        });
+        const updatedTestcases = await Promise.all(mainFile.testcases.map(async (testcase, index) => {
+            const outputFile = outputFiles[index];
 
-        // Add output file to testcase
-        mainFile.testcases[testcaseIndex].output = outputFile._id;
+            const newOutputFile = await File.create({
+                name: outputFile.name,
+                path: '/outputs',
+                isFolder: false,
+                content: outputFile.data,
+                authorId: req.userId,
+                projectId: mainFile.projectId,
+                language: 'txt',
+                fileType: 'output'
+            });
+
+            return {
+                ...testcase,
+                output: newOutputFile._id
+            };
+        }));
+
+        mainFile.testcases = updatedTestcases;
         await mainFile.save();
 
         res.status(200).json({
-            message: "Output file added to testcase successfully",
-            testcaseIndex,
-            outputFileId: outputFile._id
+            message: "Output files added to testcases successfully",
+            updatedTestcasesCount: updatedTestcases.length
         });
     } catch (error) {
         next(error);
     }
-};
+}; 
 
 const downloadProjectFiles = async (req, res, next) => {
     try {
