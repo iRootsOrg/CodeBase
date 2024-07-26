@@ -30,16 +30,16 @@ const FullScreenToggle = () => {
 
   return (
     
-      <button
+      <div
         onClick={toggleFullScreen}
-        className=""
+        className="h-full flex justify-center items-center"
       >
         {isFullScreen ? (
           <FaCompress className="" />
         ) : (
           <FaExpand className="" />
         )}
-      </button>
+      </div>
     
   );
 };

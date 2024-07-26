@@ -12,7 +12,11 @@ import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
+
+
 const EditorPage = () => {
+  
+
   const [testcaseOpen, setTestCaseOpen] = useState(false);
   const [testCases, setTestCases] = useState({
     textArea1: "",
@@ -52,14 +56,13 @@ const EditorPage = () => {
       },
     ],
   };
-  
+
   const initialOutput = {
     CompilationStatus: "Not Started",
     ExecutionTime: "0.00",
     FilesCompiled: "Still Not Compiled",
     tc: [testCasesSchema],
   };
-
 
   const initialFolderFiles = {
     folders: [],
@@ -72,9 +75,6 @@ const EditorPage = () => {
       },
     ],
   };
-
-
- 
 
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
   const [language, setLanguage] = useState("javascript");
@@ -114,7 +114,6 @@ const EditorPage = () => {
   const [lightmode, setLightMode] = useState(true);
 
   const handleLight = () => {
-    
     if (lightmode === false) {
       toast("Hello Light!", {
         icon: <AiOutlineSun className="h-6 w-6" />,
@@ -124,8 +123,7 @@ const EditorPage = () => {
           color: "#333",
         },
       });
-    }
-    else {
+    } else {
       toast("Hello Darkness!", {
         icon: <AiOutlineMoon className="h-6 w-6" />,
         style: {
@@ -143,7 +141,7 @@ const EditorPage = () => {
   const [fileIndex, setFileIndex] = useState(-1);
   const [extraFileIndex, setExtraFileIndex] = useState(-1);
   const [selectedFiles, setSelectedFiles] = useState(null); //The uploaded files
- 
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
     toast.success("URL copied to clipboard!");
@@ -154,9 +152,7 @@ const EditorPage = () => {
     setSelectedFiles(files);
     console.log(files);
 
-    
     toast.success("Files Uploaded Successfully");
-    
   };
 
   const handleClick = () => {
@@ -184,7 +180,6 @@ const EditorPage = () => {
       });
     }
   };
-
 
   const addNewFolder = () => {
     setFolderFiles((prevState) => ({
@@ -331,7 +326,7 @@ const EditorPage = () => {
   const [fileChecked, setFileChecked] = useState(false);
   const [outputChecked, setOutputChecked] = useState(false);
 
- const formatOutput = (output) => {
+  const formatOutput = (output) => {
     let formattedString =
       "Compilation Status: " + output.CompilationStatus + "\n";
     formattedString += "Execution Time: " + output.ExecutionTime + "\n";
@@ -356,12 +351,11 @@ const EditorPage = () => {
     });
 
     return formattedString;
-  }
+  };
 
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
-      
       folderfiles.folders.forEach((folder) => {
         const folderZip = zip.folder(folder.name);
         folder.files.forEach((file) => {
@@ -371,9 +365,9 @@ const EditorPage = () => {
               file.code
             );
           }
-          
+
           if (outputChecked === true) {
-             const formattedOutput = formatOutput(file.output);
+            const formattedOutput = formatOutput(file.output);
             folderZip.file(`${file.name} Output.txt`, formattedOutput);
           }
         });
@@ -414,14 +408,13 @@ const EditorPage = () => {
           const formattedOutput = formatOutput(file.output);
           folderZip.file(`${file.name} Output.txt`, formattedOutput);
         }
-        
       });
 
       zip.generateAsync({ type: "blob" }).then((content) => {
         saveAs(content, `${folder.name}.zip`);
       });
 
-      toast.success(`${folder.name} is downloaded!`)
+      toast.success(`${folder.name} is downloaded!`);
     } else if (
       extraFileIndex >= 0 &&
       extraFileIndex < folderfiles.extraFiles.length
@@ -435,10 +428,7 @@ const EditorPage = () => {
       }
 
       if (outputChecked === true) {
-        
-        const formattedOutput = formatOutput(
-         file.output
-        );
+        const formattedOutput = formatOutput(file.output);
         const blob = new Blob([formattedOutput], {
           type: "text/plain;charset=utf-8",
         });
@@ -446,7 +436,6 @@ const EditorPage = () => {
       }
 
       toast.success(`${file.name} is downloaded!`);
-      
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -456,7 +445,6 @@ const EditorPage = () => {
       const folder = folderfiles.folders[folderIndex];
       const file = folder.files[fileIndex];
       if (fileChecked === true) {
-       
         const blob = new Blob([file.code], {
           type: "text/plain;charset=utf-8",
         });
@@ -464,7 +452,6 @@ const EditorPage = () => {
       }
 
       if (outputChecked === true) {
-        
         const formattedOutput = formatOutput(file.output);
         const blob = new Blob([formattedOutput], {
           type: "text/plain;charset=utf-8",
@@ -473,12 +460,9 @@ const EditorPage = () => {
       }
 
       toast.success(`${file.name} is downloaded!`);
-      
     } else {
-      
       toast.error("No folder/file selected");
     }
-
 
     setFileChecked(false);
     setOutputChecked(false);
@@ -488,15 +472,20 @@ const EditorPage = () => {
   const [reportBugOpen, setReportBugOpen] = useState(false);
   const [keyboardShortcut, setKeyboardShortcut] = useState(false);
   const [email, setEmail] = useState("");
+  const [toolBar, setToolBar] = useState(true);
 
   return (
-    <div className={`flex h-screen ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}>
+    <div
+      className={`h-[100%] w-[100%] ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}
+    >
       <div>
         <Toaster />
       </div>
-      <div className=" flex flex-col overflow-x-hidden h-full">
-        <div className="flex-1 h-full flex overflow-x-hidden">
-          <div className="flex-1 h-[87.4%]">
+      <div className="w-full">
+        <div className="flex flex-col sm:flex-row w-full h-full">
+          <div
+            className={`h-[63vh] w-[100vw] sm:h-[100vh] sm:w-[65vw] border-b border-black `}
+          >
             <CodeEditor
               value={value}
               setValue={setValue}
@@ -549,10 +538,12 @@ const EditorPage = () => {
               setFileChecked={setFileChecked}
               setOutputChecked={setOutputChecked}
               outputChecked={outputChecked}
+              toolBar={toolBar}
+              setToolBar={setToolBar}
             />
           </div>
-          <div className="w-1 bg-gray-300 cursor-ew-resize"></div>
-          <div className="flex-1 h-full overflow-y-auto">
+          <div className="sm:w-1 sm:bg-gray-300 sm:cursor-ew-resize"></div>
+          <div className="h-auto w-full p-1 border-b border-black sm:h-[100vh] sm:max-md:w-[30vw] md:w-[40vw]">
             <Output
               lightmode={lightmode}
               option={option}
@@ -560,10 +551,17 @@ const EditorPage = () => {
               outputFile={outputFile}
               setOutputFile={setOutputFile}
             />
+
           </div>
         </div>
-        <div className={`${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"} pl-4 `}>
-          <div className={`flex p-4 justify-between h-[10vh]`}>
+        <div
+          className={`${
+            lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+          }  sm:absolute  sm:bottom-0  ${
+            toolBar ? "sm:ml-12 sm:w-100-minus-3rem" : "sm:w-[100%]"
+          }`}
+        >
+          <div className={`flex p-4 pt-3 justify-between items-center h-auto`}>
             <label
               className={`font-bold text-xl ${
                 lightmode ? "text-black" : "text-white"
@@ -616,14 +614,14 @@ const EditorPage = () => {
 
       {shareOpen === true ? (
         <div
-          className={`fixed inset-0 flex items-center justify-center backdrop-blur-sm   `}
+          className={`fixed px-2 bottom-0  sm:inset-0 w-full flex items-center justify-center backdrop-blur-sm  sm:w-auto `}
         >
           <div
-            className={`border ${
+            className={`sm:border border-t-2 ${
               lightmode
                 ? "bg-white text-black border-black"
                 : "bg-[#1e1e1e] text-white border-white"
-            } p-6 rounded-lg shadow-lg relative `}
+            } p-6 rounded-lg shadow-lg relative w-full sm:w-auto`}
           >
             <button
               onClick={() => {
@@ -680,7 +678,7 @@ const EditorPage = () => {
       )}
 
       {infoOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm">
+        <div className="fixed px-2 bottom-0  sm:inset-0 w-full  sm:w-auto flex items-center justify-center backdrop-blur-sm">
           <div
             className={`border ${
               lightmode
@@ -718,15 +716,15 @@ const EditorPage = () => {
       )}
 
       {reportBugOpen === true ? (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed bottom-0 w-full sm:w-auto sm:inset-0 flex sm:items-center sm:justify-center">
           <div
             className={`border ${
               lightmode
                 ? "bg-gray-100 bg-opacity-90 text-black border-black"
                 : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
-            } p-6 rounded-lg shadow-lg relative w-[70vw]`}
+            } p-6 rounded-lg shadow-lg relative w-full sm:w-[70vw]`}
           >
-            <div className="flex items-center">
+            <div className="flex items-center w-full justify-center">
               <button
                 onClick={() => {
                   setReportBugOpen(false);
@@ -739,9 +737,7 @@ const EditorPage = () => {
               >
                 <FaTimes size={24} />
               </button>
-              <h2 className={`text-xl font-bold top-3 left-[45%] absolute `}>
-                Report Bug
-              </h2>
+              <h2 className={`text-xl font-bold  `}>Report Bug</h2>
             </div>
 
             <form
