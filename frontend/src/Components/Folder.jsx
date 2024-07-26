@@ -178,11 +178,11 @@ const Folder = (props) => {
 
   return (
     <div
-      className={`flex flex-col w-full  gap-1  border-r-4 border-[#d1d5db] ${
+      className={`flex flex-col w-full h-full  gap-1  border-r-4 border-[#d1d5db] ${
         props.lightmode ? "text-black" : "text-white"
       }`}
     >
-      <div className="font-bold text-lg p-2 flex justify-between items-center h-10">
+      <div className="font-bold text-base sm:text-lg p-2 flex justify-between items-center h-10">
         <div className="h-full">Files</div>
         <div className="flex gap-1 items-center h-full">
           <button onClick={addNewFolder}>
@@ -197,7 +197,7 @@ const Folder = (props) => {
         {props.folderfiles.folders.map((folder, index) => (
           <div
             key={index}
-            className={`w-full text-base gap-2 p-2 font-semibold cursor-pointer ${
+            className={`w-full text-sm sm:text-base gap-2 p-2 font-semibold cursor-pointer ${
               props.lightmode
                 ? `hover:text-white  ${
                     props.folderIndex === index
@@ -255,7 +255,7 @@ const Folder = (props) => {
                 />
 
                 {props.opennewfile ? (
-                  <div className="flex gap-2 hover:text-blue-600 font-medium text-sm p-1 items-center text-black">
+                  <div className="flex gap-2 hover:text-blue-600 font-medium text-xs sm:text-sm p-1 items-center text-black">
                     <div>🗃️</div>
                     <input
                       value={props.newFileName}
@@ -287,7 +287,7 @@ const Folder = (props) => {
         ))}
 
         {props.opennewfolder === true ? (
-          <div className="flex gap-2 hover:text-blue-600 font-semibold text-lg p-2 w-full items-center">
+          <div className="flex gap-2 hover:text-blue-600 font-semibold text-base sm:text-lg p-2 w-full items-center">
             <div>📁</div>
             <input
               value={props.newFolderName}
@@ -348,7 +348,7 @@ const Folder = (props) => {
 
           {props.openExtraNewFile === true ? (
             <div
-              className={`flex gap-2  font-medium text-sm p-1 items-center ${
+              className={`flex gap-2  font-medium text-xs sm:text-sm p-1 items-center ${
                 props.lightmode
                   ? " hover:text-blue-600"
                   : "hover:text-[#00BFFF]"

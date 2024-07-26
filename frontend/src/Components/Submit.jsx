@@ -7,7 +7,7 @@ const Submit = (props) => {
   };
   return (
     <button
-      className={`block w-24 px-2 py-1 text-center rounded ${props.lightmode ? "bg-custom-gradient":"bg-custom-gradient-inverted"} text-white`}
+      className={`block h-full w-24 px-2 py-1 text-center rounded ${props.lightmode ? "bg-custom-gradient":"bg-custom-gradient-inverted"} text-white`}
       onClick={() => {
         onSubmit();
       }}
