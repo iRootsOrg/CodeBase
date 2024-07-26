@@ -54,6 +54,11 @@ const fileSchema = new mongoose.Schema({
     timestamps: true
 });
 
+fileSchema.index(
+    { name: "text", description: "text", tags: "text", content: "text" },
+    { default_language: "none", language_override: "none" }
+);
+
 fileSchema.virtual('fullPath').get(function () {
     return this.path + '/' + this.name;
 });
