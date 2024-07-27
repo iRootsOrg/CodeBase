@@ -55,6 +55,7 @@ const ToolBar = (props) => {
 
         props.setLanguage("Choose_Language");
         props.setValue(CODE_SNIPPETS["Choose_Language"]);
+         props.setTestCases(props.initialTestCases);
 
         break;
 

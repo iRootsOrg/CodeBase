@@ -12,9 +12,10 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext";
 import { IoIosMenu } from "react-icons/io";
+
 const CodeEditor = (props) => {
   const editorRef = useRef();
-  
+
   const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -38,24 +39,32 @@ const CodeEditor = (props) => {
 
     editor.onDidChangeModelContent((event) => {
       const value = editor.getValue();
+      const changes = event.changes.map((change) => ({
+        range: change.range,
+        rangeLength: change.rangeLength,
+        text: change.text,
+      }));
+
+      // Check for restricted patterns
       for (let pattern of restrictedPatterns) {
         if (pattern.test(value)) {
-          // toast.error("Not allowed");
-          
           // Remove the restricted text by restoring the previous value
           editor.executeEdits("", [
             {
               range: editor.getModel().getFullModelRange(),
               text: value.replace(pattern, ""),
-              
             },
           ]);
-          break;
+          return; // Exit after handling the restricted pattern
         }
       }
-      return;
+
+      // If no restricted pattern is found, update delta changes
+      console.log("Editor changes detected:", changes);
+      props.updateDeltaChanges(changes);
     });
   };
+
   const onSelect = (language) => {
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
@@ -106,10 +115,6 @@ const CodeEditor = (props) => {
       window.removeEventListener("resize", handleResize);
     };
   });
-  
-
-
-  
 
   return (
     <div className={`h-full w-full flex flex-col `}>
@@ -247,6 +252,9 @@ const CodeEditor = (props) => {
             outputChecked={props.outputChecked}
             setFileChecked={props.setFileChecked}
             setOutputChecked={props.setOutputChecked}
+            testCases={props.testCases}
+            setTestCases={props.setTestCases}
+            initialTestCases={props.initialTestCases}
           />
         </div>
         <div className="h-full">
@@ -287,6 +295,9 @@ const CodeEditor = (props) => {
                 outputFile={props.outputFile}
                 setOutputFile={props.setOutputFile}
                 initialOutput={props.initialOutput}
+                testCases={props.testCases}
+                setTestCases={props.setTestCases}
+                initialTestCases={props.initialTestCases}
               />
             </div>
           ) : (

@@ -1,8 +1,8 @@
 import Output from "../Components/Output.jsx";
 import CodeEditor from "../Components/CodeEditor";
 import TestCase from "../Components/TestCase.jsx";
-import { useState, useEffect } from "react";
-import JSZip from "jszip";
+import { useState, useEffect,useRef } from "react";
+import JSZip, { folder } from "jszip";
 import { saveAs } from "file-saver";
 import Run from "../Components/Run.jsx";
 import RunAll from "../Components/RunAll.jsx";
@@ -12,18 +12,13 @@ import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
-
+import { server } from "../service/api.js";
+import axios from "axios";
+const FormData = require("form-data");
 
 const EditorPage = () => {
-  
-
   const [testcaseOpen, setTestCaseOpen] = useState(false);
-  const [testCases, setTestCases] = useState({
-    textArea1: "",
-    textArea2: "",
-    textArea3: "",
-    textArea4: "",
-  });
+
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
@@ -40,28 +35,65 @@ const EditorPage = () => {
   const [saveLocally, setSaveLocally] = useState(false);
   const [folderopen, setFolderOpen] = useState(false);
 
-  const testCasesSchema = {
-    input: [
-      {
-        content: "",
-      },
-    ],
-    output: [
-      {
+  const initialTestCases = [
+    {
+      input: { content: "1" },
+      output: {
         error: false,
-        erorrCount: 0,
+        errorCount: 0,
         warning: 0,
         errors: 0,
-        content: "Hello JI",
+        content: "No Output",
       },
-    ],
-  };
+    },
+    {
+      input: { content: "2" },
+      output: {
+        error: false,
+        errorCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "No Output",
+      },
+    },
+    {
+      input: { content: "3" },
+      output: {
+        error: false,
+        errorCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "No Output",
+      },
+    },
+    {
+      input: { content: "4" },
+      output: {
+        error: false,
+        errorCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "No Output",
+      },
+    },
+    {
+      input: { content: "5" },
+      output: {
+        error: false,
+        errorCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "No Output",
+      },
+    },
+
+  ];
 
   const initialOutput = {
     CompilationStatus: "Not Started",
     ExecutionTime: "0.00",
     FilesCompiled: "Still Not Compiled",
-    tc: [testCasesSchema],
+    tc: initialTestCases,
   };
 
   const initialFolderFiles = {
@@ -76,8 +108,64 @@ const EditorPage = () => {
     ],
   };
 
+  const deltaChangesRef = useRef([]);
+  const [deltaChanges, setDeltaChanges] = useState([]);
+
+const updateDeltaChanges = (newChanges) => {
+  setDeltaChanges((prevChanges) => {
+    const updatedChanges = [...prevChanges, ...newChanges];
+    console.log("Delta changes updated:", updatedChanges);
+    deltaChangesRef.current = updatedChanges;
+    return updatedChanges;
+  });
+};
+const getChangesFromEditor = () => {
+  console.log("Fetching current delta changes:", deltaChangesRef.current);
+  return deltaChangesRef.current;
+};
+
+const pollForChanges = () => {
+  return setInterval(async () => {
+    const changes = deltaChangesRef.current;
+    console.log("Polling - Current changes:", changes);
+
+    if (changes.length > 0) {
+      try {
+        const response = await fetch(`${server}/api/files/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer ...",
+          },
+          body: JSON.stringify({
+            projectId: "66a4711832fbcc6ead5b8860",
+            changes: changes,
+          }),
+        });
+        const data = await response.json();
+        console.log("Files updated:", data);
+
+        // Clear the changes after successful update
+        setDeltaChanges([]);
+        deltaChangesRef.current = [];
+      } catch (error) {
+        console.error("Error updating files:", error);
+      }
+    } else {
+      console.log("No changes to send");
+    }
+  }, 5000);
+};
+
+ useEffect(() => {
+   deltaChangesRef.current = deltaChanges;
+ }, [deltaChanges]);
+
+
+
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
   const [language, setLanguage] = useState("javascript");
+  const [testCases, setTestCases] = useState(initialTestCases);
 
   const [value, setValue] = useState("");
   const [option, setOption] = useState("Output");
@@ -93,16 +181,25 @@ const EditorPage = () => {
       setLanguage(initialFolderFiles.extraFiles[0].language);
       setValue(initialFolderFiles.extraFiles[0].code);
       setOutputFile(initialFolderFiles.extraFiles[0].output);
+      setTestCases(initialFolderFiles.extraFiles[0].output.tc);
     } else {
       const folderParsing = JSON.parse(initialCode);
       setFolderFiles(folderParsing);
-
       setLanguage(folderParsing.extraFiles[0].language);
       setValue(folderParsing.extraFiles[0].code);
       setOutputFile(folderParsing.extraFiles[0].output);
+      setTestCases(folderParsing.extraFiles[0].output.tc);
       setSaveLocally(true);
     }
     setExtraFileIndex(0);
+
+
+    
+  }, []);
+
+  useEffect(() => {
+    const intervalId = pollForChanges();
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -122,6 +219,7 @@ const EditorPage = () => {
           background: "#fff",
           color: "#333",
         },
+         duration: 800,
       });
     } else {
       toast("Hello Darkness!", {
@@ -131,6 +229,7 @@ const EditorPage = () => {
           background: "#333",
           color: "#fff",
         },
+         duration: 800,
       });
     }
 
@@ -203,7 +302,8 @@ const EditorPage = () => {
       fileIndex,
       extraFileIndex,
       newCode,
-      newLanguage
+      newLanguage,
+      newTestCases
     ) => {
       setFolderFiles((prevFolderFiles) => {
         if (folderIndex === -1) {
@@ -216,6 +316,10 @@ const EditorPage = () => {
                   ...file,
                   code: newCode,
                   language: newLanguage,
+                  output: {
+                    ...file.output,
+                    tc: newTestCases,
+                  },
                 };
               }
               return file;
@@ -243,6 +347,10 @@ const EditorPage = () => {
                       ...file,
                       code: newCode,
                       language: newLanguage,
+                      output: {
+                        ...file.output,
+                        tc: newTestCases,
+                      },
                     };
                   }
                   return file;
@@ -261,7 +369,14 @@ const EditorPage = () => {
       });
     };
 
-    updateFileCode(folderIndex, fileIndex, extraFileIndex, value, language);
+    updateFileCode(
+      folderIndex,
+      fileIndex,
+      extraFileIndex,
+      value,
+      language,
+      testCases
+    );
 
     // Post request sending can be implemented here
   };
@@ -473,6 +588,108 @@ const EditorPage = () => {
   const [keyboardShortcut, setKeyboardShortcut] = useState(false);
   const [email, setEmail] = useState("");
   const [toolBar, setToolBar] = useState(true);
+  const [testCaseSelected, setTestCaseSelected] = useState(0);
+
+  //Making a file for sending
+  //on clicking run
+
+ 
+      // Example POST request
+    //   fetch("/upload", {
+    //     method: "POST",
+    //     body: formData,
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       console.log("Success:", data);
+    //       toast.success("Files successfully uploaded!");
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error:", error);
+    //       toast.error("Failed to upload files.");
+    //     });
+
+async function sendTestCases(testCases,trigger) {
+  const form = new FormData();
+
+  // Check if the selected file is in the main folder
+  if (folderIndex !== -1 && fileIndex !== -1) {
+    const filename = `main.${LAN_CONVERSION[language]}`;
+    const filecontent = folderfiles.folder[folderIndex].files[fileIndex].code;
+
+    // Convert the file content to a Blob
+    const fileBlob = new Blob([filecontent], { type: "text/plain" });
+
+    form.append("main", fileBlob, filename);
+
+    console.log(form);
+  }
+  // Check if the selected file is in the extra folder
+  else if (extraFileIndex !== -1) {
+    const extrafilename = `main.${LAN_CONVERSION[language]}`;
+    const extrafilecontent = folderfiles.extraFiles[extraFileIndex].code;
+
+    // Convert the extra file content to a Blob
+    const extrafileBlob = new Blob([extrafilecontent], { type: "text/plain" });
+
+    form.append("main", extrafileBlob, extrafilename);
+
+    console.log(form);
+  }
+
+  // Run
+  if (trigger === "run") {
+    const testCaseName = `input_${testCaseSelected + 1}`;
+    const testCaseContent = testCases[testCaseSelected].input.content;
+
+    // Convert the test case content to a Blob
+    const testCaseBlob = new Blob([testCaseContent], { type: "text/plain" });
+
+    form.append(
+      `input_file${testCaseSelected + 1}`,
+      testCaseBlob,
+      testCaseName
+    );
+  } else if (trigger === "runall") {
+    testCases.forEach((testCase, index) => {
+      const testCaseName = `input_${index + 1}`;
+      const testCaseContent = testCase.input.content;
+
+      // Convert the test case content to a Blob
+      const testCaseBlob = new Blob([testCaseContent], { type: "text/plain" });
+
+      form.append(`input_file${index + 1}`, testCaseBlob, testCaseName);
+    });
+  }
+
+
+  form.append("mainFile", `main.${LAN_CONVERSION[language]}`);
+  // for (let pair of form.entries()) {
+  //   console.log(pair[0] + ":", pair[1]);
+  // }
+
+  try {
+    const response = await axios.post(`${server}/api/v1/file/upload`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIwNTE2MzIsImV4cCI6MTcyMjEzODAzMn0.EY2FaL9iZHV6uj7rQBQaYXo8B_Zojw4CaeHdHt019hI",
+      },
+    });
+
+    console.log("Files sent successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending files:", error);
+  }
+}
+
+
+
+  // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
+  // sendTestCases(initialTestCases);
+   
+
 
   return (
     <div
@@ -540,6 +757,12 @@ const EditorPage = () => {
               outputChecked={outputChecked}
               toolBar={toolBar}
               setToolBar={setToolBar}
+              testCases={testCases}
+              setTestCases={setTestCases}
+              initialTestCases={initialTestCases}
+              updateDeltaChanges={updateDeltaChanges}
+              deltaChanges={deltaChanges}
+              setDeltaChanges={setDeltaChanges}
             />
           </div>
           <div className="sm:w-1 sm:bg-gray-300 sm:cursor-ew-resize"></div>
@@ -550,66 +773,88 @@ const EditorPage = () => {
               setOption={setOption}
               outputFile={outputFile}
               setOutputFile={setOutputFile}
-            />
-
-          </div>
-        </div>
-        <div
-          className={`${
-            lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
-          }  sm:absolute  sm:bottom-0  ${
-            toolBar ? "sm:ml-12 sm:w-100-minus-3rem" : "sm:w-[100%]"
-          }`}
-        >
-          <div className={`flex p-4 pt-3 justify-between items-center h-auto`}>
-            <label
-              className={`font-bold text-xl ${
-                lightmode ? "text-black" : "text-white"
-              }`}
-            >
-              Test Cases :
-            </label>
-            <div className="flex items-center gap-4">
-              <Run
-                lightmode={lightmode}
-                outputFile={outputFile}
-                setOutputFile={setOutputFile}
-                updateChangeOutput={updateChangeOutput}
-              />
-              <RunAll lightmode={lightmode} />
-              <button
-                onClick={() => {
-                  handleClick();
-                }}
-              >
-                <img
-                  src={
-                    testcaseOpen
-                      ? lightmode
-                        ? "./Icons/Down.png"
-                        : "./Icons/DownLight.png"
-                      : lightmode
-                      ? "./Icons/Up.png"
-                      : "./Icons/UpLight.png"
-                  }
-                  alt="Arrow"
-                  className="h-[32px] w-[32px]"
-                ></img>
-              </button>
-            </div>
-          </div>
-          {testcaseOpen === true ? (
-            <TestCase
               testCases={testCases}
               setTestCases={setTestCases}
-              lightmode={lightmode}
-              reportBugOpen={reportBugOpen}
-              setReportBugOpen={setReportBugOpen}
+              testCaseSelected={testCaseSelected}
+              setTestCaseSelected={setTestCaseSelected}
             />
-          ) : (
-            ""
-          )}
+          </div>
         </div>
+        {(fileIndex !== -1 || extraFileIndex !== -1) ? (
+          <div
+            className={`z-20 ${lightmode ? "bg-gray-100" : "bg-[#1e1e1e]"
+              }  sm:absolute  sm:bottom-0  ${toolBar ? "sm:ml-12 sm:w-100-minus-3rem" : "sm:w-[100%]"
+              }`}
+          >
+            <div className={`flex p-4 pt-3 justify-between items-center h-auto`}>
+              <label
+                className={`font-bold text-xl ${lightmode ? "text-black" : "text-white"
+                  }`}
+              >
+                Test Cases :
+              </label>
+              <div className="flex items-center gap-4">
+                <Run
+                  lightmode={lightmode}
+                  outputFile={outputFile}
+                  setOutputFile={setOutputFile}
+                  updateChangeOutput={updateChangeOutput}
+                  updateChangeCode={updateChangeCode}
+                  testCases={testCases}
+                  setTestCases={setTestCases}
+                  sendTestCases={sendTestCases}
+                  folderIndex={folderIndex}
+                  fileIndex={fileIndex}
+                  testCaseSelected={testCaseSelected}
+                />
+                <RunAll
+                  lightmode={lightmode}
+                  outputFile={outputFile}
+                  setOutputFile={setOutputFile}
+                  updateChangeOutput={updateChangeOutput}
+                  updateChangeCode={updateChangeCode}
+                  testCases={testCases}
+                  setTestCases={setTestCases}
+                  sendTestCases={sendTestCases}
+                  folderIndex={folderIndex}
+                  fileIndex={fileIndex}
+                  testCaseSelected={testCaseSelected}
+                />
+                <button
+                  onClick={() => {
+                    handleClick();
+                  }}
+                >
+                  <img
+                    src={
+                      testcaseOpen
+                        ? lightmode
+                          ? "./Icons/Down.png"
+                          : "./Icons/DownLight.png"
+                        : lightmode
+                          ? "./Icons/Up.png"
+                          : "./Icons/UpLight.png"
+                    }
+                    alt="Arrow"
+                    className="h-[32px] w-[32px]"
+                  ></img>
+                </button>
+              </div>
+            </div>
+            {testcaseOpen === true ? (
+              <TestCase
+                testCases={testCases}
+                setTestCases={setTestCases}
+                lightmode={lightmode}
+                reportBugOpen={reportBugOpen}
+                setReportBugOpen={setReportBugOpen}
+                testCaseSelected={testCaseSelected}
+                setTestCaseSelected={setTestCaseSelected}
+              />
+            ) : (
+              ""
+            )}
+          </div>) : ""}
       </div>
 
       {shareOpen === true ? (
