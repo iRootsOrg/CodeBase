@@ -276,10 +276,56 @@ const downloadProjectFiles = async (req, res, next) => {
     }
 };
 
+const getTestcaseOutputs = async (req, res, next) => {
+    try {
+        const { mainFileId } = req.params;
+
+        const mainFile = await File.findById(mainFileId).populate({
+            path: 'testcases.input testcases.output',
+            select: 'name content'
+        });
+
+        if (!mainFile) {
+            throw new CustomError("Main file not found.", 404);
+        }
+
+        const testcaseOutputs = await Promise.all(mainFile.testcases.map(async (testcase, index) => {
+            let inputContent = null;
+            let outputContent = null;
+
+            if (testcase.input) {
+                const inputFile = await File.findById(testcase.input);
+                inputContent = inputFile ? inputFile.content.toString('utf-8') : null;
+            }
+
+            if (testcase.output) {
+                const outputFile = await File.findById(testcase.output);
+                outputContent = outputFile ? outputFile.content.toString('utf-8') : null;
+            }
+
+            return {
+                testcaseIndex: index,
+                inputFileName: testcase.input ? testcase.input.name : null,
+                inputContent: inputContent,
+                outputFileName: testcase.output ? testcase.output.name : null,
+                outputContent: outputContent
+            };
+        }));
+
+        res.status(200).json({
+            mainFileName: mainFile.name,
+            testcaseOutputs: testcaseOutputs
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     uploadController,
     decodeController,
     getFolderStructureController,
     addOutputToTestcase,
-    downloadProjectFiles
+    downloadProjectFiles,
+    getTestcaseOutputs
 };
