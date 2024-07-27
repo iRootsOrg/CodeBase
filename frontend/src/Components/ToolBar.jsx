@@ -1,5 +1,7 @@
 import Settings from "./Settings.jsx";
 import { CODE_SNIPPETS } from "../Utils/languages.jsx";
+import ToolTip from "./ToolTip.jsx";
+
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaPlus } from "react-icons/fa";
@@ -163,7 +165,9 @@ const ToolBar = (props) => {
             props.lightmode ? "" : "bg-[#1e1e1e]"
           }`}
         >
+          
           <div className="flex flex-col items-center gap-3">
+          <ToolTip text="Select file">
             <div
               className={`ml-1  h-auto py-1 flex justify-center items-center  w-full pt-2 ${
                 props.selected === 1
@@ -182,6 +186,8 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+            </ToolTip>
+            <ToolTip text="Save">
             <div
               className={`ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 2
@@ -200,6 +206,8 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+            </ToolTip>
+            <ToolTip text="Folders">
             <div
               className={`ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 3
@@ -218,6 +226,11 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+
+            </ToolTip>
+            <ToolTip text="Download">
+            
+
             <div>
               <div
                 className={`      ml-1  h-auto py-1 flex justify-center items-center w-full ${
@@ -300,7 +313,11 @@ const ToolBar = (props) => {
               ) : (
                 ""
               )}
-            </div>
+              </div>
+
+            
+            </ToolTip>
+            <ToolTip text="History">
             <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 5
@@ -319,6 +336,8 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+            </ToolTip> 
+            <ToolTip text="Save To Clipboard">
             <div
               className={`      ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 6
@@ -337,6 +356,8 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+            </ToolTip>
+            <ToolTip text="Share">
             <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 8
@@ -355,6 +376,8 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+            </ToolTip>
+            <ToolTip text="Info">
             <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 9
@@ -373,6 +396,8 @@ const ToolBar = (props) => {
                 className="!h-[24px] !w-[24px]"
               />
             </div>
+            </ToolTip>
+            <ToolTip text="Upload">
             <div
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 10
@@ -400,8 +425,11 @@ const ToolBar = (props) => {
                 />
               </label>
             </div>
+            </ToolTip>
           </div>
+          
           <div className="flex flex-col items-center gap-3">
+            <ToolTip text="Settings">
             <div
               className={`  mb-4   ml-1  h-auto py-1 flex justify-center items-center w-full  ${
                 props.selected === 7
@@ -537,7 +565,13 @@ const ToolBar = (props) => {
 
               
             </div>
+
+            </ToolTip>
+         
+            <div
+
             {/* <div
+
               className={`     ml-1  h-auto py-1 flex justify-center items-center w-full ${
                 props.selected === 11
                   ? `border-l-4 ${
@@ -554,8 +588,13 @@ const ToolBar = (props) => {
                 alt="Info"
                 className="!h-[24px] !w-[24px]"
               />
+
             </div> */}
+          
+            </div>
+          
           </div>
+        
         </div>
       ) : (
         ""
