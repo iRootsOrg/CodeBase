@@ -185,9 +185,51 @@ const getFolderStructureController = async (req, res, next) => {
     }
 };
 
+const updateController = async (req, res, next) => {
+    try {
+        const { projectId, changes } = req.body;
+
+        if (!projectId || !changes || changes.length === 0) {
+            throw new CustomError("Project ID and changes must be provided.", 400);
+        }
+
+        const userId = req.userId;
+        const updatedFiles = [];
+
+        for (const change of changes) {
+            const { fileId, newContent } = change;
+
+            if (!fileId || !newContent) {
+                throw new CustomError("fileId and newContent must be provided for each change.", 400);
+            }
+
+            const file = await File.findById(fileId);
+            if (!file) {
+                throw new CustomError(`File with id ${fileId} not found.`, 404);
+            }
+
+            if (file.authorId.toString() !== userId) {
+                throw new CustomError(`You do not have permission to update file with id ${fileId}.`, 403);
+            }
+
+            file.content = Buffer.from(newContent, 'utf-8');
+            await file.save();
+            updatedFiles.push(file);
+        }
+
+        res.status(200).json({
+            message: "Files updated successfully",
+            updatedFiles
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     uploadController,
     decodeController,
     searchFiles,
-    getFolderStructureController
+    getFolderStructureController,
+    updateController
 };
