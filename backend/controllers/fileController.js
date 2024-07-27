@@ -1,186 +1,193 @@
 const fs = require("fs");
 const File = require("../models/fileModel.js");
+const Project = require("../models/projectModel.js");
 const dotenv = require("dotenv");
 const path = require("path");
+const CustomError = require("../utils/CustomError.js");
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-const handleFileUpload = async (file, authorId) => {
-    const fileData = {
-        filename: file.name,
-        language: file.language,
-        file: file.data,
-        authorId: authorId,  
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        tags: file.tags || [],
-        description: file.description || ''
-    };
+const prepareFileStructure = (files) => {
+    const structure = {};
 
-    const savedTestCaseFile = await File.create(fileData);
-    return savedTestCaseFile._id;
-};
+    for (const [key, file] of Object.entries(files)) {
+        const parts = key.split('[').map(part => part.replace(']', ''));
+        let current = structure;
 
-const parseTestCases = async (testCases) => {
-    return Promise.all(testCases.map(async testCase => ({
-        inputs: await Promise.all(testCase.inputs.map(async input => {
-            if (input.type === 'file' && input.file) {
-                const fileId = await handleFileUpload(input.file);
-                return {
-                    type: 'file',
-                    reference: fileId,
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            if (i === parts.length - 1) {
+                // It's a file
+                const isInput = key === 'input_file';
+                const isOutput = key === 'output_file';
+                current[part] = {
+                    name: file.name,
+                    path: parts.slice(0, -1).join('/') || '/',
+                    isFolder: false,
+                    content: file.data,
+                    language: path.extname(file.name).slice(1) || 'txt',
+                    isInput,
+                    isOutput
                 };
             } else {
-                return {
-                    type: 'direct',
-                    content: input.content,
-                };
+                // It's a folder
+                if (!current[part]) {
+                    current[part] = {};
+                }
+                current = current[part];
             }
-        })),
-        outputs: await Promise.all(testCase.outputs.map(async output => {
-            if (output.type === 'file' && output.file) {
-                const fileId = await handleFileUpload(output.file);
-                return {
-                    type: 'file',
-                    reference: fileId,
-                };
-            } else {
-                return {
-                    type: 'direct',
-                    content: output.content,
-                };
-            }
-        }))
-    })));
+        }
+    }
+
+    const result = convertToArray(structure);
+    return result;
 };
 
-const uploadController = async (req, res) => {
+const convertToArray = (obj, parentPath = '') => {
+    return Object.entries(obj).map(([name, content]) => {
+        const currentPath = parentPath ? `${parentPath}/${name}` : name;
+        if (content.isFolder === false) {
+            // It's a file
+            return content;
+        } else {
+            // It's a folder
+            return {
+                name,
+                path: parentPath || '/',
+                isFolder: true,
+                files: convertToArray(content, currentPath)
+            };
+        }
+    });
+};
+
+const uploadController = async (req, res, next) => {
     try {
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send("No files uploaded.");
+            throw new CustomError("No files uploaded.", 400);
         }
 
-        const mainFile = req.files.file;
-        if (!mainFile) {
-            return res.status(400).send("No main file named 'file' found in the request.");
-        }
-
-        
         if (!req.userId) {
-            return res.status(401).send("User not authenticated.");
+            throw new CustomError("User not authenticated.", 401);
         }
 
-        let testCases;
-        try {
-            testCases = JSON.parse(req.body.testCases);
-            if (!Array.isArray(testCases)) {
-                testCases = [testCases]; 
-            }
-        } catch (error) {
-            return res.status(400).send("Invalid testCases format. Must be a valid JSON array.");
+        let tags = [];
+        if (req.body.tags) {
+            tags = req.body.tags.replace(/^\[|\]$/g, '').split(',').map(tag => tag.trim());
         }
 
-        if (!testCases.every(testCase => 
-            Array.isArray(testCase.inputs) && Array.isArray(testCase.outputs)
-        )) {
-            return res.status(400).send("Invalid testCase structure. Each testCase must have 'inputs' and 'outputs' arrays.");
-        }
-
-        
-        const processedTestCases = await Promise.all(testCases.map(async testCase => ({
-            inputs: await Promise.all(testCase.inputs.map(async input => {
-                if (input.type === 'file' && input.file) {
-                    const uploadedFile = req.files[input.file];
-                    if (!uploadedFile) {
-                        throw new Error(`File ${input.file} not found in the request.`);
-                    }
-                    const fileId = await handleFileUpload({
-                        name: uploadedFile.name,
-                        data: uploadedFile.data,
-                        language: path.extname(uploadedFile.name).slice(1)
-                    }, req.userId);  // Pass req.userId here
-                    return { type: 'file', reference: fileId };
-                } else {
-                    return input;
-                }
-            })),
-            outputs: await Promise.all(testCase.outputs.map(async output => {
-                if (output.type === 'file' && output.file) {
-                    const uploadedFile = req.files[output.file];
-                    if (!uploadedFile) {
-                        throw new Error(`File ${output.file} not found in the request.`);
-                    }
-                    const fileId = await handleFileUpload({
-                        name: uploadedFile.name,
-                        data: uploadedFile.data,
-                        language: path.extname(uploadedFile.name).slice(1)
-                    }, req.userId);  // Pass req.userId here
-                    return { type: 'file', reference: fileId };
-                } else {
-                    return output;
-                }
-            }))
-        })));
-
-        const fileData = {
-            filename: mainFile.name,
-            language: req.body.language,
-            file: mainFile.data,
+        const project = await Project.create({
+            name: req.body.projectName || "Untitled Project",
+            description: req.body.description || "",
             authorId: req.userId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()) : [],
-            description: req.body.description,
-            testCases: processedTestCases
-        };
+            tags: tags
+        });
 
-        const savedFile = await File.create(fileData);
-        res.status(201).send({ fileId: savedFile._id });
+        const folderStructure = prepareFileStructure(req.files);
+        const createdFiles = await File.createFolderStructure(folderStructure, null, req.userId, project._id);
+
+        const inputFile = createdFiles.find(f => f.isInput);
+        const outputFile = createdFiles.find(f => f.isOutput);
+
+        if (!inputFile || !outputFile) {
+            throw new CustomError("Input or output file not found in uploaded files.", 400);
+        }
+
+        const rootFolder = createdFiles.find(f => f.parentFolder === null && f.isFolder);
+        if (rootFolder) {
+            project.rootFolder = rootFolder._id;
+            await project.save();
+        }
+
+        res.status(201).json({ 
+            message: "Project created and files uploaded successfully", 
+            projectId: project._id,
+            rootFolderId: rootFolder ? rootFolder._id : null 
+        });
     } catch (error) {
-        console.error('Error in uploadController:', error);
-        res.status(500).send({ error: error.message || "An error occurred while processing your request." });
+        next(error);
     }
 };
 
-const decodeController = async (req, res) => {
+const decodeController = async (req, res, next) => {
     const fileId = req.params.id;
     if (!fileId) {
-        return res.status(400).send("No fileId provided.");
+        throw new CustomError("No fileId provided.", 400);
     }
 
     try {
         const file = await File.findById(fileId);
         if (!file) {
-            return res.status(404).send("File not found.");
+            throw new CustomError("File not found.", 404);
         }
 
-        const decodedFile = Buffer.from(file.file, 'binary').toString('utf-8');
-        res.status(200).send(decodedFile);
+        if (file.isFolder) {
+            // If it's a folder, return its contents
+            const contents = await File.find({ parentFolder: fileId }).select('-content');
+            res.status(200).json(contents);
+        } else {
+            // If it's a file, return its decoded content
+            const decodedContent = file.content.toString('utf-8');
+            res.status(200).send(decodedContent);
+        }
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        next(error);
     }
 };
 
-const decodeController = async (req, res) => {
-    if (!req.body.fileId) {
-        return res.status(400).send("No filename provided.");
+const searchFiles = async (req, res, next) => {
+    const { query } = req.query;
+    if (!query) {
+        return res.status(400).json({ message: "No search query provided." });
     }
 
     try {
-        const fileId = req.body.fileId;
-        const file = await File.findById(fileId);
-        if (!file) {
-            return res.status(404).send("File not found.");
-        }
+        // Ensure indexes are created before querying
+        await File.init();
 
-        const decodedFile = Buffer.from(file.file, 'binary').toString('utf-8');
-        res.status(200).send(decodedFile);
+        const results = await File.find(
+            { $text: { $search: query } },
+            { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } });
+
+        res.status(200).json(results);
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        if (error.code === 27) {
+            res.status(500).json({ status: "error", statusCode: 500, message: "text index required for $text query" });
+        } else {
+            next(error);
+        }
     }
 }
 
+const getFolderStructureController = async (req, res, next) => {
+    try {
+        const { projectId } = req.params;
+        const userId = req.userId;
+
+        const project = await Project.findOne({ _id: projectId, authorId: userId });
+        if (!project) {
+            throw new CustomError("Project not found or you don't have access to it.", 404);
+        }
+
+        const structure = await File.getProjectFileStructure(projectId);
+        const response = {
+            projectId: project._id,
+            projectName: project.name,
+            description: project.description,
+            tags: project.tags,
+            fileStructure: structure
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     uploadController,
-    decodeController
+    decodeController,
+    searchFiles,
+    getFolderStructureController
 };
