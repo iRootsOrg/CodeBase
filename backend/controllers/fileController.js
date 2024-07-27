@@ -161,6 +161,31 @@ const decodeController = async (req, res, next) => {
     }
 };
 
+const searchFiles = async (req, res, next) => {
+    const { query } = req.query;
+    if (!query) {
+        return res.status(400).json({ message: "No search query provided." });
+    }
+
+    try {
+        // Ensure indexes are created before querying
+        await File.init();
+
+        const results = await File.find(
+            { $text: { $search: query } },
+            { score: { $meta: "textScore" } }
+        ).sort({ score: { $meta: "textScore" } });
+
+        res.status(200).json(results);
+    } catch (error) {
+        if (error.code === 27) {
+            res.status(500).json({ status: "error", statusCode: 500, message: "text index required for $text query" });
+        } else {
+            next(error);
+        }
+    }
+}
+
 const getFolderStructureController = async (req, res, next) => {
     try {
         const { projectId } = req.params;
@@ -324,6 +349,7 @@ const getTestcaseOutputs = async (req, res, next) => {
 module.exports = {
     uploadController,
     decodeController,
+    searchFiles,
     getFolderStructureController,
     addOutputToTestcase,
     downloadProjectFiles,
