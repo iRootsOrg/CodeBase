@@ -138,7 +138,7 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
         )}
 
         {props.option === "Graphs" ? <div>Graph output</div> : ""}
-        {props.option === "Terminal" ? <div>Terminal output</div> : ""}
+        
       </div>
     </div>
   );

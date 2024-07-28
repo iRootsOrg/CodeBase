@@ -67,6 +67,8 @@ const Run = (props) => {
     //   error: <b>Could not run</b>,
     // });
 
+    console.log("sending the data");
+
     const responseData = await props.sendTestCases(props.testCases, "run");
 
     console.log(responseData);
@@ -77,16 +79,16 @@ const Run = (props) => {
     form.append('fileIndex', props.fileIndex);
     form.append('testCaseSelected', props.testCaseSelected);
     // console.log(form);
-    const compilerResponse = await axios.post(`${compiler}/compiler`, form);
+    // const compilerResponse = await axios.post(`${compiler}/upload`, form);
 
     //Get the output
-    
+    console.log("Getting the output");
     const responseOutput = await axios.get(
       `${server}/api/v1/file/testcase-outputs/${responseData.mainFileId}`
     );
     console.log(responseOutput);
 
-
+    
 
 
     // await setOutputFileWrapper(sampleOutput);

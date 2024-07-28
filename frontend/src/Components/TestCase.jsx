@@ -3,7 +3,6 @@ import { restrictedPatterns } from "../Utils/restrictedtext";
 import toast from "react-hot-toast";
 
 const TestCase = (props) => {
-
   const lastInvalidInputRef = useRef("");
   // console.log(props.testCases[props.testCaseSelected]);
   const handleSelected = (e) => {
@@ -32,9 +31,26 @@ const TestCase = (props) => {
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters.", {
           id: "restricted-chars-error",
+          duration:800,
         });
       }
     }
+  };
+
+  const addTestCase = () => {
+    console.log("adding test case");
+
+    const newTestCase = {
+      input: { content: "" },
+      output: {
+        error: false,
+        errorCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "No Output",
+      },
+    };
+    props.setTestCases([...props.testCases, newTestCase]);
   };
 
   useEffect(() => {
@@ -42,9 +58,9 @@ const TestCase = (props) => {
   }, [props.testCaseSelected]);
 
   return (
-    <div className="flex h-52 ">
+    <div className="flex h-64 ">
       <div
-        className={`w-56 font-bold h-full overflow-y-scroll ${
+        className={`w-56 font-bold h-full overflow-y-scroll select-none ${
           props.lightmode
             ? "scrollbar-light text-black"
             : "scrollbar-dark text-white"
@@ -53,7 +69,7 @@ const TestCase = (props) => {
         {props.testCases.map((testCase, index) => (
           <div
             key={index}
-            className={`${
+            className={`w-full ${
               props.lightmode ? "border-[#d1d5db]" : "border-[#2e2a24]"
             } border-r-2 h-14 w-full content-center p-2.5 cursor-pointer ${
               props.testCaseSelected === index
@@ -66,11 +82,37 @@ const TestCase = (props) => {
             }`}
             onClick={() => handleSelected(index)}
           >
-            Test Case {index + 1}
+            <div className="flex justify-between items-center">
+              Test Case {index + 1}
+              {props.testCases[props.testCaseSelected].output.error ===
+              false ? (
+                props.testCases[props.testCaseSelected].output.content ===
+                "No Output" ? (
+                  <div></div>
+                ) : (
+                  <div>✅</div>
+                )
+              ) : (
+                <div>🚫</div>
+              )}
+            </div>
           </div>
         ))}
+
+        <button
+          className={`${
+            props.lightmode
+              ? "border-[#d1d5db] text-gray-700"
+              : "border-[#2e2a24] text-slate-200"
+          } border-r-2 h-14 w-full flex justify-start p-2.5  cursor-pointer shadow-2xl `}
+          onClick={() => {
+            addTestCase();
+          }}
+        >
+          Add Test Case +
+        </button>
       </div>
-      <div className="flex flex-col h-full w-full overflow-y-auto items-end ">
+      <div className="flex flex-col h-full w-full  items-end ">
         <textarea
           className={`border-l-4 w-full h-full p-2 ${
             props.lightmode

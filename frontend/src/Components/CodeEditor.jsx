@@ -86,7 +86,7 @@ const CodeEditor = (props) => {
 
   const formatCode = () => {
     editorRef.current.getAction("editor.action.formatDocument").run();
-    toast.success("Code Formatted");
+    toast.success("Code Formatted", { duration: 800 });
   };
 
   const handleToolBar = () => {

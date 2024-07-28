@@ -59,6 +59,7 @@ const Folder = (props) => {
         lastInvalidFileNameRef.current = name;
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters", {
+          duration: 800,
           id: "restricted-chars-error",
         });
       }
@@ -85,6 +86,7 @@ const Folder = (props) => {
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters", {
           id: "restricted-chars-error-extra",
+          duration:800,
         });
       }
     }

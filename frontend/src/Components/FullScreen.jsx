@@ -12,12 +12,13 @@ const FullScreenToggle = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(()=>{toast.success("Entered Full Screen")}).catch((err) => {
         toast.error(
-          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`,
+          { duration: 800 }
         );
       });
     } else {
       document.exitFullscreen();
-      toast.success("Exited Full Screen");
+      toast.success("Exited Full Screen", { duration: 800 });
     }
   };
 

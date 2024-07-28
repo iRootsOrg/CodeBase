@@ -86,10 +86,12 @@ const ToolBar = (props) => {
           .writeText(props.value)
           .then(() => {
             props.setSelected(0);
-            toast.success("Code successfully copied to Clipboard!");
+            toast.success("Code successfully copied to Clipboard!", {
+              duration: 800,
+            });
           })
           .catch((err) => {
-            toast.error("Error in copying ");
+            toast.error("Error in copying ", { duration: 800 });
           });
         break;
 
@@ -143,7 +145,7 @@ const ToolBar = (props) => {
     setInviteSuccessfull(true);
 
     setShowInviteSuccessfull(true);
-    toast.success("Invite Successful");
+    toast.success("Invite Successful", { duration: 800 });
     setTimeout(() => {
       setShowInviteSuccessfull(false);
     }, 3000);
