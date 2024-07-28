@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Output from './Output';
+import { FaTimes } from "react-icons/fa";
 
 const TestCaseEditor = () => {
   const [testCases, setTestCases] = useState([
@@ -11,6 +12,8 @@ const TestCaseEditor = () => {
   const [selectedTestResult, setSelectedTestResult] = useState(null);
   const [testMode, setTestMode] = useState('testCases');
   const [testsRun, setTestsRun] = useState(false);
+  const [reportBugOpen, setReportBugOpen] = useState(false);
+  const [lightmode, setLightMode] = useState(true);
 
   const handleAddTestCase = () => {
     const newTestCase = {
@@ -117,7 +120,10 @@ const TestCaseEditor = () => {
         </div>
       )}
       {testMode==='testResults'&&selectedTestResult && (
+        <div>
         <Output result={selectedTestResult.result} />
+        <button className={`p-2.5 `} onClick={() => { setReportBugOpen(true); }}>🐞 Report Bug</button>
+      </div>
       )}
       {testMode === 'testCases' && selectedTestCase && (
         <textarea
@@ -128,7 +134,86 @@ const TestCaseEditor = () => {
           style={{ borderRadius: '8px', borderTopLeftRadius: 0, borderTopRightRadius: 0, height: '400px' }}
         />
       )}
+     {reportBugOpen === true ? (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div
+      className={`bg-gray-900 bg-opacity-70 backdrop-blur-lg border ${
+        lightmode
+          ? "bg-gray-100 bg-opacity-90 text-black border-black"
+          : "bg-[#1e1e1e] bg-opacity-90 text-white border-white"
+      } p-6 rounded-lg shadow-lg relative w-[70vw]`}
+    >
+      <div className="flex items-center">
+        <button
+          onClick={() => {
+            setReportBugOpen(false);
+          }}
+          className={`absolute top-3 right-2 ${
+            lightmode
+              ? "text-black hover:text-gray-700"
+              : "text-white hover:text-gray-200"
+          }`}
+        >
+          <FaTimes size={24} />
+        </button>
+        <h2 className={`text-xl font-bold top-3 left-[45%] absolute `}>
+          Report Bug
+        </h2>
+      </div>
+
+      <form
+        action="POST"
+        className="flex flex-col gap-3 mt-4 font-semibold w-full"
+      >
+        <p>Tell us some details:</p>
+        <label>Name :</label>
+        <input
+          type="text"
+          placeholder="Name"
+          name="Name"
+          className={`p-2 border rounded-md ${
+            lightmode ? "bg-gray-200" : "bg-black"
+          }`}
+        ></input>
+        <label>Email :</label>
+        <input
+          type="email"
+          placeholder="Email"
+          name="Email"
+          className={`p-2 border rounded-md ${
+            lightmode ? "bg-gray-200" : "bg-black"
+          }`}
+        ></input>
+        <label>Tell us what issue/bug, you met :</label>
+        <textarea
+          type="text"
+          placeholder="Issue"
+          name="Issue"
+          className={`p-2 border rounded-md ${
+            lightmode ? "bg-gray-200" : "bg-black"
+          }`}
+          rows={6}
+        ></textarea>
+        <div className="flex justify-end pr-2 w-full">
+          <button
+            className={`block w-24 px-2 py-1 text-center rounded ${
+              lightmode
+                ? "bg-custom-gradient"
+                : "bg-custom-gradient-inverted"
+            } text-white`}
+            type="submit"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
     </div>
+  </div>
+) : (
+  ""
+)}
+
+     </div>
   );
 };
 

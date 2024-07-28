@@ -12,6 +12,7 @@ import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
+
 import { server } from "../service/api.js";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
@@ -20,6 +21,7 @@ const FormData = require("form-data");
 
 const EditorPage = () => {
   
+
 
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -90,6 +92,7 @@ const EditorPage = () => {
     },
   ];
 
+
   const initialOutput = {
     CompilationStatus: "Not Started",
     ExecutionTime: "0.00",
@@ -108,6 +111,7 @@ const EditorPage = () => {
       },
     ],
   };
+
 
   const deltaChangesRef = useRef([]);
   const [deltaChanges, setDeltaChanges] = useState([]);
@@ -161,6 +165,7 @@ const EditorPage = () => {
   useEffect(() => {
     deltaChangesRef.current = deltaChanges;
   }, [deltaChanges]);
+
 
   const [folderfiles, setFolderFiles] = useState(initialFolderFiles);
   const [language, setLanguage] = useState("javascript");
@@ -248,6 +253,7 @@ const EditorPage = () => {
     console.log(files);
 
     toast.success("Files Uploaded Successfully", { duration: 800 });
+
   };
 
 
@@ -524,7 +530,9 @@ const EditorPage = () => {
         saveAs(content, `${folder.name}.zip`);
       });
 
+
       toast.success(`${folder.name} is downloaded!`, { duration: 800 });
+
     } else if (
       extraFileIndex >= 0 &&
       extraFileIndex < folderfiles.extraFiles.length
@@ -545,7 +553,9 @@ const EditorPage = () => {
         saveAs(blob, `${file.name} Output.txt`);
       }
 
+
       toast.success(`${file.name} is downloaded!`, { duration: 800 });
+
     } else if (
       folderIndex >= 0 &&
       folderIndex < folderfiles.folders.length &&
@@ -569,9 +579,11 @@ const EditorPage = () => {
         saveAs(blob, `${file.name} Output.txt`);
       }
 
+
       toast.success(`${file.name} is downloaded!`, { duration: 800 });
     } else {
       toast.error("No folder/file selected", { duration: 800 });
+
     }
 
     setFileChecked(false);
@@ -583,6 +595,7 @@ const EditorPage = () => {
   const [keyboardShortcut, setKeyboardShortcut] = useState(false);
   const [email, setEmail] = useState("");
   const [toolBar, setToolBar] = useState(true);
+
   const [testCaseSelected, setTestCaseSelected] = useState(0);
 
   //Making a file for sending
@@ -727,6 +740,7 @@ const EditorPage = () => {
     document.addEventListener("mouseup", stopDrag);
   };
 
+
   return (
     <div
       className={`h-[100%] w-[100%] ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}
@@ -804,6 +818,7 @@ const EditorPage = () => {
           <div className="sm:w-1 sm:bg-gray-300 sm:cursor-ew-resize"></div>
 
           <div className="h-auto w-full p-1 border-b border-black sm:h-[100vh] sm:max-md:w-[30vw] md:w-[40vw] select-none">
+
             <Output
               lightmode={lightmode}
               option={option}
@@ -815,8 +830,10 @@ const EditorPage = () => {
               testCaseSelected={testCaseSelected}
               setTestCaseSelected={setTestCaseSelected}
             />
+
           </div>
         </div>
+
         {fileIndex !== -1 || extraFileIndex !== -1 ? (
           <div
             className={`z-20 ${
@@ -832,6 +849,7 @@ const EditorPage = () => {
             ></div>
             <div
               className={`flex p-4 pt-3 justify-between items-center h-auto select-none`}
+
             >
               <label
                 className={`font-bold text-xl ${

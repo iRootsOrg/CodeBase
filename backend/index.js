@@ -91,7 +91,7 @@ app.get("/", (req, res) => {
 
 
 app.get('/wss', (req, res) => {
-    res.render('websockets');
+    res.render('index');
 });
 
 app.use(errorMiddleware);
