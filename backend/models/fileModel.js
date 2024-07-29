@@ -42,14 +42,22 @@ const fileSchema = new mongoose.Schema({
         ref: 'Project',
         required: true
     },
-    isInput: {
-        type: Boolean,
-        default: false
+    fileType: {
+        type: String,
+        enum: ['main', 'input', 'output', 'other'],
+        default: 'other'
     },
-    isOutput: {
-        type: Boolean,
-        default: false
-    }
+    testcases: [{
+        input: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'File'
+        },
+        output: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'File',
+            default: null
+        }
+    }],
 }, {
     timestamps: true
 });
@@ -74,24 +82,28 @@ fileSchema.statics.createFolderStructure = async function (structure, parentId =
             authorId: authorId,
             parentFolder: parentId,
             projectId: projectId,
-            isInput: item.isInput || false,
-            isOutput: item.isOutput || false
+            fileType: item.fileType || 'other',
         };
 
         if (!item.isFolder) {
-            fileData.content = item.content;
+            fileData.content = item.content || Buffer.from('');
             fileData.language = item.language;
         }
 
+        console.log(`Creating file/folder: ${fileData.name}, Type: ${fileData.fileType}, IsFolder: ${fileData.isFolder}`);
+
         const file = await this.create(fileData);
+
+        console.log(`Created file/folder: ${file.name}, Type: ${file.fileType}, IsFolder: ${file.isFolder}, ID: ${file._id}`);
 
         if (item.isFolder && item.files) {
             const childFiles = await this.createFolderStructure(item.files, file._id, authorId, projectId);
             file.files = childFiles.map(f => f._id);
             await file.save();
+            createdFiles.push(file, ...childFiles);  // Add both the folder and its children
+        } else {
+            createdFiles.push(file);
         }
-
-        createdFiles.push(file);
     }
 
     return createdFiles;
@@ -118,31 +130,30 @@ fileSchema.statics.getProjectFileStructure = async function(projectId) {
             id: item._id,
             name: item.name,
             type: item.isFolder ? 'folder' : 'file',
-            path: itemPath
+            path: itemPath,
         };
-
+    
         if (!item.isFolder) {
             node.language = item.language;
-            node.isInput = item.isInput;
-            node.isOutput = item.isOutput;
+            node.fileType = item.fileType
         }
-
+    
         if (itemPath === parentPath) {
             return node;
         }
-
+    
         let parent = root;
         const pathParts = parentPath.split('/').filter(Boolean);
         for (const part of pathParts) {
             parent = parent.children.find(child => child.name === part);
             if (!parent) break;
         }
-
+    
         if (parent) {
             if (!parent.children) parent.children = [];
             parent.children.push(node);
         }
-
+    
         return null;
     };
 
