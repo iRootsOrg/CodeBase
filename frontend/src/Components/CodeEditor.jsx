@@ -8,6 +8,8 @@ import Fullscreen from "./FullScreen";
 import ToolBar from "./ToolBar";
 import Folder from "./Folder";
 import History from "./History";
+import ToolTip from "./ToolTip";
+import { useNavigate } from 'react-router-dom';
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext";
@@ -15,10 +17,16 @@ import { IoIosMenu } from "react-icons/io";
 
 const CodeEditor = (props) => {
   const editorRef = useRef();
-
+  
   const [selected, setSelected] = useState(0);
   const [settingsopen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+
+  const [lastSubmission, setLastSubmission] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [newDescription, setNewDescription] = useState("");
   const [wordWrap, setWordWrap] = useState(false);
   const [fontSize, setFontSize] = useState(16);
 
@@ -73,6 +81,51 @@ const CodeEditor = (props) => {
     props.setLanguage(language);
     console.log(language);
   };
+  if (editorRef.current && editorRef.current.getValue) {
+    const language = editorRef.current.getValue();
+    const newSubmission = {
+      pfp: 'https://cdn.pixabay.com/photo/2017/06/13/12/54/profile-2398783_1280.png',
+      username: 'Pratham9770',
+      title: 'Malware Detection by Machine Learning',
+      filename: 'main.c',
+      language: language,
+      code: language,
+      description: newDescription,
+      reviewed: false,
+      role: "author"
+    };
+  }
+  const handleSubmission = () => {
+    if (lastSubmission && !lastSubmission.reviewed) {
+      if (window.confirm("Your previous submission is under review. Do you wish to change it?")) {
+        setShowDescriptionModal(true);
+      }
+    } else {
+      setShowDescriptionModal(true);
+    }
+  };
+
+  const handleConfirmDescription = () => {
+    if (editorRef.current && editorRef.current.getValue) {
+      const language = editorRef.current.getValue();
+      const newSubmission = {
+        pfp: 'https://cdn.pixabay.com/photo/2017/06/13/12/54/profile-2398783_1280.png',
+        username: 'Pratham9770',
+        title: 'Malware Detection by Machine Learning',
+        filename: 'main.c',
+        language: language,
+        code: language,
+        description: newDescription,
+        reviewed: false,
+        role: "author"
+      };
+
+      setLastSubmission(newSubmission);
+      setError("");
+      setShowDescriptionModal(false);
+      navigate('/review', { state: { s: 'value_of_s', submission: newSubmission } });
+    } 
+  };
 
   const setToolbarNull = () => {
     setSelected(0);
@@ -117,9 +170,13 @@ const CodeEditor = (props) => {
   });
 
   return (
+
     <div className={`h-full w-full flex flex-col `}>
+      {error && <div className="error">{error}</div>}
       <div className="flex justify-between  items-center w-full  h-20 p-2">
         <div className="cursor-pointer sm:flex gap-2  ">
+       <ToolTip text={(toolBar ? "Close" : "Toolbar")}>
+
           {props.toolBar === true ? (
             <img
               src="./Icons/Close.png"
@@ -147,24 +204,30 @@ const CodeEditor = (props) => {
             }}
             className="block sm:hidden"
           />
-
+        </ToolTip>
+             
           {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
+          
             <DropDown
               language={props.language}
               onSelect={onSelect}
               lightmode={props.lightmode}
             />
+           
           ) : (
             ""
-          )}
+              )}
         </div>
+        
 
         <div className=" flex gap-2 h-10 items-center sm:gap-4">
           <button
             className="h-10 w-10  sm:flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hidden "
             onClick={formatCode}
           >
+           <ToolTip text="Format Code">
             <BiCodeAlt className="text-xl" />
+             </ToolTip>
           </button>
           <div
             className={` cursor-pointer w-10 h-[94%] ${
@@ -173,12 +236,15 @@ const CodeEditor = (props) => {
                 : "text-white bg-[#1e1e1e] border-white"
             }   rounded border `}
           >
+           <ToolTip text="Full Screen">
             <Fullscreen />
+             </ToolTip>
           </div>
           <div
             className=" cursor-pointer font-semibold h-full w-10 "
             onClick={() => props.handleLight()}
           >
+          <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
             {props.lightmode === true ? (
               <div className="text-white h-full w-full bg-[#1e1e1e]  flex justify-center items-center rounded border border-white">
                 <AiOutlineMoon className="h-6 w-6" />
@@ -187,12 +253,36 @@ const CodeEditor = (props) => {
               <div className="text-black  bg-white h-full w-full flex justify-center items-center  rounded border border-black">
                 <AiOutlineSun className="h-6 w-6" />
               </div>
+              
             )}
+            </ToolTip>
+
           </div>
 
           <Submit lightmode={props.lightmode} />
-        </div>
-      </div>
+          
+           {showDescriptionModal && (
+                  <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="description-modal-container w-full max-w-screen-lg">
+                      <div className="description-modal p-6 bg-gray-800 bg-opacity-90 rounded-lg shadow-lg">
+                        <textarea
+                          value={newDescription}
+                          onChange={(e) => setNewDescription(e.target.value)}
+                          placeholder="Enter description..."
+                          className="w-full h-48 p-3 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                        />
+                        <button
+                          onClick={handleConfirmDescription}
+                          className="mt-4 border border-custom-gradient block w-32 md:w-24 px-2 py-1 ml-auto text-center rounded bg-custom-gradient text-white focus:outline-none"
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+          </div>
+          
 
       <div
         className={`flex h-full w-full ${
@@ -255,6 +345,8 @@ const CodeEditor = (props) => {
             testCases={props.testCases}
             setTestCases={props.setTestCases}
             initialTestCases={props.initialTestCases}
+
+
           />
         </div>
         <div className="h-full">
@@ -321,6 +413,7 @@ const CodeEditor = (props) => {
           )}
         </div>
 
+
         <Editor
           options={{
             minimap: {
@@ -342,9 +435,13 @@ const CodeEditor = (props) => {
             props.setBoilerPlateCode(false);
           }}
         />
+
       </div>
-    </div>
+          </div >
+          </div>
+        
+    
   );
-};
+}
 
 export default CodeEditor;

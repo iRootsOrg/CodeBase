@@ -12,11 +12,13 @@ import KeyBoardShortcuts from "../Components/KeyBoardShortcuts.jsx";
 import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
+
 import { server } from "../service/api.js";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
 
 const FormData = require("form-data");
+
 
 const EditorPage = () => {
   
@@ -815,6 +817,7 @@ const EditorPage = () => {
               testCaseSelected={testCaseSelected}
               setTestCaseSelected={setTestCaseSelected}
             />
+
           </div>
         </div>
         {fileIndex !== -1 || extraFileIndex !== -1 ? (
