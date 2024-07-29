@@ -6,6 +6,7 @@
   "author": "Himanshu <96365482+17himanshu@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
+    "archiver": "^7.0.1",
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
