@@ -670,7 +670,7 @@ const EditorPage = () => {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIwNTE2MzIsImV4cCI6MTcyMjEzODAzMn0.EY2FaL9iZHV6uj7rQBQaYXo8B_Zojw4CaeHdHt019hI",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIyMzQ2NDMsImV4cCI6MTcyMjMyMTA0M30.sNOCy0a2EgTVNAn7KOH8RebjhNRs9SFdjU6uc8zzzZU",
         },
       });
 

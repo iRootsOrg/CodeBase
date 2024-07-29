@@ -73,11 +73,11 @@ const Run = (props) => {
 
     console.log(responseData);
     
-    const form = new FormData();
-    form.append('response', responseData);
-    form.append('folderIndex', props.folderIndex);
-    form.append('fileIndex', props.fileIndex);
-    form.append('testCaseSelected', props.testCaseSelected);
+    // const form = new FormData();
+    // form.append('response', responseData);
+    // form.append('folderIndex', props.folderIndex);
+    // form.append('fileIndex', props.fileIndex);
+    // form.append('testCaseSelected', props.testCaseSelected);
     // console.log(form);
     // const compilerResponse = await axios.post(`${compiler}/upload`, form);
 
