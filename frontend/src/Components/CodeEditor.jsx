@@ -14,6 +14,7 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext";
 import { IoIosMenu } from "react-icons/io";
+
 const CodeEditor = (props) => {
   const editorRef = useRef();
   
@@ -26,8 +27,7 @@ const CodeEditor = (props) => {
   const navigate = useNavigate();
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [newDescription, setNewDescription] = useState("");
-  const [wordWrap, setWordWrap] = useState(true);
-
+  const [wordWrap, setWordWrap] = useState(false);
   const [fontSize, setFontSize] = useState(16);
 
   useEffect(() => {
@@ -47,24 +47,32 @@ const CodeEditor = (props) => {
 
     editor.onDidChangeModelContent((event) => {
       const value = editor.getValue();
+      const changes = event.changes.map((change) => ({
+        range: change.range,
+        rangeLength: change.rangeLength,
+        text: change.text,
+      }));
+
+      // Check for restricted patterns
       for (let pattern of restrictedPatterns) {
         if (pattern.test(value)) {
-          // toast.error("Not allowed");
-          
           // Remove the restricted text by restoring the previous value
           editor.executeEdits("", [
             {
               range: editor.getModel().getFullModelRange(),
               text: value.replace(pattern, ""),
-              
             },
           ]);
-          break;
+          return; // Exit after handling the restricted pattern
         }
       }
-      return;
+
+      // If no restricted pattern is found, update delta changes
+      console.log("Editor changes detected:", changes);
+      props.updateDeltaChanges(changes);
     });
   };
+
   const onSelect = (language) => {
     if (props.value === CODE_SNIPPETS[props.language]) {
       props.setValue(CODE_SNIPPETS[language]);
@@ -131,7 +139,7 @@ const CodeEditor = (props) => {
 
   const formatCode = () => {
     editorRef.current.getAction("editor.action.formatDocument").run();
-    toast.success("Code Formatted");
+    toast.success("Code Formatted", { duration: 800 });
   };
 
   const handleToolBar = () => {
@@ -161,149 +169,40 @@ const CodeEditor = (props) => {
     };
   });
 
-
-  
-
   return (
-
-   
- 
-      <div className={`h-full`}>
-        {error && <div className="error">{error}</div>}
-        <div className="flex justify-between m-4 items-center">
-          <ToolTip text={(toolBar ? "Close" : "Toolbar")}>
-            <div className="cursor-pointer flex gap-2">
-              {toolBar === true ? (
-                <img
-                  src="./Icons/Close.png"
-                  alt="Close"
-                  className="h-[32px] w-[32px]"
-                  onClick={() => {
-                    handleToolBar();
-                  }}
-                />
-              ) : (
-                <img
-                  src="./Icons/More.png"
-                  alt="More"
-                  className="h-[32px] w-[32px]"
-                  onClick={() => {
-                    handleToolBar();
-                  }}
-                />
-              )}
-
-              {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
-                <DropDown
-                  language={props.language}
-                  onSelect={onSelect}
-                  lightmode={props.lightmode}
-                />
-              ) : (
-                ""
-              )}
-            </div>
-          </ToolTip>
-
-          <div className="flex flex-row gap-4 mr-1 ml-auto ">
-            <div className="flex gap-5 h-10 ">
-              <ToolTip text="Format Code">
-                <button
-                  className="h-10 w-10  flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 "
-                  onClick={formatCode}
-                >
-                  <BiCodeAlt className="text-xl" />
-                </button>
-              </ToolTip>
-
-                  <div className="cursor-pointer h-10 w-10  text-black bg-white  p-2 flex justify-center items-center rounded border border-black">
-                <ToolTip text="Full Screen">
-                  <div
-                    className={` cursor-pointer h-10 w-10 ${
-                      props.lightmode
-                        ? "text-black bg-white border-black"
-                        : "text-white bg-[#1e1e1e] border-white"
-                    }  p-2 flex justify-center items-center rounded border `}
-                  >
-                    <Fullscreen />
-              </div>
-                  
-                </ToolTip>
-                <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
-                  <div
-                    className=" cursor-pointer font-semibold "
-                    onClick={() => props.handleLight()}
-                  >
-                    {props.lightmode === true ? (
-                      <button className="text-white h-10 w-10 bg-[#1e1e1e]  p-2 flex justify-between rounded border border-white">
-                        <AiOutlineMoon className="h-6 w-6" />
-                      </button>
-                    ) : (
-                      <button className="text-black  h-10 w-10 bg-white  p-2 flex justify-between rounded border border-black">
-                        <AiOutlineSun className="h-6 w-6" />
-                      </button>
-                    )}
-                  </div>
-                </ToolTip>
-                <Submit onSubmit={handleSubmission} lightmode={props.lightmode} />
-
-                {showDescriptionModal && (
-                  <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="description-modal-container w-full max-w-screen-lg">
-                      <div className="description-modal p-6 bg-gray-800 bg-opacity-90 rounded-lg shadow-lg">
-                        <textarea
-                          value={newDescription}
-                          onChange={(e) => setNewDescription(e.target.value)}
-                          placeholder="Enter description..."
-                          className="w-full h-48 p-3 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
-                        />
-                        <button
-                          onClick={handleConfirmDescription}
-                          className="mt-4 border border-custom-gradient block w-32 md:w-24 px-2 py-1 ml-auto text-center rounded bg-custom-gradient text-white focus:outline-none"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-
-                
-               
-              </div>
-            </div>
-
     <div className={`h-full w-full flex flex-col `}>
+      {error && <div className="error">{error}</div>}
       <div className="flex justify-between  items-center w-full  h-20 p-2">
         <div className="cursor-pointer sm:flex gap-2  ">
-          {props.toolBar === true ? (
-            <img
-              src="./Icons/Close.png"
-              alt="Close"
-              className="h-[32px] w-[32px] hidden sm:block"
-              onClick={() => {
-                handleToolBar();
-              }}
-            />
-          ) : (
-            <img
-              src="./Icons/More.png"
-              alt="More"
-              className="h-[32px] w-[32px] hidden sm:block"
-              onClick={() => {
-                handleToolBar();
-              }}
-            />
-          )}
+          <ToolTip text={props.toolBar ? "Close" : "Toolbar"}>
+            {props.toolBar === true ? (
+              <img
+                src="./Icons/Close.png"
+                alt="Close"
+                className="h-[32px] w-[32px] hidden sm:block"
+                onClick={() => {
+                  handleToolBar();
+                }}
+              />
+            ) : (
+              <img
+                src="./Icons/More.png"
+                alt="More"
+                className="h-[32px] w-[32px] hidden sm:block"
+                onClick={() => {
+                  handleToolBar();
+                }}
+              />
+            )}
 
-          <IoIosMenu
-            size={36}
-            onClick={() => {
-              handleToolBar();
-            }}
-            className="block sm:hidden"
-          />
+            <IoIosMenu
+              size={36}
+              onClick={() => {
+                handleToolBar();
+              }}
+              className="block sm:hidden"
+            />
+          </ToolTip>
 
           {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
             <DropDown
@@ -321,8 +220,11 @@ const CodeEditor = (props) => {
             className="h-10 w-10  sm:flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hidden "
             onClick={formatCode}
           >
-            <BiCodeAlt className="text-xl" />
+            <ToolTip text="Format Code">
+              <BiCodeAlt className="text-xl" />
+            </ToolTip>
           </button>
+
           <div
             className={` cursor-pointer w-10 h-[94%] ${
               props.lightmode
@@ -332,25 +234,50 @@ const CodeEditor = (props) => {
           >
             <Fullscreen />
           </div>
+
           <div
             className=" cursor-pointer font-semibold h-full w-10 "
             onClick={() => props.handleLight()}
           >
             {props.lightmode === true ? (
               <div className="text-white h-full w-full bg-[#1e1e1e]  flex justify-center items-center rounded border border-white">
-                <AiOutlineMoon className="h-6 w-6" />
+                <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
+                  <AiOutlineMoon className="h-6 w-6" />
+                </ToolTip>
               </div>
             ) : (
               <div className="text-black  bg-white h-full w-full flex justify-center items-center  rounded border border-black">
-                <AiOutlineSun className="h-6 w-6" />
+                <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
+                  <AiOutlineSun className="h-6 w-6" />
+                </ToolTip>
               </div>
             )}
-
           </div>
 
           <Submit lightmode={props.lightmode} />
-        </div>
 
+          {showDescriptionModal && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+              <div className="description-modal-container w-full max-w-screen-lg">
+                <div className="description-modal p-6 bg-gray-800 bg-opacity-90 rounded-lg shadow-lg">
+                  <textarea
+                    value={newDescription}
+                    onChange={(e) => setNewDescription(e.target.value)}
+                    placeholder="Enter description..."
+                    className="w-full h-48 p-3 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                  />
+                  <button
+                    onClick={handleConfirmDescription}
+                    className="mt-4 border border-custom-gradient block w-32 md:w-24 px-2 py-1 ml-auto text-center rounded bg-custom-gradient text-white focus:outline-none"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       <div
         className={`flex h-full w-full ${
           props.lightmode ? "" : "bg-[#1e1e1e]"
@@ -409,6 +336,9 @@ const CodeEditor = (props) => {
             outputChecked={props.outputChecked}
             setFileChecked={props.setFileChecked}
             setOutputChecked={props.setOutputChecked}
+            testCases={props.testCases}
+            setTestCases={props.setTestCases}
+            initialTestCases={props.initialTestCases}
           />
         </div>
         <div className="h-full">
@@ -449,13 +379,15 @@ const CodeEditor = (props) => {
                 outputFile={props.outputFile}
                 setOutputFile={props.setOutputFile}
                 initialOutput={props.initialOutput}
+                testCases={props.testCases}
+                setTestCases={props.setTestCases}
+                initialTestCases={props.initialTestCases}
               />
             </div>
           ) : (
             ""
           )}
         </div>
-
 
         <div className="h-full">
           {historyOpen === true ? (
@@ -472,7 +404,6 @@ const CodeEditor = (props) => {
             ""
           )}
         </div>
-
 
         <Editor
           options={{
@@ -495,11 +426,9 @@ const CodeEditor = (props) => {
             props.setBoilerPlateCode(false);
           }}
         />
-
       </div>
-      </div>
-    
+    </div>
   );
-};
+}
 
 export default CodeEditor;
