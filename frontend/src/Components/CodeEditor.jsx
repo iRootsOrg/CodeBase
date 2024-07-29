@@ -170,65 +170,61 @@ const CodeEditor = (props) => {
   });
 
   return (
-
     <div className={`h-full w-full flex flex-col `}>
       {error && <div className="error">{error}</div>}
       <div className="flex justify-between  items-center w-full  h-20 p-2">
         <div className="cursor-pointer sm:flex gap-2  ">
-       <ToolTip text={(toolBar ? "Close" : "Toolbar")}>
+          <ToolTip text={props.toolBar ? "Close" : "Toolbar"}>
+            {props.toolBar === true ? (
+              <img
+                src="./Icons/Close.png"
+                alt="Close"
+                className="h-[32px] w-[32px] hidden sm:block"
+                onClick={() => {
+                  handleToolBar();
+                }}
+              />
+            ) : (
+              <img
+                src="./Icons/More.png"
+                alt="More"
+                className="h-[32px] w-[32px] hidden sm:block"
+                onClick={() => {
+                  handleToolBar();
+                }}
+              />
+            )}
 
-          {props.toolBar === true ? (
-            <img
-              src="./Icons/Close.png"
-              alt="Close"
-              className="h-[32px] w-[32px] hidden sm:block"
+            <IoIosMenu
+              size={36}
               onClick={() => {
                 handleToolBar();
               }}
+              className="block sm:hidden"
             />
-          ) : (
-            <img
-              src="./Icons/More.png"
-              alt="More"
-              className="h-[32px] w-[32px] hidden sm:block"
-              onClick={() => {
-                handleToolBar();
-              }}
-            />
-          )}
+          </ToolTip>
 
-          <IoIosMenu
-            size={36}
-            onClick={() => {
-              handleToolBar();
-            }}
-            className="block sm:hidden"
-          />
-        </ToolTip>
-             
           {props.fileIndex !== -1 || props.extraFileIndex !== -1 ? (
-          
             <DropDown
               language={props.language}
               onSelect={onSelect}
               lightmode={props.lightmode}
             />
-           
           ) : (
             ""
-              )}
+          )}
         </div>
-        
 
         <div className=" flex gap-2 h-10 items-center sm:gap-4">
           <button
             className="h-10 w-10  sm:flex items-center justify-center bg-blue-500 text-white rounded-full focus:outline-none focus:bg-blue-600 hidden "
             onClick={formatCode}
           >
-           <ToolTip text="Format Code">
-            <BiCodeAlt className="text-xl" />
-             </ToolTip>
+            <ToolTip text="Format Code">
+              <BiCodeAlt className="text-xl" />
+            </ToolTip>
           </button>
+
           <div
             className={` cursor-pointer w-10 h-[94%] ${
               props.lightmode
@@ -236,54 +232,52 @@ const CodeEditor = (props) => {
                 : "text-white bg-[#1e1e1e] border-white"
             }   rounded border `}
           >
-           <ToolTip text="Full Screen">
             <Fullscreen />
-             </ToolTip>
           </div>
+
           <div
             className=" cursor-pointer font-semibold h-full w-10 "
             onClick={() => props.handleLight()}
           >
-          <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
             {props.lightmode === true ? (
               <div className="text-white h-full w-full bg-[#1e1e1e]  flex justify-center items-center rounded border border-white">
-                <AiOutlineMoon className="h-6 w-6" />
+                <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
+                  <AiOutlineMoon className="h-6 w-6" />
+                </ToolTip>
               </div>
             ) : (
               <div className="text-black  bg-white h-full w-full flex justify-center items-center  rounded border border-black">
-                <AiOutlineSun className="h-6 w-6" />
+                <ToolTip text={props.lightmode ? "Dark Mode" : "Light Mode"}>
+                  <AiOutlineSun className="h-6 w-6" />
+                </ToolTip>
               </div>
-              
             )}
-            </ToolTip>
-
           </div>
 
           <Submit lightmode={props.lightmode} />
-          
-           {showDescriptionModal && (
-                  <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="description-modal-container w-full max-w-screen-lg">
-                      <div className="description-modal p-6 bg-gray-800 bg-opacity-90 rounded-lg shadow-lg">
-                        <textarea
-                          value={newDescription}
-                          onChange={(e) => setNewDescription(e.target.value)}
-                          placeholder="Enter description..."
-                          className="w-full h-48 p-3 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
-                        />
-                        <button
-                          onClick={handleConfirmDescription}
-                          className="mt-4 border border-custom-gradient block w-32 md:w-24 px-2 py-1 ml-auto text-center rounded bg-custom-gradient text-white focus:outline-none"
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-          </div>
-          
 
+          {showDescriptionModal && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+              <div className="description-modal-container w-full max-w-screen-lg">
+                <div className="description-modal p-6 bg-gray-800 bg-opacity-90 rounded-lg shadow-lg">
+                  <textarea
+                    value={newDescription}
+                    onChange={(e) => setNewDescription(e.target.value)}
+                    placeholder="Enter description..."
+                    className="w-full h-48 p-3 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                  />
+                  <button
+                    onClick={handleConfirmDescription}
+                    className="mt-4 border border-custom-gradient block w-32 md:w-24 px-2 py-1 ml-auto text-center rounded bg-custom-gradient text-white focus:outline-none"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       <div
         className={`flex h-full w-full ${
           props.lightmode ? "" : "bg-[#1e1e1e]"
@@ -345,8 +339,6 @@ const CodeEditor = (props) => {
             testCases={props.testCases}
             setTestCases={props.setTestCases}
             initialTestCases={props.initialTestCases}
-
-
           />
         </div>
         <div className="h-full">
@@ -413,7 +405,6 @@ const CodeEditor = (props) => {
           )}
         </div>
 
-
         <Editor
           options={{
             minimap: {
@@ -435,12 +426,8 @@ const CodeEditor = (props) => {
             props.setBoilerPlateCode(false);
           }}
         />
-
       </div>
-          </div >
-          </div>
-        
-    
+    </div>
   );
 }
 

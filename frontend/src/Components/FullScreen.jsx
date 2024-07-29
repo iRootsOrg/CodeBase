@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaExpand, FaCompress } from "react-icons/fa";
 import toast from "react-hot-toast";
+import ToolTip from "./ToolTip";
 const FullScreenToggle = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -30,18 +31,16 @@ const FullScreenToggle = () => {
   }, []);
 
   return (
-    
+      
       <div
         onClick={toggleFullScreen}
         className="h-full flex justify-center items-center"
-      >
-        {isFullScreen ? (
-          <FaCompress className="" />
-        ) : (
-          <FaExpand className="" />
-        )}
+    > 
+      <ToolTip text="Full Screen">
+        {isFullScreen ? <FaCompress className="" /> : <FaExpand className="" />}
+        </ToolTip>
       </div>
-    
+   
   );
 };
 
