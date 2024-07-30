@@ -12,13 +12,17 @@ const WebSocket = require("ws");
 const errorMiddleware = require("./middlewares/errorMiddleware");
 const webSocketRoute = require("./routes/websocketRoutes");
 const session = require("express-session");
-
+const ensureIndexes = require("./utils/ensureIndexes");
 
 
 const app = express();
 dotenv.config();
 
-connectDB();
+connectDB().then(() => {
+    ensureIndexes(); 
+}).catch(err => {
+    console.error("Error connecting to MongoDB:", err);
+});
 
 // middlewares
 app.use(cors());
