@@ -1,7 +1,7 @@
 
 import toast from "react-hot-toast";
 import axios from "axios";
-import { compiler } from "../service/api";
+import { server,compiler } from "../service/api";
 
 const RunAll = (props) => {
 
@@ -10,15 +10,37 @@ const RunAll = (props) => {
         await props.updateChangeCode();
         resolve();
       });
-    };
+  };
+  
+  const updateTestCases = (testCases, data) => {
+    data.testcaseOutputs.forEach((testcaseOutput,index) => {
+      const { outputContent } = testcaseOutput;
+      if (testCases[index]) {
+        testCases[index].output.content = outputContent;
+      }
+    });
+    return testCases;
+  };
+
+  const setOutputFileWrapper = async (responseData) => {
+    return new Promise(async (resolve) => {
+      const updatedTestCases = updateTestCases(
+        [...props.testCases],
+        responseData.data
+      );
+      await props.setTestCases(updatedTestCases);
+      resolve();
+    });
+  };
+
   
   const onRunAll = async() => {
      console.log("Running All");
 
-    await updateChangeCodeWrapper().then(() => {
-      console.log("complete code change")
+    await updateChangeCodeWrapper();
+      console.log("code change complete ");
       
-    });
+    
 
    
     //Change into files
@@ -39,26 +61,34 @@ const RunAll = (props) => {
     //   error: <b>Could not run</b>,
     // });
 
-    const responseData = await props.sendTestCases(props.testCases,"runall").then(() => {
-      console.log("sent test case");
-    });
+      console.log("sending the data");
+
+      const responseData = await props.sendTestCases(props.testCases, "runall");
+
+      console.log(responseData);
     
-    const form = new FormData();
-    form.append('response', responseData);
-    form.append('folderIndex', props.folderIndex);
-    form.append('fileIndex', props.fileIndex);
-    form.append('testCaseSelected', props.testCaseSelected);
-    const compilerResponse = await axios.post(`${compiler}`, form);
+    // const form = new FormData();
+    // form.append('response', responseData);
+    // form.append('folderIndex', props.folderIndex);
+    // form.append('fileIndex', props.fileIndex);
+    // form.append('testCaseSelected', props.testCaseSelected);
+    // const compilerResponse = await axios.post(`${compiler}`, form);
+
+       console.log("Getting the output");
+       const responseOutput = await axios.get(
+         `${server}/api/v1/file/testcase-outputs/${responseData.mainFileId}`
+       );
+       console.log(responseOutput);
 
 
 
-
-    // await setOutputFileWrapper(sampleOutput);
-    
+ console.log("setting output");
+ await setOutputFileWrapper(responseOutput);
+ console.log("Output setup completed");
    
     //loader for compiling
 
-    // await props.updateChangeOutput(sampleOutput);
+    await props.updateChangeOutput(responseOutput.data, null);
 
   };
 

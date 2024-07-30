@@ -195,10 +195,10 @@ const EditorPage = () => {
     setExtraFileIndex(0);
   }, []);
 
-  useEffect(() => {
-    const intervalId = pollForChanges();
-    return () => clearInterval(intervalId);
-  }, []);
+  // useEffect(() => {
+  //   const intervalId = pollForChanges();
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   useEffect(() => {
     if (saveLocally === true) {
@@ -378,93 +378,135 @@ const EditorPage = () => {
     // Post request sending can be implemented here
   };
 
-  const updateChangeOutput = (newOutput) => {
-    setFolderFiles((prevFolderFiles) => {
-      if (folderIndex === -1) {
-        // Update extraFiles
-        const newExtraFiles = prevFolderFiles.extraFiles.map(
-          (file, fiIndex) => {
-            if (fiIndex === extraFileIndex) {
-              console.log("Updating extra file output :", file.name);
-              return {
-                ...file,
-                output: newOutput,
-              };
-            }
-            return file;
-          }
-        );
-        console.log("Updated extraFiles:", newExtraFiles);
-        return {
-          ...prevFolderFiles,
-          extraFiles: newExtraFiles,
-        };
-      } else {
-        // Update files within a folder
-        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
-          if (fIndex === folderIndex) {
-            return {
-              ...folder,
-              files: folder.files.map((file, fiIndex) => {
-                if (fiIndex === fileIndex) {
-                  console.log(
-                    "Updating file output in folder:",
-                    folder.name,
-                    file.name
-                  );
-                  return {
-                    ...file,
-                    output: newOutput,
-                  };
-                }
-                return file;
-              }),
-            };
-          }
-          return folder;
-        });
+ const updateChangeOutput = async (responseOutputData, testCaseSelected) => {
+   const { testcaseOutputs } = responseOutputData;
 
-        console.log("Updated folders:", newFolders);
-        return {
-          ...prevFolderFiles,
-          folders: newFolders,
-        };
-      }
-    });
+   setFolderFiles((prevFolderFiles) => {
+     const updateTestCases = (testCases, newOutputContents) => {
+       if (testCaseSelected !== null) {
+         return testCases.map((testCase, index) => {
+           if (index === testCaseSelected) {
+             return {
+               ...testCase,
+               output: {
+                 ...testCase.output,
+                 content: newOutputContents[0].outputContent, // Update the content here
+               },
+             };
+           }
+           return testCase;
+         });
+       } else {
+         return testCases.map((testCase, index) => ({
+           ...testCase,
+           output: {
+             ...testCase.output,
+             content: newOutputContents[index].outputContent, // Update each test case with the corresponding output
+           },
+         }));
+       }
+     };
 
-    // Post request sending can be implemented here
-  };
+     if (folderIndex === -1) {
+       // Update extraFiles
+       const newExtraFiles = prevFolderFiles.extraFiles.map((file, fiIndex) => {
+         if (fiIndex === extraFileIndex) {
+           console.log("Updating extra file output :", file.name);
+           return {
+             ...file,
+
+             output: {
+               ...file.output,
+               CompilationStatus: "Compilation Completed",
+                 FilesCompiled:file.name,
+               tc: updateTestCases(file.output.tc, testcaseOutputs),
+             },
+           };
+         }
+         return file;
+       });
+       console.log("Updated extraFiles:", newExtraFiles);
+       return {
+         ...prevFolderFiles,
+         extraFiles: newExtraFiles,
+       };
+     } else {
+       // Update files within a folder
+       const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
+         if (fIndex === folderIndex) {
+           return {
+             ...folder,
+             files: folder.files.map((file, fiIndex) => {
+               if (fiIndex === fileIndex) {
+                 console.log(
+                   "Updating file output in folder:",
+                   folder.name,
+                   file.name
+                 );
+                 return {
+                   ...file,
+                   output: {
+                     ...file.output,
+                     CompilationStatus: "Compilation Completed",
+                     FilesCompiled: file.name,
+                     tc: updateTestCases(file.output.tc, testcaseOutputs),
+                   },
+                 };
+               }
+               return file;
+             }),
+           };
+         }
+         return folder;
+       });
+
+       console.log("Updated folders:", newFolders);
+       return {
+         ...prevFolderFiles,
+         folders: newFolders,
+       };
+     }
+   });
+
+
+
+
+   //Upadate Output Component
+   if (fileIndex !== -1) {
+     setOutputFile(folderfiles.folder[folderIndex].files[fileIndex].output);
+   }
+   else if (extraFileIndex !== -1) {
+     setOutputFile(folderfiles.extraFiles[extraFileIndex].output);
+   }
+ };
+
+
 
   const [fileChecked, setFileChecked] = useState(false);
   const [outputChecked, setOutputChecked] = useState(false);
+const formatOutput = (output) => {
+  let formattedString =
+    "Compilation Status: " + output.CompilationStatus + "\n";
+  formattedString += "Execution Time: " + output.ExecutionTime + "\n";
+  formattedString += "Files Compiled: " + output.FilesCompiled + "\n\n";
 
-  const formatOutput = (output) => {
-    let formattedString =
-      "Compilation Status: " + output.CompilationStatus + "\n";
-    formattedString += "Execution Time: " + output.ExecutionTime + "\n";
-    formattedString += "Files Compiled: " + output.FilesCompiled + "\n\n";
+  output.tc.forEach((testCase, index) => {
+    formattedString += `Test Case ${index + 1}:\n`;
+    formattedString += `  Input:\n`;
+    formattedString += `    Content: ${testCase.input.content}\n`;
 
-    output.tc.forEach((testCase, index) => {
-      formattedString += `Test Case ${index + 1}:\n`;
-      testCase.input.forEach((input, iIndex) => {
-        formattedString += `  Input ${iIndex + 1}:\n`;
-        formattedString += `    Content: ${input.content}\n`;
-      });
+    formattedString += `  Output:\n`;
+    formattedString += `    Error: ${testCase.output.error}\n`;
+    formattedString += `    Error Count: ${testCase.output.errorCount}\n`;
+    formattedString += `    Warning: ${testCase.output.warning}\n`;
+    formattedString += `    Errors: ${testCase.output.errors}\n`;
+    formattedString += `    Content: ${testCase.output.content}\n`;
 
-      testCase.output.forEach((output, oIndex) => {
-        formattedString += `  Output ${oIndex + 1}:\n`;
-        formattedString += `    Error: ${output.error}\n`;
-        formattedString += `    Error Count: ${output.errorCount}\n`;
-        formattedString += `    Warning: ${output.warning}\n`;
-        formattedString += `    Errors: ${output.errors}\n`;
-        formattedString += `    Content: ${output.content}\n`;
-      });
-      formattedString += "\n";
-    });
+    formattedString += "\n";
+  });
 
-    return formattedString;
-  };
-
+  return formattedString;
+};
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
@@ -608,6 +650,8 @@ const EditorPage = () => {
   async function sendTestCases(testCases, trigger) {
     const form = new FormData();
 
+    console.log("Sending testcases");
+
     // Check if the selected file is in the main folder
     if (folderIndex !== -1 && fileIndex !== -1) {
       const filename = `main.${LAN_CONVERSION[language]}`;
@@ -650,36 +694,48 @@ const EditorPage = () => {
       );
     } else if (trigger === "runall") {
       testCases.forEach((testCase, index) => {
-        const testCaseName = `input_${index + 1}`;
-        const testCaseContent = testCase.input.content;
+        let testCaseName = `input_${index + 1}`;
+        let testCaseContent = testCase.input.content;
 
         // Convert the test case content to a Blob
-        const testCaseBlob = new Blob([testCaseContent], {
+        let testCaseBlob = new Blob([testCaseContent], {
           type: "text/plain",
         });
 
         form.append(`input_file${index + 1}`, testCaseBlob, testCaseName);
+
+        console.log(`${testCaseName} added`);
       });
     }
 
     form.append("mainFile", `main.${LAN_CONVERSION[language]}`);
-    // for (let pair of form.entries()) {
-    //   console.log(pair[0] + ":", pair[1]);
-    // }
+    for (let pair of form.entries()) {
+      console.log(pair[0] + ":" + pair[1] + "\n");
+    }
 
+   
     try {
-      const response = await axios.post(`${server}/api/v1/file/upload`, form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIyMzQ2NDMsImV4cCI6MTcyMjMyMTA0M30.sNOCy0a2EgTVNAn7KOH8RebjhNRs9SFdjU6uc8zzzZU",
-        },
-      });
+      const toastPromise = toast.promise(
+        axios.post(`${server}/api/v1/file/upload`, form, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIzNDY2MjMsImV4cCI6MTcyMjQzMzAyM30.FNmoH2gfMsbIICwRfT15Yl878qdI0fGWHp_riFpuMho",
+          },
+        }),
+        {
+          loading: "Sending files...",
+          success: "Files sent successfully!",
+          error: "Failed to send files. Please try again.",
+        }
+      );
 
+      const response = await toastPromise;
       console.log("Files sent successfully:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error sending files:", error);
+      throw error; // Re-throw the error so it can be handled by the caller if needed
     }
   }
 
@@ -733,8 +789,14 @@ const EditorPage = () => {
     <div
       className={`h-[100%] w-[100%] ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}
     >
-      <div>
-        <Toaster />
+      <div className="relative z-50">
+        <Toaster
+          position="top-center"
+          containerStyle={{
+            top: "4rem", // This is equivalent to top-12 in most cases
+          }}
+          
+        />
       </div>
       <div className="w-full">
         <div className="flex flex-col sm:flex-row w-full h-full">
@@ -817,7 +879,6 @@ const EditorPage = () => {
               testCaseSelected={testCaseSelected}
               setTestCaseSelected={setTestCaseSelected}
             />
-
           </div>
         </div>
         {fileIndex !== -1 || extraFileIndex !== -1 ? (
@@ -830,7 +891,9 @@ const EditorPage = () => {
             style={{ height: `${testCaseBarHeight}px`, maxHeight: "50vh" }}
           >
             <div
-              className={`h-0.5 w-full cursor-ns-resize ${lightmode ?  "bg-gray-300":"bg-slate-300"}`}
+              className={`h-0.5 w-full cursor-ns-resize ${
+                lightmode ? "bg-gray-300" : "bg-slate-300"
+              }`}
               onMouseDown={handleTestCaseBarResize}
             ></div>
             <div
