@@ -393,8 +393,8 @@ module.exports = {
     searchFiles,
     getFolderStructureController,
     updateController,
-    updateController,
     addOutputToTestcase,
     downloadProjectFiles,
     getTestcaseOutputs
 };
+
