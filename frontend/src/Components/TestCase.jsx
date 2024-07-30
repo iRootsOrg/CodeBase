@@ -3,15 +3,14 @@ import { restrictedPatterns } from "../Utils/restrictedtext";
 import toast from "react-hot-toast";
 
 const TestCase = (props) => {
-  const [selected, setSelected] = useState(1);
   const lastInvalidInputRef = useRef("");
-
+  // console.log(props.testCases[props.testCaseSelected]);
   const handleSelected = (e) => {
-    setSelected(e);
+    props.setTestCaseSelected(e);
   };
 
   const handleTestCase = (e) => {
-    const { name, value } = e.target;
+    const { value } = e.target;
     let isValid = true;
 
     restrictedPatterns.forEach((pattern) => {
@@ -22,7 +21,9 @@ const TestCase = (props) => {
     });
 
     if (isValid) {
-      props.setTestCases({ ...props.testCases, [name]: value });
+      const updatedTestCases = [...props.testCases];
+      updatedTestCases[props.testCaseSelected].input.content = value;
+      props.setTestCases(updatedTestCases);
       lastInvalidInputRef.current = ""; // Reset the last invalid input
     } else {
       if (lastInvalidInputRef.current !== value) {
@@ -30,31 +31,48 @@ const TestCase = (props) => {
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters.", {
           id: "restricted-chars-error",
+          duration:800,
         });
       }
     }
   };
 
+  const addTestCase = () => {
+    console.log("adding test case");
+
+    const newTestCase = {
+      input: { content: "" },
+      output: {
+        error: false,
+        errorCount: 0,
+        warning: 0,
+        errors: 0,
+        content: "No Output",
+      },
+    };
+    props.setTestCases([...props.testCases, newTestCase]);
+  };
+
   useEffect(() => {
-    console.log(props.testCases[`textArea${selected}`]);
-  }, [props.testCases, selected]);
+    console.log(props.testCases[props.testCaseSelected]);
+  }, [props.testCaseSelected]);
 
   return (
-    <div className="flex h-52 ">
+    <div className="flex h-64 ">
       <div
-        className={`w-56 font-bold h-full overflow-y-scroll ${
+        className={`w-56 font-bold h-full overflow-y-scroll select-none ${
           props.lightmode
             ? "scrollbar-light text-black"
             : "scrollbar-dark text-white"
         }`}
       >
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+        {props.testCases.map((testCase, index) => (
           <div
-            key={num}
-            className={`${
+            key={index}
+            className={`w-full ${
               props.lightmode ? "border-[#d1d5db]" : "border-[#2e2a24]"
             } border-r-2 h-14 w-full content-center p-2.5 cursor-pointer ${
-              selected === num
+              props.testCaseSelected === index
                 ? `shadow-2xl ${
                     props.lightmode
                       ? "bg-white text-blue-600 "
@@ -62,13 +80,39 @@ const TestCase = (props) => {
                   }`
                 : ""
             }`}
-            onClick={() => handleSelected(num)}
+            onClick={() => handleSelected(index)}
           >
-            Test Case {num}
+            <div className="flex justify-between items-center">
+              Test Case {index + 1}
+              {props.testCases[props.testCaseSelected].output.error ===
+              false ? (
+                props.testCases[props.testCaseSelected].output.content ===
+                "No Output" ? (
+                  <div></div>
+                ) : (
+                  <div>✅</div>
+                )
+              ) : (
+                <div>🚫</div>
+              )}
+            </div>
           </div>
         ))}
+
+        <button
+          className={`${
+            props.lightmode
+              ? "border-[#d1d5db] text-gray-700"
+              : "border-[#2e2a24] text-slate-200"
+          } border-r-2 h-14 w-full flex justify-start p-2.5  cursor-pointer shadow-2xl `}
+          onClick={() => {
+            addTestCase();
+          }}
+        >
+          Add Test Case +
+        </button>
       </div>
-      <div className="flex flex-col h-full w-full overflow-y-auto items-end ">
+      <div className="flex flex-col h-full w-full  items-end ">
         <textarea
           className={`border-l-4 w-full h-full p-2 ${
             props.lightmode
@@ -76,8 +120,8 @@ const TestCase = (props) => {
               : "bg-[#1e1e1e] text-white border-[#2e2a24] scrollbar-dark"
           } focus:outline-none focus:border-t`}
           placeholder="Please input your test cases..."
-          name={`textArea${selected}`}
-          value={props.testCases[`textArea${selected}`]}
+          name={`testCase${props.testCaseSelected}`}
+          value={props.testCases[props.testCaseSelected].input.content}
           onChange={handleTestCase}
         />
         <button
