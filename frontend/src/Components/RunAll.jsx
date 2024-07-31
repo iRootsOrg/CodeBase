@@ -67,12 +67,16 @@ const RunAll = (props) => {
 
       console.log(responseData);
     
-    // const form = new FormData();
-    // form.append('response', responseData);
-    // form.append('folderIndex', props.folderIndex);
-    // form.append('fileIndex', props.fileIndex);
-    // form.append('testCaseSelected', props.testCaseSelected);
-    // const compilerResponse = await axios.post(`${compiler}`, form);
+    const form = new FormData();
+    form.append('response', responseData);
+    form.append('folderIndex', props.folderIndex);
+    form.append('fileIndex', props.fileIndex);
+    form.append('testCaseSelected', props.testCaseSelected);
+    const compilerResponse = await axios.post(
+      `${compiler}/initiate-compilation`,
+      form
+    );
+    console.log(compilerResponse);
 
        console.log("Getting the output");
        const responseOutput = await axios.get(
