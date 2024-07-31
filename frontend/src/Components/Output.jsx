@@ -47,9 +47,7 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
               <option value="Graphs" className="text-black">
                 Graphs
               </option>
-              <option value="Terminal" className="text-black">
-                Terminal
-              </option>
+              
             </select>
           </div>
         </div>

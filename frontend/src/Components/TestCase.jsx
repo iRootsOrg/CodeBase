@@ -31,7 +31,7 @@ const TestCase = (props) => {
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters.", {
           id: "restricted-chars-error",
-          duration:800,
+          duration: 800,
         });
       }
     }
@@ -84,16 +84,21 @@ const TestCase = (props) => {
           >
             <div className="flex justify-between items-center">
               Test Case {index + 1}
-              {props.testCases[props.testCaseSelected].output.error ===
-              false ? (
-                props.testCases[props.testCaseSelected].output.content ===
-                "No Output" ? (
-                  <div></div>
+              {props.testCases[index].output.error === false ? (
+                props.testCases[index].output.content === "No Output" ? (
+                  <div>
+                    <img src="./Icons/notreview.png" alt="🔸" />
+                  </div>
                 ) : (
-                  <div>✅</div>
+                  <div>
+                    <img src="./Icons/Done.png" alt="✅" />
+                  </div>
                 )
               ) : (
-                <div>🚫</div>
+                <div>
+                  {" "}
+                  <img src="./Icons/err.png" alt="🚫" />
+                </div>
               )}
             </div>
           </div>
