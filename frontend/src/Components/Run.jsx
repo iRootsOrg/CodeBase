@@ -83,34 +83,7 @@ const setOutputFileWrapper = async (responseData) => {
 
     
 
-    
-    
-    const form = new FormData();
-    form.append('response', responseData);
-    form.append('folderIndex', props.folderIndex);
-    form.append('fileIndex', props.fileIndex);
-    form.append('testCaseSelected', props.testCaseSelected);
-    console.log(form);
-
-    console.log("Compiling");
-
-    const compilerPromise = toast.promise(
-      await axios.post(`${compiler}/initiate-compilation`, form),
-      {
-        loading: "Compiling...",
-        success: (response) => {
-          console.log("Compiled successfully:", response.data);
-          return "Compiled successfully!";
-        },
-        error: (error) => {
-          console.error("Error fetching output:", error);
-          throw error;
-        },
-      }
-    );
-
-    const compilerResponse = await compilerPromise;
-    console.log(compilerResponse);
+   
   
 
     //Get the output

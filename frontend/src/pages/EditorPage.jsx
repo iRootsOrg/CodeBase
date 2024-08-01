@@ -13,7 +13,8 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
 
-import { server } from "../service/api.js";
+
+import { server,compiler } from "../service/api.js";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
 
@@ -732,6 +733,35 @@ const formatOutput = (output) => {
 
       const response = await toastPromise;
       console.log("Files sent successfully:", response.data);
+       
+    
+    const form = new FormData();
+    form.append("response", response);
+    form.append("folderIndex", folderIndex);
+    form.append("fileIndex", fileIndex);
+    form.append("testCaseSelected",testCaseSelected);
+    console.log(form);
+
+    console.log("Compiling");
+
+    const compilerPromise = toast.promise(
+      await axios.post(`${compiler}/initiate-compilation`, form),
+      {
+        loading: "Compiling...",
+        success: (response) => {
+          console.log("Compiled successfully:", response.data);
+          return "Compiled successfully!";
+        },
+        error: (error) => {
+          console.error("Error fetching output:", error);
+          throw error;
+        },
+      }
+    );
+
+    const compilerResponse = await compilerPromise;
+      console.log(compilerResponse);
+      
       return response.data;
     } catch (error) {
       console.error("Error sending files:", error);
