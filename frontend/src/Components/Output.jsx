@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import { docco, a11yDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { docco, a11yDark ,javascript} from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 const Output = (props) => {
   //Sample Error Text
@@ -10,7 +10,7 @@ main.c:7:30: error: ‘z’ undeclared (first use in this function)
       |                              ^
 main.c:7:30: note: each undeclared identifier is reported only once for each function it appears in `;
   //Sample output Text
-  let outputText = `Ramcharan`;
+  let outputText = `Hello\nWorld`;
 
   const handleChange = (event) => {
     props.setOption(event.target.value);
@@ -88,7 +88,7 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
                   null ? (
                     <div className="overflow-x-auto max-w-full">
                       <SyntaxHighlighter
-                        language="bash"
+                        language="javascript"
                         style={props.lightmode ? `${docco}` : `${a11yDark}`}
                         className="text-left !text-red-600"
                       >
@@ -114,11 +114,12 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
                   } p-3 overflow-x-auto max-w-full`}
                 >
                   <SyntaxHighlighter
-                    language="bash"
+                    language="javascript"
                     style={props.lightmode ? docco : a11yDark}
                     className="text-left"
                   >
-                    {props.testCases[props.testCaseSelected].output.content}
+                      {props.testCases[props.testCaseSelected].output.content}
+                      {/* {`${outputText}`} */}
                   </SyntaxHighlighter>
                 </div>
               ) : (

@@ -815,6 +815,11 @@ const formatOutput = (output) => {
     document.addEventListener("mouseup", stopDrag);
   };
 
+  const testCaseStyles =
+    window.innerWidth >= 576
+      ? { height: `${testCaseBarHeight}px`, maxHeight: "50vh" }
+      : {};
+
   return (
     <div
       className={`h-[100%] w-[100%] ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}
@@ -825,7 +830,6 @@ const formatOutput = (output) => {
           containerStyle={{
             top: "4rem", // This is equivalent to top-12 in most cases
           }}
-          
         />
       </div>
       <div className="w-full">
@@ -918,16 +922,16 @@ const formatOutput = (output) => {
             } sm:absolute sm:bottom-0 ${
               toolBar ? "sm:ml-12 sm:w-100-minus-3rem" : "sm:w-[100%]"
             } overflow-hidden`}
-            style={{ height: `${testCaseBarHeight}px`, maxHeight: "50vh" }}
+            style={testCaseStyles}
           >
             <div
-              className={`h-0.5 w-full cursor-ns-resize ${
+              className={` hidden sm:block h-0.5 w-full cursor-ns-resize ${
                 lightmode ? "bg-gray-300" : "bg-slate-300"
               }`}
               onMouseDown={handleTestCaseBarResize}
             ></div>
             <div
-              className={`flex p-4 pt-3 justify-between items-center h-auto select-none`}
+              className={`flex p-4 pt-3 justify-between items-center h-full sm:h-auto select-none`}
             >
               <label
                 className={`font-bold text-xl ${
