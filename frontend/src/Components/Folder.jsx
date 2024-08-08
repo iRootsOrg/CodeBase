@@ -13,6 +13,7 @@ const Folder = (props) => {
   const openFolder = (index) => {
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
+    props.setTestCases(props.initialTestCases);
     if (props.folderIndex === index) {
       props.setFolderIndex(-1);
       props.setFileIndex(-1);
@@ -32,6 +33,7 @@ const Folder = (props) => {
     props.setFolderIndex(index);
     props.setOpenNewFile(true);
     props.setOutputFile(props.initialOutput);
+     props.setTestCases(props.initialTestCases);
   };
 
   const addNewFolder = () => {
@@ -57,6 +59,7 @@ const Folder = (props) => {
         lastInvalidFileNameRef.current = name;
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters", {
+          duration: 800,
           id: "restricted-chars-error",
         });
       }
@@ -83,6 +86,7 @@ const Folder = (props) => {
         console.log("Restricted characters detected");
         toast.error("Your input contains restricted characters", {
           id: "restricted-chars-error-extra",
+          duration:800,
         });
       }
     }
@@ -162,6 +166,7 @@ const Folder = (props) => {
     props.setExtraFileIndex(-1);
     props.setValue("No File Selected");
     props.setOutputFile(props.initialOutput);
+     props.setTestCases(props.initialTestCases);
   };
 
   const setAllNull = () => {
@@ -174,6 +179,7 @@ const Folder = (props) => {
     props.setLanguage("Choose_Language");
     props.setValue(CODE_SNIPPETS["Choose_Language"]);
     props.setOutputFile(props.initialOutput);
+     props.setTestCases(props.initialTestCases);
   };
 
   return (
@@ -252,6 +258,9 @@ const Folder = (props) => {
                   outputFile={props.outputFile}
                   setOutputFile={props.setOutputFile}
                   initialOutput={props.initialOutput}
+                  testCases={props.testCases}
+                  setTestCases={props.setTestCases}
+                  initialTestCases={props.initialTestCases}
                 />
 
                 {props.opennewfile ? (
@@ -344,6 +353,9 @@ const Folder = (props) => {
             outputFile={props.outputFile}
             setOutputFile={props.setOutputFile}
             initialOutput={props.initialOutput}
+            testCases={props.testCases}
+            setTestCases={props.setTestCases}
+            initialTestCases={props.initialTestCases}
           />
 
           {props.openExtraNewFile === true ? (

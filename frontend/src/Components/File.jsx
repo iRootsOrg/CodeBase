@@ -9,7 +9,8 @@ const File = (props) => {
      
       props.setFileIndex(-1);
        props.setLanguage("Choose_Language");
-       props.setValue(CODE_SNIPPETS["Choose_Language"]);
+        props.setValue(CODE_SNIPPETS["Choose_Language"]);
+        props.setTestCases(props.initialTestCases);
     } else {
       
       // console.log(file);
@@ -19,6 +20,7 @@ const File = (props) => {
       props.setLanguage(file.language);
         props.setExtraFileIndex(-1);
         props.setOutputFile(file.output);
+        props.setTestCases(file.output.tc);
     }
 
 
@@ -31,6 +33,7 @@ const File = (props) => {
     props.setExtraFileIndex(-1);
     props.setValue("No File Selected");
     props.setOutputFile(props.initialOutput);
+    props.setTestCases(props.initialTestCases);
   };
 
 

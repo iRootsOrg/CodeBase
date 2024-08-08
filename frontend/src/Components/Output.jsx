@@ -47,9 +47,7 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
               <option value="Graphs" className="text-black">
                 Graphs
               </option>
-              <option value="Terminal" className="text-black">
-                Terminal
-              </option>
+              
             </select>
           </div>
         </div>
@@ -65,25 +63,39 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
               <p>Execution Time : {props.outputFile.ExecutionTime}s</p>
             </div>
             <div className="">
-              {props.outputFile.tc[0].output[0].error === true ? (
+              {props.testCases[props.testCaseSelected].output.error ===
+              true ? (
                 <div
                   className={`text-red-700 flex flex-col items-start border-b-2 border-dashed ${
                     props.lightmode ? "border-black" : "border-gray-100"
                   } p-3`}
                 >
                   <div className="flex p-3 gap-4">
-                    <p>Errors : {props.outputFile.tc[0].output[0].errorCount}</p>
-                    <p>Warning : {props.outputFile.tc[0].output[0].warning}</p>
+                    <p>
+                      Errors :{" "}
+                      {
+                        props.testCases[props.testCaseSelected].output
+                          .errorCount
+                      }
+                    </p>
+                    <p>
+                      Warning :{" "}
+                      {props.testCases[props.testCaseSelected].output.warning}
+                    </p>
                   </div>
 
-                  {props.outputFile.tc[0].output[0].errors !== null ? (
+                  {props.testCases[props.testCaseSelected].output.errors !==
+                  null ? (
                     <div className="overflow-x-auto max-w-full">
                       <SyntaxHighlighter
                         language="bash"
                         style={props.lightmode ? `${docco}` : `${a11yDark}`}
                         className="text-left !text-red-600"
                       >
-                        {props.outputFile.tc[0].output[0].errors}
+                        {
+                          props.testCases[props.testCaseSelected].output
+                            .errors
+                        }
                       </SyntaxHighlighter>
                     </div>
                   ) : (
@@ -94,7 +106,8 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
                 ""
               )}
 
-              {props.outputFile.tc[0].output[0].error === false ? (
+              {props.testCases[props.testCaseSelected].output.error ===
+              false ? (
                 <div
                   className={`border-b-2 border-dashed ${
                     props.lightmode ? "border-black" : "border-gray-100"
@@ -105,7 +118,7 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
                     style={props.lightmode ? docco : a11yDark}
                     className="text-left"
                   >
-                    {props.outputFile.tc[0].output[0].content}
+                    {props.testCases[props.testCaseSelected].output.content}
                   </SyntaxHighlighter>
                 </div>
               ) : (
@@ -123,7 +136,7 @@ main.c:7:30: note: each undeclared identifier is reported only once for each fun
         )}
 
         {props.option === "Graphs" ? <div>Graph output</div> : ""}
-        {props.option === "Terminal" ? <div>Terminal output</div> : ""}
+        
       </div>
     </div>
   );
