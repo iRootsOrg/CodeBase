@@ -2,7 +2,7 @@
 import toast from "react-hot-toast";
 import axios from "axios";
 import { server,compiler } from "../service/api";
-
+import { useEffect } from "react";
 const RunAll = (props) => {
 
     const updateChangeCodeWrapper = () => {
@@ -32,6 +32,18 @@ const RunAll = (props) => {
       resolve();
     });
   };
+
+   useEffect(() => {
+     if (props.RunOnAll === true) {
+       onRunAll();
+       props.setRunOnAll(false);
+     }
+     // else {
+     //   toast.error("Please until last run is executed");
+     // }
+
+     props.setRunOnAll(false);
+   }, [props.RunOnAll]);
 
   
   const onRunAll = async() => {

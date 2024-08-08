@@ -14,12 +14,16 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext";
 import { IoIosMenu } from "react-icons/io";
+import { KeyMod } from "monaco-editor";
+import { KeyCode } from 'monaco-editor';
 
+// import { useHotkeys } from "react-hotkeys-hook";
+// import * as monaco from "monaco-editor";
 const CodeEditor = (props) => {
   const editorRef = useRef();
   
   const [selected, setSelected] = useState(0);
-  const [settingsopen, setSettingsOpen] = useState(false);
+ 
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const [lastSubmission, setLastSubmission] = useState(null);
@@ -29,6 +33,12 @@ const CodeEditor = (props) => {
   const [newDescription, setNewDescription] = useState("");
   const [wordWrap, setWordWrap] = useState(false);
   const [fontSize, setFontSize] = useState(16);
+
+  // useHotkeys("alt+s", () => props.setSettingsOpen(!props.settingsopen));
+  // useHotkeys("alt+k", () => props.setKeyboardShortcut(!props.keyboardShortcut));
+  // // useHotkeys("alt+shift+p", () => window.onclick("F1"));
+  // useHotkeys("ctrl+shift+s", () => props.updateChangeCode());
+  // useHotkeys("alt+shift+f", () => props.setFormatCodeFunction(true));
 
   useEffect(() => {
     props.setLanguage("Choose_Language");
@@ -41,9 +51,118 @@ const CodeEditor = (props) => {
     }
   }, [wordWrap]);
 
+  const blockContext =
+    "editorTextFocus && !suggestWidgetVisible && !renameInputVisible && !inSnippetMode " +
+    "&& !quickFixWidgetVisible";
+
+
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
+    
+      editor.addAction({
+        id: "executeCurrentAndAdvance1",
+        label: "Execute Block and Advance",
+        keybindings: [KeyMod.Alt | KeyCode.KeyQ],
+        contextMenuGroupId: "2_execution",
+        precondition: blockContext,
+        run: () => {
+          props.setFolderOpen(!props.folderopen);
+        },
+      });
+
+      editor.addAction({
+        id: "executeCurrentAndAdvance2",
+        label: "Execute Block and Advance",
+        keybindings: [KeyMod.Alt | KeyMod.Shift | KeyCode.KeyS],
+        contextMenuGroupId: "2_execution",
+        precondition: blockContext,
+        run: () => {
+          props.setSettingsOpen(!props.settingsopen);
+        },
+      });
+      
+    editor.addAction({
+      id: "executeCurrentAndAdvance3",
+      label: "Execute Block and Advance",
+      keybindings: [KeyMod.Alt | KeyMod.Shift | KeyCode.KeyF],
+      contextMenuGroupId: "2_execution",
+      precondition: blockContext,
+      run: () => {
+        props.setFormatCodeFunction(true);
+      },
+    });
+
+    editor.addAction({
+      id: "executeCurrentAndAdvance4",
+      label: "Execute Block and Advance",
+      keybindings: [KeyMod.Alt | KeyCode.KeyS],
+      contextMenuGroupId: "2_execution",
+      precondition: blockContext,
+      run: () => {
+       props.updateChangeCode();
+      },
+    });
+
+     editor.addAction({
+       id: "executeCurrentAndAdvance5",
+       label: "Execute Block and Advance",
+       keybindings: [KeyMod.Alt | KeyCode.KeyB],
+       contextMenuGroupId: "2_execution",
+       precondition: blockContext,
+       run: () => {
+         props.setToolBar(!props.toolBar);
+       },
+     });
+    
+    editor.addAction({
+      id: "executeCurrentAndAdvance6",
+      label: "Execute Block and Advance",
+      keybindings: [KeyMod.Alt | KeyCode.KeyK],
+      contextMenuGroupId: "2_execution",
+      precondition: blockContext,
+      run: () => {
+        props.setKeyboardShortcut(!props.keyboardShortcut);
+      },
+    });
+
+    editor.addAction({
+      id: "executeCurrentAndAdvance7",
+      label: "Execute Block and Advance",
+      keybindings: [KeyMod.CtrlCmd | KeyCode.Quote],
+      contextMenuGroupId: "2_execution",
+      precondition: blockContext,
+      run: () => {
+        props.setRunOn(true);
+      },
+    });
+
+
+    editor.addAction({
+      id: "executeCurrentAndAdvance8",
+      label: "Execute Block and Advance",
+      keybindings: [KeyMod.CtrlCmd | KeyCode.Enter],
+      contextMenuGroupId: "2_execution",
+      precondition: blockContext,
+      run: () => {
+        props.setRunOnAll(true);
+      },
+    });
+
+
+
+    
+    
+      // editor.addAction({
+      //   id: "toggle-settings",
+      //   label: "Toggle Settings",
+      //   keybindings: [monaco.KeyMod.CtrlCmd],
+      //   run: () => {
+      //     alert("Working ")
+      //   },
+      // });
+    
+
 
     editor.onDidChangeModelContent((event) => {
       const value = editor.getValue();
@@ -132,7 +251,7 @@ const CodeEditor = (props) => {
     props.setFolderOpen(false);
     props.setOpenNewFile(false);
     props.setOpenExtraNewFile(false);
-    setSettingsOpen(false);
+    props.setSettingsOpen(false);
     props.setShareOpen(false);
     props.setInfoOpen(false);
   };
@@ -169,6 +288,20 @@ const CodeEditor = (props) => {
     };
   });
 
+  useEffect(() => {
+    if (props.formatCodeFunction === true) {
+      
+       formatCode();
+    }
+    
+    props.setFormatCodeFunction(false);
+  }, [props.formatCodeFunction]);
+
+
+
+  
+
+  
   return (
     <div className={`h-full w-full flex flex-col `}>
       {error && <div className="error">{error}</div>}
@@ -318,8 +451,8 @@ const CodeEditor = (props) => {
             setOpenExtraNewFile={props.setOpenExtraNewFile}
             selected={selected}
             setSelected={setSelected}
-            settingsopen={settingsopen}
-            setSettingsOpen={setSettingsOpen}
+            settingsopen={props.settingsopen}
+            setSettingsOpen={props.setSettingsOpen}
             historyOpen={historyOpen}
             setHistoryOpen={setHistoryOpen}
             language={props.language}
@@ -408,11 +541,12 @@ const CodeEditor = (props) => {
         <Editor
           options={{
             minimap: {
-              enabled: true,
+              enabled:false,
             },
             wordWrap: wordWrap ? "on" : "off",
             fontSize: fontSize,
             lineNumbers: "on",
+            contextmenu:false,
           }}
           height="100%"
           width={editorWidth}

@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useEffect } from "react";
 import { compiler } from "../service/api";
 import { server } from "../service/api";
 const FormData = require("form-data");
@@ -54,6 +55,19 @@ const setOutputFileWrapper = async (responseData) => {
       resolve();
     });
   };
+
+
+  useEffect(() => {
+    if (props.RunOn === true) {
+      onRun();
+      props.setRunOn(false);
+    }
+    // else {
+    //   toast.error("Please until last run is executed");
+    // }
+
+    props.setRunOn(false);
+  },[props.RunOn]);
 
   const onRun = async() => {
     console.log("Running");

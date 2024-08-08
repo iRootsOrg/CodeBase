@@ -13,17 +13,15 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
 
-
-import { server,compiler } from "../service/api.js";
+import { server, compiler } from "../service/api.js";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
 
+const { useHotkeys } = require("react-hotkeys-hook");
+
 const FormData = require("form-data");
 
-
 const EditorPage = () => {
-  
-
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
@@ -39,6 +37,7 @@ const EditorPage = () => {
   //Sample Folders
   const [saveLocally, setSaveLocally] = useState(false);
   const [folderopen, setFolderOpen] = useState(false);
+  const [settingsopen, setSettingsOpen] = useState(false);
 
   const initialTestCases = [
     {
@@ -253,8 +252,6 @@ const EditorPage = () => {
     toast.success("Files Uploaded Successfully", { duration: 800 });
   };
 
-
-
   const handleFolderName = (e) => {
     const name = e.target.value;
     let isValid = true;
@@ -294,7 +291,7 @@ const EditorPage = () => {
     setNewFolderName("");
   };
 
-  const updateChangeCode = () => {
+  const updateChangeCode = async () => {
     const updateFileCode = (
       folderIndex,
       fileIndex,
@@ -324,6 +321,7 @@ const EditorPage = () => {
             }
           );
           console.log("Updated extraFiles:", newExtraFiles);
+
           return {
             ...prevFolderFiles,
             extraFiles: newExtraFiles,
@@ -359,6 +357,7 @@ const EditorPage = () => {
           });
 
           console.log("Updated folders:", newFolders);
+          // toast.success("Saved Successfully in local storage");
           return {
             ...prevFolderFiles,
             folders: newFolders,
@@ -367,7 +366,7 @@ const EditorPage = () => {
       });
     };
 
-    updateFileCode(
+    await updateFileCode(
       folderIndex,
       fileIndex,
       extraFileIndex,
@@ -376,138 +375,136 @@ const EditorPage = () => {
       testCases
     );
 
+    toast.success("Saved Successfully in local storage");
+
     // Post request sending can be implemented here
   };
 
- const updateChangeOutput = async (responseOutputData, testCaseSelected) => {
-   const { testcaseOutputs } = responseOutputData;
+  const updateChangeOutput = async (responseOutputData, testCaseSelected) => {
+    const { testcaseOutputs } = responseOutputData;
 
-   setFolderFiles((prevFolderFiles) => {
-     const updateTestCases = (testCases, newOutputContents) => {
-       if (testCaseSelected !== null) {
-         return testCases.map((testCase, index) => {
-           if (index === testCaseSelected) {
-             return {
-               ...testCase,
-               output: {
-                 ...testCase.output,
-                 content: newOutputContents[0].outputContent, // Update the content here
-               },
-             };
-           }
-           return testCase;
-         });
-       } else {
-         return testCases.map((testCase, index) => ({
-           ...testCase,
-           output: {
-             ...testCase.output,
-             content: newOutputContents[index].outputContent, // Update each test case with the corresponding output
-           },
-         }));
-       }
-     };
+    setFolderFiles((prevFolderFiles) => {
+      const updateTestCases = (testCases, newOutputContents) => {
+        if (testCaseSelected !== null) {
+          return testCases.map((testCase, index) => {
+            if (index === testCaseSelected) {
+              return {
+                ...testCase,
+                output: {
+                  ...testCase.output,
+                  content: newOutputContents[0].outputContent, // Update the content here
+                },
+              };
+            }
+            return testCase;
+          });
+        } else {
+          return testCases.map((testCase, index) => ({
+            ...testCase,
+            output: {
+              ...testCase.output,
+              content: newOutputContents[index].outputContent, // Update each test case with the corresponding output
+            },
+          }));
+        }
+      };
 
-     if (folderIndex === -1) {
-       // Update extraFiles
-       const newExtraFiles = prevFolderFiles.extraFiles.map((file, fiIndex) => {
-         if (fiIndex === extraFileIndex) {
-           console.log("Updating extra file output :", file.name);
-           return {
-             ...file,
+      if (folderIndex === -1) {
+        // Update extraFiles
+        const newExtraFiles = prevFolderFiles.extraFiles.map(
+          (file, fiIndex) => {
+            if (fiIndex === extraFileIndex) {
+              console.log("Updating extra file output :", file.name);
+              return {
+                ...file,
 
-             output: {
-               ...file.output,
-               CompilationStatus: "Compilation Completed",
-                 FilesCompiled:file.name,
-               tc: updateTestCases(file.output.tc, testcaseOutputs),
-             },
-           };
-         }
-         return file;
-       });
-       console.log("Updated extraFiles:", newExtraFiles);
-       return {
-         ...prevFolderFiles,
-         extraFiles: newExtraFiles,
-       };
-     } else {
-       // Update files within a folder
-       const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
-         if (fIndex === folderIndex) {
-           return {
-             ...folder,
-             files: folder.files.map((file, fiIndex) => {
-               if (fiIndex === fileIndex) {
-                 console.log(
-                   "Updating file output in folder:",
-                   folder.name,
-                   file.name
-                 );
-                 return {
-                   ...file,
-                   output: {
-                     ...file.output,
-                     CompilationStatus: "Compilation Completed",
-                     FilesCompiled: file.name,
-                     tc: updateTestCases(file.output.tc, testcaseOutputs),
-                   },
-                 };
-               }
-               return file;
-             }),
-           };
-         }
-         return folder;
-       });
+                output: {
+                  ...file.output,
+                  CompilationStatus: "Compilation Completed",
+                  FilesCompiled: file.name,
+                  tc: updateTestCases(file.output.tc, testcaseOutputs),
+                },
+              };
+            }
+            return file;
+          }
+        );
+        console.log("Updated extraFiles:", newExtraFiles);
+        return {
+          ...prevFolderFiles,
+          extraFiles: newExtraFiles,
+        };
+      } else {
+        // Update files within a folder
+        const newFolders = prevFolderFiles.folders.map((folder, fIndex) => {
+          if (fIndex === folderIndex) {
+            return {
+              ...folder,
+              files: folder.files.map((file, fiIndex) => {
+                if (fiIndex === fileIndex) {
+                  console.log(
+                    "Updating file output in folder:",
+                    folder.name,
+                    file.name
+                  );
+                  return {
+                    ...file,
+                    output: {
+                      ...file.output,
+                      CompilationStatus: "Compilation Completed",
+                      FilesCompiled: file.name,
+                      tc: updateTestCases(file.output.tc, testcaseOutputs),
+                    },
+                  };
+                }
+                return file;
+              }),
+            };
+          }
+          return folder;
+        });
 
-       console.log("Updated folders:", newFolders);
-       return {
-         ...prevFolderFiles,
-         folders: newFolders,
-       };
-     }
-   });
+        console.log("Updated folders:", newFolders);
+        return {
+          ...prevFolderFiles,
+          folders: newFolders,
+        };
+      }
+    });
 
-
-
-
-   //Upadate Output Component
-   if (fileIndex !== -1) {
-     setOutputFile(folderfiles.folder[folderIndex].files[fileIndex].output);
-   }
-   else if (extraFileIndex !== -1) {
-     setOutputFile(folderfiles.extraFiles[extraFileIndex].output);
-   }
- };
-
-
+    //Upadate Output Component
+    if (fileIndex !== -1) {
+      setOutputFile(folderfiles.folder[folderIndex].files[fileIndex].output);
+    } else if (extraFileIndex !== -1) {
+      setOutputFile(folderfiles.extraFiles[extraFileIndex].output);
+    }
+  };
 
   const [fileChecked, setFileChecked] = useState(false);
   const [outputChecked, setOutputChecked] = useState(false);
-const formatOutput = (output) => {
-  let formattedString =
-    "Compilation Status: " + output.CompilationStatus + "\n";
-  formattedString += "Execution Time: " + output.ExecutionTime + "\n";
-  formattedString += "Files Compiled: " + output.FilesCompiled + "\n\n";
+  const formatOutput = (output) => {
+    let formattedString =
+      "Compilation Status: " + output.CompilationStatus + "\n";
+    formattedString += "Execution Time: " + output.ExecutionTime + "\n";
+    formattedString += "Files Compiled: " + output.FilesCompiled + "\n\n";
 
-  output.tc.forEach((testCase, index) => {
-    formattedString += `Test Case ${index + 1}:\n`;
-    formattedString += `  Input:\n`;
-    formattedString += `    Content: ${testCase.input.content}\n`;
+    output.tc.forEach((testCase, index) => {
+      formattedString += `Test Case ${index + 1}:\n`;
+      formattedString += `  Input:\n`;
+      formattedString += `    Content: ${testCase.input.content}\n`;
 
-    formattedString += `  Output:\n`;
-    formattedString += `    Error: ${testCase.output.error}\n`;
-    formattedString += `    Error Count: ${testCase.output.errorCount}\n`;
-    formattedString += `    Warning: ${testCase.output.warning}\n`;
-    formattedString += `    Errors: ${testCase.output.errors}\n`;
-    formattedString += `    Content: ${testCase.output.content}\n`;
+      formattedString += `  Output:\n`;
+      formattedString += `    Error: ${testCase.output.error}\n`;
+      formattedString += `    Error Count: ${testCase.output.errorCount}\n`;
+      formattedString += `    Warning: ${testCase.output.warning}\n`;
+      formattedString += `    Errors: ${testCase.output.errors}\n`;
+      formattedString += `    Content: ${testCase.output.content}\n`;
 
-    formattedString += "\n";
-  });
+      formattedString += "\n";
+    });
 
-  return formattedString;
-};
+    return formattedString;
+  };
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
@@ -714,7 +711,6 @@ const formatOutput = (output) => {
       console.log(pair[0] + ":" + pair[1] + "\n");
     }
 
-   
     try {
       const toastPromise = toast.promise(
         axios.post(`${server}/api/v1/file/upload`, form, {
@@ -733,35 +729,34 @@ const formatOutput = (output) => {
 
       const response = await toastPromise;
       console.log("Files sent successfully:", response.data);
-       
-    
-    const form = new FormData();
-    form.append("response", response);
-    form.append("folderIndex", folderIndex);
-    form.append("fileIndex", fileIndex);
-    form.append("testCaseSelected",testCaseSelected);
-    console.log(form);
 
-    console.log("Compiling");
+      const form = new FormData();
+      form.append("response", response);
+      form.append("folderIndex", folderIndex);
+      form.append("fileIndex", fileIndex);
+      form.append("testCaseSelected", testCaseSelected);
+      console.log(form);
 
-    const compilerPromise = toast.promise(
-      await axios.post(`${compiler}/initiate-compilation`, form),
-      {
-        loading: "Compiling...",
-        success: (response) => {
-          console.log("Compiled successfully:", response.data);
-          return "Compiled successfully!";
-        },
-        error: (error) => {
-          console.error("Error fetching output:", error);
-          throw error;
-        },
-      }
-    );
+      console.log("Compiling");
 
-    const compilerResponse = await compilerPromise;
+      const compilerPromise = toast.promise(
+        await axios.post(`${compiler}/initiate-compilation`, form),
+        {
+          loading: "Compiling...",
+          success: (response) => {
+            console.log("Compiled successfully:", response.data);
+            return "Compiled successfully!";
+          },
+          error: (error) => {
+            console.error("Error fetching output:", error);
+            throw error;
+          },
+        }
+      );
+
+      const compilerResponse = await compilerPromise;
       console.log(compilerResponse);
-      
+
       return response.data;
     } catch (error) {
       console.error("Error sending files:", error);
@@ -819,6 +814,28 @@ const formatOutput = (output) => {
     window.innerWidth >= 576
       ? { height: `${testCaseBarHeight}px`, maxHeight: "50vh" }
       : {};
+
+  const [formatCodeFunction, setFormatCodeFunction] = useState(false);
+
+  const [RunOn, setRunOn] = useState(false);
+  const [RunOnAll, setRunOnAll] = useState(false);
+  
+  
+  useHotkeys("alt+q", () => setFolderOpen(!folderopen));
+  useHotkeys("alt+shift+s", () => setSettingsOpen(!settingsopen));
+  useHotkeys("alt+shift+f", () => setFormatCodeFunction(true));
+  useHotkeys("alt+s", () => updateChangeCode());
+  useHotkeys("alt+b", () => setToolBar(!toolBar));
+  useHotkeys("alt+k", () => setKeyboardShortcut(!keyboardShortcut));
+  
+  useHotkeys("ctrl+'", () => setRunOn(true));
+  useHotkeys("ctrl+enter", () => setRunOnAll(true));
+  
+ 
+  
+
+
+  // useHotkeys("alt+shift+p", () => window.onclick("F1"));
 
   return (
     <div
@@ -897,6 +914,14 @@ const formatOutput = (output) => {
               updateDeltaChanges={updateDeltaChanges}
               deltaChanges={deltaChanges}
               setDeltaChanges={setDeltaChanges}
+              settingsopen={settingsopen}
+              setSettingsOpen={setSettingsOpen}
+              formatCodeFunction={formatCodeFunction}
+              setFormatCodeFunction={setFormatCodeFunction}
+              RunOn={RunOn}
+              setRunOn={setRunOn}
+              RunOnAll={RunOnAll}
+              setRunOnAll={setRunOnAll}
             />
           </div>
           <div className="sm:w-1 sm:bg-gray-300 sm:cursor-ew-resize"></div>
@@ -964,6 +989,8 @@ const formatOutput = (output) => {
                   folderIndex={folderIndex}
                   fileIndex={fileIndex}
                   testCaseSelected={testCaseSelected}
+                  RunOn={RunOn}
+                  setRunOn={setRunOn}
                 />
                 <RunAll
                   lightmode={lightmode}
@@ -977,6 +1004,8 @@ const formatOutput = (output) => {
                   folderIndex={folderIndex}
                   fileIndex={fileIndex}
                   testCaseSelected={testCaseSelected}
+                  RunOnAll={RunOnAll}
+                  setRunOnAll={setRunOnAll}
                 />
               </div>
             </div>
