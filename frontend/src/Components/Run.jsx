@@ -24,35 +24,40 @@ const Run = (props) => {
       },
     ],
   };
+  
 
-  const updateTestCases = (testCases, data) => {
-    data.testcaseOutputs.forEach((testcaseOutput) => {
-      const { outputContent } = testcaseOutput;
-      if (testCases[props.testCaseSelected]) {
-        testCases[props.testCaseSelected].output.content = outputContent;
-      }
-    });
-    return testCases;
-  };
+const updateTestCases = (testCases, data) => {
+  data.testcaseOutputs.forEach((testcaseOutput) => {
+    const { outputContent } = testcaseOutput;
+    if (testCases[props.testCaseSelected]) {
+      testCases[props.testCaseSelected].output.content = outputContent;
+    }
+  });
+  return testCases;
+};
 
-  const setOutputFileWrapper = async (responseData) => {
-    return new Promise(async (resolve) => {
-      const updatedTestCases = updateTestCases(
-        [...props.testCases],
-        responseData.data
-      );
-      await props.setTestCases(updatedTestCases);
-      resolve();
-    });
-  };
+
+
+const setOutputFileWrapper = async (responseData) => {
+  return new Promise(async (resolve) => {
+    const updatedTestCases = updateTestCases(
+      [...props.testCases],
+      responseData.data
+    );
+    await props.setTestCases(updatedTestCases);
+    resolve();
+  });
+};
+
 
   const updateChangeCodeWrapper = () => {
     return new Promise(async (resolve) => {
-      console.log("Update Change code wrapper");
+      console.log("Update Change code wrapper")
       await props.updateChangeCode();
       resolve();
     });
   };
+
 
   useEffect(() => {
     if (props.RunOn === true) {
