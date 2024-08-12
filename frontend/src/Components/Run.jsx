@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useEffect } from "react";
 import { compiler } from "../service/api";
 import { server } from "../service/api";
 const FormData = require("form-data");
@@ -23,58 +24,68 @@ const Run = (props) => {
       },
     ],
   };
-  
 
-const updateTestCases = (testCases, data) => {
-  data.testcaseOutputs.forEach((testcaseOutput) => {
-    const { outputContent } = testcaseOutput;
-    if (testCases[props.testCaseSelected]) {
-      testCases[props.testCaseSelected].output.content = outputContent;
-    }
-  });
-  return testCases;
-};
+  const updateTestCases = (testCases, data) => {
+    data.testcaseOutputs.forEach((testcaseOutput) => {
+      const { outputContent } = testcaseOutput;
+      if (testCases[props.testCaseSelected]) {
+        testCases[props.testCaseSelected].output.content = outputContent;
+      }
+    });
+    return testCases;
+  };
 
-const setOutputFileWrapper = async (responseData) => {
-  return new Promise(async (resolve) => {
-    const updatedTestCases = updateTestCases(
-      [...props.testCases],
-      responseData.data
-    );
-    await props.setTestCases(updatedTestCases);
-    resolve();
-  });
-};
-
+  const setOutputFileWrapper = async (responseData) => {
+    return new Promise(async (resolve) => {
+      const updatedTestCases = updateTestCases(
+        [...props.testCases],
+        responseData.data
+      );
+      await props.setTestCases(updatedTestCases);
+      resolve();
+    });
+  };
 
   const updateChangeCodeWrapper = () => {
     return new Promise(async (resolve) => {
-      console.log("Update Change code wrapper")
+      console.log("Update Change code wrapper");
       await props.updateChangeCode();
       resolve();
     });
   };
 
-const onRun = async () => {
-  try {
-    console.log("Running");
+  useEffect(() => {
+    if (props.RunOn === true) {
+      onRun();
+      props.setRunOn(false);
+    }
+    // else {
+    //   toast.error("Please until last run is executed");
+    // }
 
-    // Update the code and save it before proceeding
-    await updateChangeCodeWrapper();
-    console.log("Code updated and saved");
+    props.setRunOn(false);
+  }, [props.RunOn]);
 
-    // Trigger the process and wait for the output
-    const responseData = await props.sendTestCases(props.testCases, "run");
+  const onRun = async () => {
+    try {
+      console.log("Running");
 
-    // Update the output in the state
-    await props.updateChangeOutput(responseData, props.testCaseSelected);
+      // Update the code and save it before proceeding
+      await updateChangeCodeWrapper();
+      console.log("Code updated and saved");
 
-    toast.success("Execution completed successfully!");
-  } catch (error) {
-    console.error("Error during execution:", error);
-    toast.error("An error occurred during execution.");
-  }
-};
+      // Trigger the process and wait for the output
+      const responseData = await props.sendTestCases(props.testCases, "run");
+
+      // Update the output in the state
+      await props.updateChangeOutput(responseData, props.testCaseSelected);
+
+      toast.success("Execution completed successfully!");
+    } catch (error) {
+      console.error("Error during execution:", error);
+      toast.error("An error occurred during execution.");
+    }
+  };
 
   return (
     <button
