@@ -630,64 +630,37 @@ const formatOutput = (output) => {
   const [toolBar, setToolBar] = useState(true);
   const [testCaseSelected, setTestCaseSelected] = useState(0);
 
-  //Making a file for sending
-  //on clicking run
 
-  // Example POST request
-  //   fetch("/upload", {
-  //     method: "POST",
-  //     body: formData,
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log("Success:", data);
-  //       toast.success("Files successfully uploaded!", { duration: 800 });
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error:", error);
-  //       toast.error("Failed to upload files.", { duration: 800 });
-  //     });
 
-  async function sendTestCases(testCases, trigger) {
+async function sendTestCases(testCases, trigger) {
+  try {
+    // Prepare and Send Code to Backend
     const form = new FormData();
 
-    console.log("Sending testcases");
+    // Ensure state updates are processed
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-    // Check if the selected file is in the main folder
+    // Prepare the file for backend
     if (folderIndex !== -1 && fileIndex !== -1) {
       const filename = `main.${LAN_CONVERSION[language]}`;
-      const filecontent = folderfiles.folder[folderIndex].files[fileIndex].code;
-
-      // Convert the file content to a Blob
+      const filecontent =
+        folderfiles.folders[folderIndex].files[fileIndex].code;
       const fileBlob = new Blob([filecontent], { type: "text/plain" });
-
       form.append("main", fileBlob, filename);
-
-      console.log(form);
-    }
-    // Check if the selected file is in the extra folder
-    else if (extraFileIndex !== -1) {
+    } else if (extraFileIndex !== -1) {
       const extrafilename = `main.${LAN_CONVERSION[language]}`;
       const extrafilecontent = folderfiles.extraFiles[extraFileIndex].code;
-
-      // Convert the extra file content to a Blob
       const extrafileBlob = new Blob([extrafilecontent], {
         type: "text/plain",
       });
-
       form.append("main", extrafileBlob, extrafilename);
-
-      console.log(form);
     }
 
-    // Run
+    // Attach test cases based on the trigger
     if (trigger === "run") {
       const testCaseName = `input_${testCaseSelected + 1}`;
       const testCaseContent = testCases[testCaseSelected].input.content;
-
-      // Convert the test case content to a Blob
       const testCaseBlob = new Blob([testCaseContent], { type: "text/plain" });
-
       form.append(
         `input_file${testCaseSelected + 1}`,
         testCaseBlob,
@@ -695,82 +668,60 @@ const formatOutput = (output) => {
       );
     } else if (trigger === "runall") {
       testCases.forEach((testCase, index) => {
-        let testCaseName = `input_${index + 1}`;
-        let testCaseContent = testCase.input.content;
-
-        // Convert the test case content to a Blob
-        let testCaseBlob = new Blob([testCaseContent], {
+        const testCaseName = `input_${index + 1}`;
+        const testCaseContent = testCase.input.content;
+        const testCaseBlob = new Blob([testCaseContent], {
           type: "text/plain",
         });
-
         form.append(`input_file${index + 1}`, testCaseBlob, testCaseName);
-
-        console.log(`${testCaseName} added`);
       });
     }
 
     form.append("mainFile", `main.${LAN_CONVERSION[language]}`);
-    for (let pair of form.entries()) {
-      console.log(pair[0] + ":" + pair[1] + "\n");
-    }
 
-   
-    try {
-      const toastPromise = toast.promise(
-        axios.post(`${server}/api/v1/file/upload`, form, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIzNDY2MjMsImV4cCI6MTcyMjQzMzAyM30.FNmoH2gfMsbIICwRfT15Yl878qdI0fGWHp_riFpuMho",
-          },
-        }),
-        {
-          loading: "Sending files...",
-          success: "Files sent successfully!",
-          error: "Failed to send files. Please try again.",
-        }
-      );
-
-      const response = await toastPromise;
-      console.log("Files sent successfully:", response.data);
-       
-    
-    const form = new FormData();
-    form.append("response", response);
-    form.append("folderIndex", folderIndex);
-    form.append("fileIndex", fileIndex);
-    form.append("testCaseSelected",testCaseSelected);
-    console.log(form);
-
-    console.log("Compiling");
-
-    const compilerPromise = toast.promise(
-      await axios.post(`${compiler}/initiate-compilation`, form),
+    // Send data to backend
+    console.log("Sending code to backend");
+    const backendResponse = await axios.post(
+      `${server}/api/v1/file/upload`,
+      form,
       {
-        loading: "Compiling...",
-        success: (response) => {
-          console.log("Compiled successfully:", response.data);
-          return "Compiled successfully!";
-        },
-        error: (error) => {
-          console.error("Error fetching output:", error);
-          throw error;
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer <your-token>",
         },
       }
     );
+    console.log("Backend response:", backendResponse.data);
 
-    const compilerResponse = await compilerPromise;
-      console.log(compilerResponse);
-      
-      return response.data;
-    } catch (error) {
-      console.error("Error sending files:", error);
-      throw error; // Re-throw the error so it can be handled by the caller if needed
-    }
+    // Send to Compiler
+    console.log("Sending to compiler");
+    const compilerForm = new FormData();
+    compilerForm.append("response", JSON.stringify(backendResponse.data));
+    compilerForm.append("folderIndex", folderIndex);
+    compilerForm.append("fileIndex", fileIndex);
+    compilerForm.append("testCaseSelected", testCaseSelected);
+
+    const compilerResponse = await axios.post(
+      `${compiler}/initiate-compilation`,
+      compilerForm
+    );
+    console.log("Compiler response:", compilerResponse.data);
+
+    // Fetch output from backend
+    console.log("Fetching output from backend");
+    const outputResponse = await axios.get(
+      `${server}/api/v1/file/testcase-outputs/${backendResponse.data.mainFileId}`
+    );
+    console.log("Output fetched:", outputResponse.data);
+
+    return outputResponse.data;
+  } catch (error) {
+    console.error("Error in sendTestCases:", error);
+    toast.error("An error occurred while processing the code");
+    throw error;
   }
+}
 
-  // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-  // sendTestCases(initialTestCases);
 
   //delete testCases
   const deleteTestCase = () => {

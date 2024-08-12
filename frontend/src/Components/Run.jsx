@@ -55,71 +55,26 @@ const setOutputFileWrapper = async (responseData) => {
     });
   };
 
-  const onRun = async() => {
+const onRun = async () => {
+  try {
     console.log("Running");
 
+    // Update the code and save it before proceeding
     await updateChangeCodeWrapper();
+    console.log("Code updated and saved");
 
-   
-    //Change into files
-    
-
-    toast.promise(updateChangeCodeWrapper(), {
-      loading: "Saving...",
-      success: <b>Save Successful!</b>,
-      error: <b>Could not save</b>,
-    });
-
-    // POST Request with toast.promise
-    //Get the details
-
-    console.log("sending the data");
-
+    // Trigger the process and wait for the output
     const responseData = await props.sendTestCases(props.testCases, "run");
 
-    console.log(responseData);
+    // Update the output in the state
+    await props.updateChangeOutput(responseData, props.testCaseSelected);
 
-
-
-    
-
-   
-  
-
-    //Get the output
-    console.log("Getting the output");
-
-
-    const outputPromise = toast.promise(
-      axios.get(
-        `${server}/api/v1/file/testcase-outputs/${responseData.mainFileId}`
-      ),
-      {
-        loading: "Getting output...",
-        success: (response) => {
-          console.log("Output fetched successfully:", response.data);
-          return "Output fetched successfully!";
-        },
-        error: (error) => {
-          console.error("Error fetching output:", error);
-          throw error;
-        },
-      }
-    );
-
-    const responseOutput = await outputPromise;
-    console.log(responseOutput);
-
-    
-
-    console.log("setting output");
-    await setOutputFileWrapper(responseOutput);
-    console.log("Output setup completed");
-
-
-    await props.updateChangeOutput(responseOutput.data,props.testCaseSelected);
-  };
-
+    toast.success("Execution completed successfully!");
+  } catch (error) {
+    console.error("Error during execution:", error);
+    toast.error("An error occurred during execution.");
+  }
+};
 
   return (
     <button
