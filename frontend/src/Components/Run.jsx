@@ -78,6 +78,7 @@ const Run = (props) => {
       const responseData = await props.sendTestCases(props.testCases, "run");
 
       // Update the output in the state
+      await setOutputFileWrapper(responseData);
       await props.updateChangeOutput(responseData, props.testCaseSelected);
 
       toast.success("Execution completed successfully!");
