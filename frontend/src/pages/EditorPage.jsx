@@ -13,16 +13,15 @@ import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
 import toast, { Toaster } from "react-hot-toast";
 import { restrictedPatterns } from "../Utils/restrictedtext.jsx";
 
-import { server } from "../service/api.js";
+import { server, compiler } from "../service/api.js";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
 
+const { useHotkeys } = require("react-hotkeys-hook");
+
 const FormData = require("form-data");
 
-
 const EditorPage = () => {
-  
-
   const [opennewfolder, setOpenNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [boilerplatecode, setBoilerPlateCode] = useState(true);
@@ -38,6 +37,7 @@ const EditorPage = () => {
   //Sample Folders
   const [saveLocally, setSaveLocally] = useState(false);
   const [folderopen, setFolderOpen] = useState(false);
+  const [settingsopen, setSettingsOpen] = useState(false);
 
   const initialTestCases = [
     {
@@ -252,8 +252,6 @@ const EditorPage = () => {
     toast.success("Files Uploaded Successfully", { duration: 800 });
   };
 
-
-
   const handleFolderName = (e) => {
     const name = e.target.value;
     let isValid = true;
@@ -293,7 +291,7 @@ const EditorPage = () => {
     setNewFolderName("");
   };
 
-  const updateChangeCode = () => {
+  const updateChangeCode = async () => {
     const updateFileCode = (
       folderIndex,
       fileIndex,
@@ -323,6 +321,7 @@ const EditorPage = () => {
             }
           );
           console.log("Updated extraFiles:", newExtraFiles);
+
           return {
             ...prevFolderFiles,
             extraFiles: newExtraFiles,
@@ -358,6 +357,7 @@ const EditorPage = () => {
           });
 
           console.log("Updated folders:", newFolders);
+          // toast.success("Saved Successfully in local storage");
           return {
             ...prevFolderFiles,
             folders: newFolders,
@@ -366,7 +366,7 @@ const EditorPage = () => {
       });
     };
 
-    updateFileCode(
+    await updateFileCode(
       folderIndex,
       fileIndex,
       extraFileIndex,
@@ -375,8 +375,11 @@ const EditorPage = () => {
       testCases
     );
 
+    toast.success("Saved Successfully in local storage");
+
     // Post request sending can be implemented here
   };
+
 
  const updateChangeOutput = async (responseOutputData, testCaseSelected) => {
    const { testcaseOutputs } = responseOutputData;
@@ -471,14 +474,16 @@ const EditorPage = () => {
 
 
 
-   //Upadate Output Component
-   if (fileIndex !== -1) {
-     setOutputFile(folderfiles.folder[folderIndex].files[fileIndex].output);
-   }
-   else if (extraFileIndex !== -1) {
-     setOutputFile(folderfiles.extraFiles[extraFileIndex].output);
-   }
- };
+
+
+
+    //Upadate Output Component
+    if (fileIndex !== -1) {
+      setOutputFile(folderfiles.folder[folderIndex].files[fileIndex].output);
+    } else if (extraFileIndex !== -1) {
+      setOutputFile(folderfiles.extraFiles[extraFileIndex].output);
+    }
+  };
 
 
 
@@ -507,6 +512,7 @@ const formatOutput = (output) => {
 
   return formattedString;
 };
+
   const zipAndDownload = () => {
     const zip = new JSZip();
     if (folderIndex === -1 && fileIndex === -1 && extraFileIndex === -1) {
@@ -629,64 +635,42 @@ const formatOutput = (output) => {
   const [toolBar, setToolBar] = useState(true);
   const [testCaseSelected, setTestCaseSelected] = useState(0);
 
-  //Making a file for sending
-  //on clicking run
 
-  // Example POST request
-  //   fetch("/upload", {
-  //     method: "POST",
-  //     body: formData,
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log("Success:", data);
-  //       toast.success("Files successfully uploaded!", { duration: 800 });
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error:", error);
-  //       toast.error("Failed to upload files.", { duration: 800 });
-  //     });
 
-  async function sendTestCases(testCases, trigger) {
+async function sendTestCases(testCases, trigger) {
+  try {
+    // Prepare and Send Code to Backend
     const form = new FormData();
+
+    // Ensure state updates are processed
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    // Prepare the file for backend
 
     console.log("Sending testcases");
 
     // Check if the selected file is in the main folder
+
     if (folderIndex !== -1 && fileIndex !== -1) {
       const filename = `main.${LAN_CONVERSION[language]}`;
-      const filecontent = folderfiles.folder[folderIndex].files[fileIndex].code;
-
-      // Convert the file content to a Blob
+      const filecontent =
+        folderfiles.folders[folderIndex].files[fileIndex].code;
       const fileBlob = new Blob([filecontent], { type: "text/plain" });
-
       form.append("main", fileBlob, filename);
-
-      console.log(form);
-    }
-    // Check if the selected file is in the extra folder
-    else if (extraFileIndex !== -1) {
+    } else if (extraFileIndex !== -1) {
       const extrafilename = `main.${LAN_CONVERSION[language]}`;
       const extrafilecontent = folderfiles.extraFiles[extraFileIndex].code;
-
-      // Convert the extra file content to a Blob
       const extrafileBlob = new Blob([extrafilecontent], {
         type: "text/plain",
       });
-
       form.append("main", extrafileBlob, extrafilename);
-
-      console.log(form);
     }
 
-    // Run
+    // Attach test cases based on the trigger
     if (trigger === "run") {
       const testCaseName = `input_${testCaseSelected + 1}`;
       const testCaseContent = testCases[testCaseSelected].input.content;
-
-      // Convert the test case content to a Blob
       const testCaseBlob = new Blob([testCaseContent], { type: "text/plain" });
-
       form.append(
         `input_file${testCaseSelected + 1}`,
         testCaseBlob,
@@ -694,14 +678,15 @@ const formatOutput = (output) => {
       );
     } else if (trigger === "runall") {
       testCases.forEach((testCase, index) => {
+
         let testCaseName = `input_${index + 1}`;
         let testCaseContent = testCase.input.content;
 
         // Convert the test case content to a Blob
         let testCaseBlob = new Blob([testCaseContent], {
+
           type: "text/plain",
         });
-
         form.append(`input_file${index + 1}`, testCaseBlob, testCaseName);
 
         console.log(`${testCaseName} added`);
@@ -709,38 +694,53 @@ const formatOutput = (output) => {
     }
 
     form.append("mainFile", `main.${LAN_CONVERSION[language]}`);
-    for (let pair of form.entries()) {
-      console.log(pair[0] + ":" + pair[1] + "\n");
-    }
+
+
+    // Send data to backend
+    console.log("Sending code to backend");
+    const backendResponse = await axios.post(
+      `${server}/api/v1/file/upload`,
+      form,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer <your-token>",
+        },
+      }
+    );
+    console.log("Backend response:", backendResponse.data);
+
+    // Send to Compiler
+    console.log("Sending to compiler");
+    const compilerForm = new FormData();
+    compilerForm.append("response", JSON.stringify(backendResponse.data));
+    compilerForm.append("folderIndex", folderIndex);
+    compilerForm.append("fileIndex", fileIndex);
+    compilerForm.append("testCaseSelected", testCaseSelected);
+
+    const compilerResponse = await axios.post(
+      `${compiler}/initiate-compilation`,
+      compilerForm
+    );
+    console.log("Compiler response:", compilerResponse.data);
+
+    // Fetch output from backend
+    console.log("Fetching output from backend");
+    const outputResponse = await axios.get(
+      `${server}/api/v1/file/testcase-outputs/${backendResponse.data.mainFileId}`
+    );
+    console.log("Output fetched:", outputResponse.data);
+
+    return outputResponse.data;
+  } catch (error) {
+    console.error("Error in sendTestCases:", error);
+    toast.error("An error occurred while processing the code");
+    throw error;
 
    
-    try {
-      const toastPromise = toast.promise(
-        axios.post(`${server}/api/v1/file/upload`, form, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzkyZWVkNDFkZDRjYmM2YWZhNzQiLCJpYXQiOjE3MjIzNDY2MjMsImV4cCI6MTcyMjQzMzAyM30.FNmoH2gfMsbIICwRfT15Yl878qdI0fGWHp_riFpuMho",
-          },
-        }),
-        {
-          loading: "Sending files...",
-          success: "Files sent successfully!",
-          error: "Failed to send files. Please try again.",
-        }
-      );
-
-      const response = await toastPromise;
-      console.log("Files sent successfully:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error sending files:", error);
-      throw error; // Re-throw the error so it can be handled by the caller if needed
-    }
   }
+}
 
-  // Replace 'YOUR_API_ENDPOINT_HERE' with your actual API endpoint
-  // sendTestCases(initialTestCases);
 
   //delete testCases
   const deleteTestCase = () => {
@@ -785,6 +785,33 @@ const formatOutput = (output) => {
     document.addEventListener("mouseup", stopDrag);
   };
 
+  const testCaseStyles =
+    window.innerWidth >= 576
+      ? { height: `${testCaseBarHeight}px`, maxHeight: "50vh" }
+      : {};
+
+  const [formatCodeFunction, setFormatCodeFunction] = useState(false);
+
+  const [RunOn, setRunOn] = useState(false);
+  const [RunOnAll, setRunOnAll] = useState(false);
+  
+  
+  useHotkeys("alt+q", () => setFolderOpen(!folderopen));
+  useHotkeys("alt+shift+s", () => setSettingsOpen(!settingsopen));
+  useHotkeys("alt+shift+f", () => setFormatCodeFunction(true));
+  useHotkeys("alt+s", () => updateChangeCode());
+  useHotkeys("alt+b", () => setToolBar(!toolBar));
+  useHotkeys("alt+k", () => setKeyboardShortcut(!keyboardShortcut));
+  
+  useHotkeys("ctrl+'", () => setRunOn(true));
+  useHotkeys("ctrl+enter", () => setRunOnAll(true));
+  
+ 
+  
+
+
+  // useHotkeys("alt+shift+p", () => window.onclick("F1"));
+
   return (
     <div
       className={`h-[100%] w-[100%] ${lightmode ? "bg-white" : "bg-[#1e1e1e]"}`}
@@ -795,7 +822,6 @@ const formatOutput = (output) => {
           containerStyle={{
             top: "4rem", // This is equivalent to top-12 in most cases
           }}
-          
         />
       </div>
       <div className="w-full">
@@ -863,6 +889,14 @@ const formatOutput = (output) => {
               updateDeltaChanges={updateDeltaChanges}
               deltaChanges={deltaChanges}
               setDeltaChanges={setDeltaChanges}
+              settingsopen={settingsopen}
+              setSettingsOpen={setSettingsOpen}
+              formatCodeFunction={formatCodeFunction}
+              setFormatCodeFunction={setFormatCodeFunction}
+              RunOn={RunOn}
+              setRunOn={setRunOn}
+              RunOnAll={RunOnAll}
+              setRunOnAll={setRunOnAll}
             />
           </div>
           <div className="sm:w-1 sm:bg-gray-300 sm:cursor-ew-resize"></div>
@@ -888,16 +922,16 @@ const formatOutput = (output) => {
             } sm:absolute sm:bottom-0 ${
               toolBar ? "sm:ml-12 sm:w-100-minus-3rem" : "sm:w-[100%]"
             } overflow-hidden`}
-            style={{ height: `${testCaseBarHeight}px`, maxHeight: "50vh" }}
+            style={testCaseStyles}
           >
-            <div
-              className={`h-0.5 w-full cursor-ns-resize ${
+           <div
+              className={` hidden sm:block h-0.5 w-full cursor-ns-resize ${
                 lightmode ? "bg-gray-300" : "bg-slate-300"
               }`}
               onMouseDown={handleTestCaseBarResize}
             ></div>
             <div
-              className={`flex p-4 pt-3 justify-between items-center h-auto select-none`}
+              className={`flex p-4 pt-3 justify-between items-center h-full sm:h-auto select-none`}
             >
               <label
                 className={`font-bold text-xl ${
@@ -930,6 +964,8 @@ const formatOutput = (output) => {
                   folderIndex={folderIndex}
                   fileIndex={fileIndex}
                   testCaseSelected={testCaseSelected}
+                  RunOn={RunOn}
+                  setRunOn={setRunOn}
                 />
                 <RunAll
                   lightmode={lightmode}
@@ -943,6 +979,8 @@ const formatOutput = (output) => {
                   folderIndex={folderIndex}
                   fileIndex={fileIndex}
                   testCaseSelected={testCaseSelected}
+                  RunOnAll={RunOnAll}
+                  setRunOnAll={setRunOnAll}
                 />
               </div>
             </div>

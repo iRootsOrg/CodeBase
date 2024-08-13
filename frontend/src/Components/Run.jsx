@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useEffect } from "react";
 import { compiler } from "../service/api";
 import { server } from "../service/api";
 const FormData = require("form-data");
@@ -35,6 +36,8 @@ const updateTestCases = (testCases, data) => {
   return testCases;
 };
 
+
+
 const setOutputFileWrapper = async (responseData) => {
   return new Promise(async (resolve) => {
     const updatedTestCases = updateTestCases(
@@ -55,98 +58,40 @@ const setOutputFileWrapper = async (responseData) => {
     });
   };
 
-  const onRun = async() => {
-    console.log("Running");
 
-    await updateChangeCodeWrapper();
+  useEffect(() => {
+    if (props.RunOn === true) {
+      onRun();
+      props.setRunOn(false);
+    }
+    // else {
+    //   toast.error("Please until last run is executed");
+    // }
 
-   
-    //Change into files
-    
+    props.setRunOn(false);
+  }, [props.RunOn]);
 
-    toast.promise(updateChangeCodeWrapper(), {
-      loading: "Saving...",
-      success: <b>Save Successful!</b>,
-      error: <b>Could not save</b>,
-    });
+  const onRun = async () => {
+    try {
+      console.log("Running");
 
-    // POST Request with toast.promise
-    //Get the details
+      // Update the code and save it before proceeding
+      await updateChangeCodeWrapper();
+      console.log("Code updated and saved");
 
-    console.log("sending the data");
+      // Trigger the process and wait for the output
+      const responseData = await props.sendTestCases(props.testCases, "run");
 
-    const responseData = await props.sendTestCases(props.testCases, "run");
+      // Update the output in the state
+      await setOutputFileWrapper(responseData);
+      await props.updateChangeOutput(responseData, props.testCaseSelected);
 
-    console.log(responseData);
-
-
-
-    
-
-    
-    
-    const form = new FormData();
-    form.append('response', responseData);
-    form.append('folderIndex', props.folderIndex);
-    form.append('fileIndex', props.fileIndex);
-    form.append('testCaseSelected', props.testCaseSelected);
-    console.log(form);
-
-    console.log("Compiling");
-
-    const compilerPromise = toast.promise(
-      await axios.post(`${compiler}/initiate-compilation`, form),
-      {
-        loading: "Compiling...",
-        success: (response) => {
-          console.log("Compiled successfully:", response.data);
-          return "Compiled successfully!";
-        },
-        error: (error) => {
-          console.error("Error fetching output:", error);
-          throw error;
-        },
-      }
-    );
-
-    const compilerResponse = await compilerPromise;
-    console.log(compilerResponse);
-  
-
-    //Get the output
-    console.log("Getting the output");
-
-
-    const outputPromise = toast.promise(
-      axios.get(
-        `${server}/api/v1/file/testcase-outputs/${responseData.mainFileId}`
-      ),
-      {
-        loading: "Getting output...",
-        success: (response) => {
-          console.log("Output fetched successfully:", response.data);
-          return "Output fetched successfully!";
-        },
-        error: (error) => {
-          console.error("Error fetching output:", error);
-          throw error;
-        },
-      }
-    );
-
-    const responseOutput = await outputPromise;
-    console.log(responseOutput);
-
-    
-
-    console.log("setting output");
-    await setOutputFileWrapper(responseOutput);
-    console.log("Output setup completed");
-
-
-    await props.updateChangeOutput(responseOutput.data,props.testCaseSelected);
+      toast.success("Execution completed successfully!");
+    } catch (error) {
+      console.error("Error during execution:", error);
+      toast.error("An error occurred during execution.");
+    }
   };
-
 
   return (
     <button

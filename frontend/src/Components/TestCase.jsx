@@ -37,7 +37,7 @@ const TestCase = (props) => {
     }
   };
 
-  const addTestCase = () => {
+  const addTestCase = async() => {
     console.log("adding test case");
 
     const newTestCase = {
@@ -50,7 +50,11 @@ const TestCase = (props) => {
         content: "No Output",
       },
     };
+
+    
+    props.setTestCaseSelected(props.testCases.length);
     props.setTestCases([...props.testCases, newTestCase]);
+
   };
 
   useEffect(() => {
@@ -60,7 +64,7 @@ const TestCase = (props) => {
   return (
     <div className="flex h-64 ">
       <div
-        className={`w-56 font-bold h-full overflow-y-scroll select-none ${
+        className={`w-72 sm:w-56 font-bold h-full overflow-y-scroll select-none ${
           props.lightmode
             ? "scrollbar-light text-black"
             : "scrollbar-dark text-white"
@@ -82,7 +86,7 @@ const TestCase = (props) => {
             }`}
             onClick={() => handleSelected(index)}
           >
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between sm:w-auto items-center">
               Test Case {index + 1}
               {props.testCases[index].output.error === false ? (
                 props.testCases[index].output.content === "No Output" ? (
@@ -114,12 +118,12 @@ const TestCase = (props) => {
             addTestCase();
           }}
         >
-          Add Test Case +
+          New Test Case +
         </button>
       </div>
       <div className="flex flex-col h-full w-full  items-end ">
         <textarea
-          className={`border-l-4 w-full h-full p-2 ${
+          className={`border-l-4 w-full h-full p-2.5 ${
             props.lightmode
               ? "bg-gray-100 text-black border-[#d1d5db] scrollbar-light"
               : "bg-[#1e1e1e] text-white border-[#2e2a24] scrollbar-dark"
